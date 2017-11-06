@@ -3,6 +3,18 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# GitEye
+*.project
+
+# buildozer
+.buildozer
+bin/
+
+# Geany
+*.geany
+
+
+
 # C extensions
 *.so
 

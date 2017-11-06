@@ -1,0 +1,82 @@
+#:kivy 1.10.0
+#:import kivy kivy
+
+<MainScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        canvas:
+            Color:
+                rgba: 0.2, 0.2, 0.2, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        Label:
+            text: "Multi Pong"
+            bold: True
+            size_hint_y: 0.3
+            font_size: "48dp"
+            color: (0, 1, 0, 1)
+        Label:
+            text: '''Pong pour 10 joueurs'''
+            size_hint_y: 0.2
+            font_size: "18dp"
+            color: (0, 1, 0, 1)
+        BoxLayout:
+            size_hint_y: 0.06
+            orientation: 'horizontal'
+            Button:
+                background_color: (0.8, 0.8, 0, 1)
+                text: 'Jouer'
+                color: (0, 1, 0, 1)
+                font_size: "22dp"
+                on_release: root.manager.current = ("Jouer")
+        BoxLayout:
+            size_hint_y: 0.04
+            orientation: 'horizontal'
+            Button:
+                background_color: (0.8, 0.8, 0, 1)
+                text: 'Options'
+                color: (0, 1, 0, 1)
+                font_size: "22dp"
+                on_release: app.open_settings()
+            Button:
+                background_color: (0.8, 0.8, 0, 1)
+                text: 'Quitter'
+                color: (0, 1, 0, 1)
+                font_size: "22dp"
+                on_release: app.do_quit()
+
+<Screen1>
+    BoxLayout:
+        orientation: 'vertical'
+        canvas:
+            Color:
+                rgba: 0.2, 0.2, 0.2, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        BoxLayout:
+            size_hint_y: 0.9
+            orientation: 'horizontal'
+            Button:
+                background_color: (0.8, 0.8, 0, 1)
+                text: 'Envoi'
+                color: (0, 1, 0, 1)
+                font_size: "22dp"
+                on_release:
+        BoxLayout:
+            size_hint_y: 0.1
+            orientation: 'horizontal'
+            Button:
+                background_color: (0.8, 0.8, 0, 1)
+                text: 'Options'
+                color: (0, 1, 0, 1)
+                font_size: "22dp"
+                on_release: app.open_settings()
+            Button:
+                background_color: (0.8, 0.8, 0, 1)
+                text: 'Quitter'
+                color: (0, 1, 0, 1)
+                font_size: "22dp"
+                on_release: app.do_quit()
