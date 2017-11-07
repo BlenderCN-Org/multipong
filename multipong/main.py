@@ -1,10 +1,16 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = '0.008'
+__version__ = '0.014'
 
 """
 version
+0.014 ajout android.permissions
+0.013 try sur multicast receive
+0.012 print multicast
+0.011 tcp addr fixe
+0.010 avec print
+0.009 frequence 30
 0.008 envoi en tcp, réception en multicast, test débit fréquence
 0.007 sans window size
 0.006 avec import labmulticast
@@ -81,57 +87,94 @@ class MainScreen(Screen):
 
         super(MainScreen, self).__init__(**kwargs)
 
-        self.addr = None
+        # Adresse
+        self.tcp_addr = None
+        # True si ip serveur reçu
         self.tcp = None
-        self.get_tcp_port()
-        self.get_tempo()
+
+        config = MultiPongApp.get_running_app().config
+        self.tcp_port = self.get_tcp_port(config)
+        self.tempo = self.get_tempo(config)
+        self.multi_addr = self.get_multicast_addr(config)
         self.receive_thread()
 
-    def get_tcp_port(self):
-        config = MultiPongApp.get_running_app().config
-        self.tcp_port = int(config.get('network', 'tcp_port'))
+    def get_tcp_port(self, config):
+        """Retourne le port TCP"""
 
-    def get_tempo(self):
-        config = MultiPongApp.get_running_app().config
+        return int(config.get('network', 'tcp_port'))
+
+    def get_multicast_addr(self, config):
+        """Retourne l'adresse multicast"""
+
+        multi_ip = config.get('network', 'multi_ip')
+        multi_port = int(config.get('network', 'multi_port'))
+
+        return (multi_ip, multi_port)
+
+    def get_tempo(self, config):
+        """pour sleep dans la boucle TCP"""
+
         freq = int(config.get('network', 'freq'))
+
         if freq > 30:
             freq = 30
         if freq < 1:
             freq = 1
-        self.tempo = 1 / freq
+        print("Fréquence d'envoi en TCP =", freq)
+
+        return 1/freq
+
+    def receive_thread(self):
+        """Thread de réception"""
+
+        # Thread de reception
+        self.thread_multicast = Thread(target=self.my_multicast)
+        self.thread_multicast.start()
 
     def my_multicast(self):
         """Boucle infine de réception du serveur
 
-        # TODO: diviser en plusieurs méthodes
+        # TODO: diviser en plusieurs méthodes, ip port de config
         """
 
-        my_multi = Multicast("228.0.0.5", 18888, 1024)
-
+        my_multi = Multicast(   self.multi_addr[0],
+                                self.multi_addr[1],
+                                1024)
         a = 0
         while "Pour toujours":
-            sleep(0.016)
-
+            sleep(0.033)
             try:
                 data = my_multi.receive()
                 resp = datagram_to_dict(data)
-
-                if resp:
-                    if "paradis" in resp:
-                        if "ip" in resp["paradis"]:
-                            ip_server = resp["paradis"]["ip"]
-                            self.addr = ip_server, self.tcp_port
-                            self.run_send_thread()
+                self.run_tcp_thread(resp)
             except:
-                pass
+                print("Pas de réception multicast")
 
-    def my_tcp_sender(self, addr):
+    def run_tcp_thread(self, resp):
+        """"""
+
+        if resp:
+            self.ip_server = self.get_server_ip(resp)
+
+        self.tcp_addr = self.ip_server, self.tcp_port
+
+        # Lance le thread si ip_server
+        self.run_send_thread()
+
+    def get_server_ip(self, resp):
+        """Récupère l'ip du serveur, et lance le thread"""
+
+        ip = None
+        if "paradis" in resp:
+            if "ip" in resp["paradis"]:
+                ip = resp["paradis"]["ip"]
+        return ip
+
+    def my_tcp_sender_loop(self, addr):
         """Envoi en TCP au serveur, lorsque l'ip serveur a été reçue
         en multicast"""
 
-
         clt = LabTcpClient(addr[0], addr[1])
-        clt.connect_sock()
         a = 0
 
         while "Pour toujours":
@@ -141,34 +184,30 @@ class MainScreen(Screen):
             clt.send(env)
             sleep(self.tempo)
 
-    def receive_thread(self):
-        # Thread de reception
-        self.thread_multicast = Thread(target=self.my_multicast)
-        self.thread_multicast.start()
-
     def run_send_thread(self):
-        if self.addr:
-            if not self.tcp:
+        if not self.tcp:
+            if self.tcp_addr:
                 self.tcp = "tcp tourne"
                 self.send_thread()
                 sleep(0.1)
 
     def send_thread(self):
-        """Thread d'envoi
-        Ne doit être lancé qu'une seule fois,
-        TODO: et être relancé si déconnexion
+        """Thread d'envoi: ne doit être lancé qu'une seule fois,
+        les reconnexions sont faites par le client.
         """
 
-        print("Un thread d'envoi est lancé")
-        self.thread_tcp = Thread(target=self.my_tcp_sender,
-                                        args=(self.addr,))
+        a = "Un thread d'envoi en TCP est lancé ip = {} port {}"
+        print(a.format(self.ip_server, self.tcp_port))
+
+        self.thread_tcp = Thread(target=self.my_tcp_sender_loop,
+                                        args=(self.tcp_addr,))
         self.thread_tcp.start()
 
 
 # Liste des écrans, cette variable appelle les classes ci-dessus
 # et doit être placée après ces classes
 SCREENS = { 0: (MainScreen, "Menu"),
-            1: (Screen1, "Jouer")}
+            1: (Screen1,    "Jouer")}
 
 
 class MultiPongApp(App):
@@ -202,7 +241,7 @@ class MultiPongApp(App):
         """
 
         config.setdefaults('network',
-                            { 'host': '228.0.0.5',
+                            { 'multi_ip': '228.0.0.5',
                               'multi_port': '18888',
                               'tcp_port': '8000',
                               'freq': '30'})

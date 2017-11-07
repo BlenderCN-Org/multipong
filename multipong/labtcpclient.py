@@ -63,6 +63,7 @@ class LabTcpClient:
         except:
             print("        Connexion impossible du client sur {}".
                   format(self.server_address))
+            self.sock = None
             return None
 
     def send(self, msg):

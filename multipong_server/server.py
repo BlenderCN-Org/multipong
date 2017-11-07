@@ -215,7 +215,7 @@ class MyTcpServerFactory(Factory):
 
         # Serveur
         self.numProtocols = 1
-        print("Serveur twisted réception TCP sur {}\n".format(8888))
+        print("Serveur twisted réception TCP sur {}\n".format(TCP_PORT))
 
     def buildProtocol(self, addr):
         print("Nouveau protocol crée dans l'usine: factory")
