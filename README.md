@@ -30,9 +30,21 @@ Construit sur Debian Stretch 9.2
 
 Voir [Kivy Buildozer pour créer une application Android avec un script python](https://wiki.labomedia.org/index.php/Kivy_Buildozer_pour_cr%C3%A9er_une_application_Android_avec_un_script_python)
 
+pour l'installation de buildozer et son utilisation.
+
+### Installation du serveur sur un PC
+
+Le serveur va également servir de moteur physique, et de visualisation du jeu sur grand écran.
+
+#### Installation de twisted
+
+* [Installation de Twisted pour python 3.x](https://wiki.labomedia.org/index.php/Installation_de_Twisted_pour_python_3.x)
+
+#### Installation de kivy
+* [Installation de Kivy](https://wiki.labomedia.org/index.php/Kivy_Buildozer_pour_cr%C3%A9er_une_application_Android_avec_un_script_python#Installation_de_Kivy)
 
 ### Installation sur android
-Récupérer le apk sur android, l'installer après avoir autorisé les sources inconnues puisque la source est connue !!
+Récupérer le apk sur votre téléphone, l'installer après avoir autorisé les sources inconnues puisque la source est connue !!
 
 
 ### Réception sur Android en Multicast

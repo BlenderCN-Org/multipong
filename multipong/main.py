@@ -87,6 +87,12 @@ class MainScreen(Screen):
 
         super(MainScreen, self).__init__(**kwargs)
 
+
+class Network:
+    """Tout le réseau, tourne toujours."""
+
+    def __init__(self):
+
         # Adresse
         self.tcp_addr = None
         # True si ip serveur reçu
@@ -96,6 +102,10 @@ class MainScreen(Screen):
         self.tcp_port = self.get_tcp_port(config)
         self.tempo = self.get_tempo(config)
         self.multi_addr = self.get_multicast_addr(config)
+
+    def network_start(self):
+        """La réception de l'ip lancera l'envoi"""
+
         self.receive_thread()
 
     def get_tcp_port(self, config):
@@ -232,7 +242,8 @@ class MultiPongApp(App):
     def on_start(self):
         """Exécuté apres build()"""
 
-        pass
+        self.network = Network()
+        self.network.network_start()
 
     def build_config(self, config):
         """Si le fichier *.ini n'existe pas,
