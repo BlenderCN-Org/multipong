@@ -41,7 +41,7 @@ Le serveur va également servir de moteur physique, et de visualisation du jeu s
 * [Installation de Twisted pour python 3.x](https://wiki.labomedia.org/index.php/Installation_de_Twisted_pour_python_3.x)
 
 #### Installation de kivy
-* [Installation de Kivy](https://wiki.labomedia.org/index.php/Kivy_Buildozer_pour_cr%C3%A9er_une_application_Android_avec_un_script_python#Installation_de_Kivy)
+* [Installation de Kivy](https://wiki.labomedia.org/index.php/2_Kivy:_Installation)
 
 ### Installation sur android
 Récupérer le apk sur votre téléphone, l'installer après avoir autorisé les sources inconnues puisque la source est connue !!
