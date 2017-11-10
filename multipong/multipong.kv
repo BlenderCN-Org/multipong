@@ -1,5 +1,11 @@
 #:kivy 1.10.0
-#:import kivy kivy
+
+<PongBall>:
+    size: 100, 100  #root.size[0]/40, root.size[1]/40
+    canvas:
+        Ellipse:
+            pos: self.pos
+            size: self.size
 
 <MainScreen>:
     BoxLayout:
@@ -11,7 +17,7 @@
                 pos: self.pos
                 size: self.size
         Label:
-            text: "Multi Pong"
+            text: "Multi Pong en reseau"
             bold: True
             size_hint_y: 0.3
             font_size: "48dp"
@@ -29,7 +35,7 @@
                 text: 'Jouer'
                 color: (0, 1, 0, 1)
                 font_size: "22dp"
-                on_release: root.manager.current = ("Jouer")
+                on_release: root.manager.current = ("1")
         BoxLayout:
             size_hint_y: 0.04
             orientation: 'horizontal'
@@ -59,12 +65,11 @@
         BoxLayout:
             size_hint_y: 0.9
             orientation: 'horizontal'
-            Button:
-                background_color: (0.8, 0.8, 0, 1)
-                text: 'Envoi'
-                color: (0, 1, 0, 1)
-                font_size: "22dp"
-                on_release:
+
+            PongBall:
+                id: pong_ball
+                center: 200, 200
+
         BoxLayout:
             size_hint_y: 0.1
             orientation: 'horizontal'

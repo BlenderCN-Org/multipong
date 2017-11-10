@@ -1,10 +1,12 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = '0.014'
+__version__ = '0.016'
 
 """
 version
+0.016 plus utf-8
+0.015 test labo
 0.014 ajout android.permissions
 0.013 try sur multicast receive
 0.012 print multicast
@@ -27,11 +29,16 @@ kivy.require('1.10.0')
 
 from kivy.app import App
 from kivy.uix.button import Button
+from kivy.uix.widget import Widget
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.properties import NumericProperty, ObjectProperty, StringProperty
+from kivy.properties import NumericProperty, ObjectProperty
+from kivy.properties import ReferenceListProperty, StringProperty
 from kivy.core.window import Window
 from kivy.config import Config
-from kivy.core.window import Window
+from kivy.lang import Builder
+from kivy.vector import Vector  # 2D vector
+from kivy.clock import Clock
+
 
 import os
 from time import sleep
@@ -46,8 +53,11 @@ from labmulticast import Multicast
 # Envoi en TCP
 from labtcpclient import LabTcpClient
 
+Window.size = (int(640*2), int(360*2))
 
-#Window.size = (640*2, 360*2)
+### lecture du kv en utf-8
+##with open("multipong.kv", encoding='utf8') as f:
+     ##Builder.load_string(f.read())
 
 
 def datagram_to_dict(data):
@@ -74,7 +84,34 @@ def datagram_to_dict(data):
         return None
 
 
+class PongBall(Widget):
+    velocity_x = NumericProperty(0)
+    velocity_y = NumericProperty(0)
+    velocity = ReferenceListProperty(velocity_x, velocity_y)
+
+    def move(self):
+        self.pos += Vector(*self.velocity)
+
+
+class Screen3(Screen):
+    """Ecran pour 3 joueurs"""
+
+    def __init__(self, **kwargs):
+
+        super(Screen3, self).__init__(**kwargs)
+
+
+class Screen2(Screen):
+    """Ecran pour 2 joueurs"""
+
+    def __init__(self, **kwargs):
+
+        super(Screen2, self).__init__(**kwargs)
+
+
 class Screen1(Screen):
+    """Ecran pour 1 joueur"""
+
     def __init__(self, **kwargs):
 
         super(Screen1, self).__init__(**kwargs)
@@ -97,6 +134,8 @@ class Network:
         self.tcp_addr = None
         # True si ip serveur reçu
         self.tcp = None
+        # Pour les loop
+        self.loop = "Pour toujours"
 
         config = MultiPongApp.get_running_app().config
         self.tcp_port = self.get_tcp_port(config)
@@ -151,7 +190,7 @@ class Network:
                                 self.multi_addr[1],
                                 1024)
         a = 0
-        while "Pour toujours":
+        while self.loop:
             sleep(0.033)
             try:
                 data = my_multi.receive()
@@ -187,7 +226,7 @@ class Network:
         clt = LabTcpClient(addr[0], addr[1])
         a = 0
 
-        while "Pour toujours":
+        while self.loop:
             msg = {"Envoi": a}
             a += 1
             env = json.dumps(msg).encode("utf-8")
@@ -217,18 +256,15 @@ class Network:
 # Liste des écrans, cette variable appelle les classes ci-dessus
 # et doit être placée après ces classes
 SCREENS = { 0: (MainScreen, "Menu"),
-            1: (Screen1,    "Jouer")}
+            1: (Screen1,    "1"),
+            2: (Screen2,    "2"),
+            3: (Screen3,    "3")}
 
 
 class MultiPongApp(App):
-    """Construction de l'application"""
-
-    #TODO vérifier à quoi ça sert
-    title = 'multipong'
-    icon = '/data/multipong.png'
-
-    """Exécuté par __main__,
-    app est le parent de cette classe dans kv."""
+    """Construction de l'application. Exécuté par __main__,
+    app est le parent de cette classe dans kv.
+    """
 
     def build(self):
         """Exécuté en premier apres run()"""
@@ -238,6 +274,13 @@ class MultiPongApp(App):
         for i in range(len(SCREENS)):
             self.screen_manager.add_widget(SCREENS[i][0](name=SCREENS[i][1]))
         return self.screen_manager
+
+        #Clock.max_iteration
+        ##game = PongGame()
+        ##game.serve_ball()
+        ### fps = 60
+        ##Clock.schedule_interval(game.update, 1/60)
+
 
     def on_start(self):
         """Exécuté apres build()"""
@@ -315,11 +358,14 @@ class MultiPongApp(App):
 
         print("Quitter proprement")
 
-        # Acces a screen manager dans MultiPongApp
-        screen_manager = MultiPongApp.get_running_app().screen_manager
+        ### Acces a screen manager dans MultiPongApp
+        ##screen_manager = MultiPongApp.get_running_app().screen_manager
 
-        # Acces a l'ecran Menu
-        menu = screen_manager.get_screen("Menu")
+        ### Acces a l'ecran Menu
+        ##menu = screen_manager.get_screen("Menu")
+
+        # Stop des threads propre
+        self.network.loop = None
 
         # Kivy
         MultiPongApp.get_running_app().stop()

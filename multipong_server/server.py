@@ -62,6 +62,7 @@ class MyMulticastSender(DatagramProtocol):
         self.tempo = time()
         self.count = 0
         self.ip_server = get_my_ip()
+        print("self.ip_server", self.ip_server)
         print("Envoi en multicast sur", MULTICAST_IP, MULTICAST_PORT, "\n")
         self.a = 0
 

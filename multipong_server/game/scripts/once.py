@@ -3,24 +3,6 @@
 
 ## once.py
 
-#############################################################################
-# Copyright (C) Labomedia November 2012
-#
-#  This program is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU General Public License
-#  as published by the Free Software Foundation; either version 2
-#  of the License, or (at your option) any later version.
-#
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software Foundation,
-#  Inc., 51 Franproplin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-#
-#############################################################################
 
 '''
 Ce script est appelé par main_init.main dans blender
@@ -28,8 +10,8 @@ Il ne tourne qu'une seule fois pour initier las variables
 qui seront toutes des attributs du bge.logic (gl)
 Seuls les attributs de logic sont stockés en permanence.
 
-Un thread est crée pour recevoir le multicast, puis après avoir reçu l'adresse
-ip du serveur sur ce multicast, lancement d'un socket TCP pour envoyer.
+Un thread est crée pour recevoir le multicast.
+Lancement d'un socket TCP pour envoyer au serveur sur la même machine.
 
 '''
 
@@ -319,7 +301,9 @@ def create_tcp_socket():
     gl.tcp_client = LabTcpClient(gl.ip_server, gl.tcp_port)
 
 def main():
-    '''Lancé une seule fois à la 1ère frame au début du jeu par main_once.'''
+    """Lancé une seule fois
+    à la 1ère frame au début du jeu par main_once.
+    """
 
     get_conf()
     init_variable()

@@ -3,32 +3,13 @@
 
 ## game.py
 
-#############################################################################
-# Copyright (C) Labomedia November 2012
-#
-#  This program is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU General Public License
-#  as published by the Free Software Foundation; either version 2
-#  of the License, or (at your option) any later version.
-#
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software Foundation,
-#  Inc., 51 Franproplin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-#
-#############################################################################
-
 '''
 game.py
 
 Définit le Game Play
 
-Les try sont nécessaires car les objets appelés ne sont pas toujours présent
-dans les scènes à l'instant où ils sont appelés.
+Les try sont nécessaires car les objets appelés ne sont pas toujours
+présents dans les scènes à l'instant où ils sont appelés.
 L'important est qu'il n'y ait pas de pass
 '''
 
@@ -37,7 +18,6 @@ from time import sleep
 from random import uniform
 from scripts import rank_display
 from scripts import message
-from scripts.labtools.labtexturechange import TextureChange
 
 
 def main():
