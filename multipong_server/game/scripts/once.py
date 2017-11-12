@@ -164,7 +164,7 @@ def get_conf():
     gl.once = 0
 
     # TODO: trouver le *.ini en auto
-    gl.ma_conf = MyConfig(current_dir + "scripts/mpff.ini")
+    gl.ma_conf = MyConfig(current_dir + "scripts/mp.ini")
     gl.conf = gl.ma_conf.conf
 
     print("\nConfiguration du jeu MPFF:")

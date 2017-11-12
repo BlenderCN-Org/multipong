@@ -1,7 +1,7 @@
 #:kivy 1.10.0
 
 <PongBall>:
-    size: 100, 100  #root.size[0]/40, root.size[1]/40
+    size: 50, 50
     canvas:
         Ellipse:
             pos: self.pos
@@ -17,7 +17,7 @@
                 pos: self.pos
                 size: self.size
         Label:
-            text: "Multi Pong en reseau"
+            text: "Multi Pong\nen reseau"
             bold: True
             size_hint_y: 0.3
             font_size: "48dp"
@@ -52,36 +52,77 @@
                 font_size: "22dp"
                 on_release: app.do_quit()
 
-<Screen1>
+<Screen1>:
+    PongBall:
+        id: pong_ball
+        center: self.pos
+        size: self.size
     BoxLayout:
-        orientation: 'vertical'
-        canvas:
-            Color:
-                rgba: 0.2, 0.2, 0.2, 1
-            Rectangle:
-                pos: self.pos
-                size: self.size
+        orientation: 'horizontal'
+
 
         BoxLayout:
-            size_hint_y: 0.9
-            orientation: 'horizontal'
+            size_hint_x: 0.60
 
-            PongBall:
-                id: pong_ball
-                center: 200, 200
+            canvas:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Line:
+                    points: root.points
+                    width: 3
+                    close: 1
 
         BoxLayout:
-            size_hint_y: 0.1
-            orientation: 'horizontal'
+            size_hint_x: 0.40
+            orientation: 'vertical'
             Button:
+                size_hint_y: 0.08
                 background_color: (0.8, 0.8, 0, 1)
-                text: 'Options'
+                text: 'Menu'
                 color: (0, 1, 0, 1)
-                font_size: "22dp"
-                on_release: app.open_settings()
+                font_size: "20dp"
+                on_release: app.go_mainscreen()
             Button:
-                background_color: (0.8, 0.8, 0, 1)
-                text: 'Quitter'
+                size_hint_y: 0.92
+                id: button_size
                 color: (0, 1, 0, 1)
-                font_size: "22dp"
-                on_release: app.do_quit()
+                background_color: (0, 0.8, 0, 1)
+                font_size: "18dp"
+                text: "Raquette"
+
+
+<Screen2>:
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Line:
+            points: self.points
+            width: 3
+            close: 1
+
+<Screen3>:
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Line:
+            points: self.points
+            width: 3
+            close: 1
+
+<Screen4>:
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Line:
+            points: self.points
+            width: 3
+            close: 1
+
+<Screen5>:
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Line:
+            points: self.points
+            width: 3
+            close: 1

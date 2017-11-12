@@ -238,6 +238,11 @@ class GameManagement():
             self.transit = 1
             self.t_transit = time()
 
+        # Maxi 10 joueurs
+        if l > 10:
+            l=10
+            print("Nombre de joueurs supérieur à 10 soit", l)
+
         self.level = l
 
     def update_rank(self):
@@ -426,7 +431,8 @@ class GameManagement():
             del self.pile_dict[user]
             print("{} supprimé dans pile_dict".format(user))
         except:
-            print("{} n'est pas dans pile_dict".format(user))
+            a = "Le joueur {} n'est plus dans le dictionnaire"
+            print(a.format(user))
 
         for key, val in self.players.items():
             try:
