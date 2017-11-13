@@ -1,12 +1,5 @@
 #:kivy 1.10.0
 
-<PongBall>:
-    size: 50, 50
-    canvas:
-        Ellipse:
-            pos: self.pos
-            size: self.size
-
 <MainScreen>:
     BoxLayout:
         orientation: 'vertical'
@@ -23,7 +16,7 @@
             font_size: "48dp"
             color: (0, 1, 0, 1)
         Label:
-            text: '''Pong pour 10 joueurs'''
+            text: """Pong pour 10 joueurs"""
             size_hint_y: 0.2
             font_size: "18dp"
             color: (0, 1, 0, 1)
@@ -52,18 +45,23 @@
                 font_size: "22dp"
                 on_release: app.do_quit()
 
+<PongBall>:
+    canvas:
+        Rectangle:
+            size: 12, 12
+            pos: self.pos
+
 <Screen1>:
+    ball: pong_ball
+
     PongBall:
         id: pong_ball
-        center: self.pos
-        size: self.size
+        #center: self.parent.center
+
     BoxLayout:
         orientation: 'horizontal'
-
-
         BoxLayout:
             size_hint_x: 0.60
-
             canvas:
                 Color:
                     rgba: 1, 1, 1, 1
@@ -71,7 +69,18 @@
                     points: root.points
                     width: 3
                     close: 1
-
+                ##Rectangle:
+                    ##id: ball
+                    ##size: 25, 25
+                    ##pos: root.ball_pos
+                ##Rectangle:
+                    ##id: bat_0
+                    ##size: 10, 100
+                    ##pos: root.bat[0], root.bat[1]
+                ##Rectangle:
+                    ##id: bat_1
+                    ##size: 10, 100
+                    ##pos: root.bat[2], root.bat[3]
         BoxLayout:
             size_hint_x: 0.40
             orientation: 'vertical'
@@ -89,7 +98,6 @@
                 background_color: (0, 0.8, 0, 1)
                 font_size: "18dp"
                 text: "Raquette"
-
 
 <Screen2>:
     canvas:

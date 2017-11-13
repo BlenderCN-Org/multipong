@@ -1,13 +1,14 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = '0.020'
+__version__ = '0.021'
 
 """
 pas d'accent dans les fichiers !!!!!!!!!!!!!!!
 
 version
-0.020 lines
+0.021 landscape
+0.020 avec balle
 0.019 sans window size
 0.018 sans utf-8
 0.017 avec utf-8
@@ -48,7 +49,7 @@ from kivy.vector import Vector
 from kivy.clock import Clock
 
 import os
-from time import sleep
+from time import time, sleep
 import socket
 import json
 import ast
@@ -80,10 +81,10 @@ Window.size = (int(640*2), int(360*2))
 # Points des polygones = coordonnées blender
 # et correction [offset_x, offset_y, size]
 
-carre = [   -9.93542, 9.935437,
-            9.93543, 9.93543,
-            9.93543, -9.93543,
-            -9.93543, -9.93543]
+carre = [-9.93542,  9.935437,
+          9.93543,  9.93543,
+          9.93543, -9.93543,
+         -9.93543, -9.93543]
 
 carre_correction = [360, 360, 36]
 
@@ -131,9 +132,9 @@ def lines_points(poly, poly_correction):
     return points_list
 
 def datagram_to_dict(data):
-    '''Decode le message.
+    """Decode le message.
     Retourne un dict ou None
-    '''
+    """
 
     try:
         dec = data.decode("utf-8")
@@ -246,64 +247,73 @@ class Screen2(Screen):
 
 
 class PongBall(Widget):
-    pos_x = NumericProperty(100)
-    pos_y = NumericProperty(100)
+    pos_x = NumericProperty(0)
+    pos_y = NumericProperty(0)
     pos = ReferenceListProperty(pos_x, pos_y)
 
-    ##size_x = NumericProperty(50)
-    ##size_y = NumericProperty(50)
-    ##size = ReferenceListProperty(size_x, size_y)
-
     def move(self):
-        #self.pos = Vector(*self.pos)
-        pass
+        self.pos = self.pos + 1
+
 
 class Screen1(Screen):
-    """Ecran pour 1 joueur"""
 
     ball = ObjectProperty(None)
-    p = lines_points(carre, carre_correction)
-    points = ListProperty(p)
+    ##bat_0 = ObjectProperty(None)
+    ##bat_1 = ObjectProperty(None)
+
+    # Ce sont des attibuts de classe
+    # Accessible avec root.points dans kv
+    points = ListProperty(lines_points(carre, carre_correction))
+
+    # Les 2 raquettes
+    bat = ListProperty((15, 320, 700, 320))
 
     def __init__(self, **kwargs):
 
         super(Screen1, self).__init__(**kwargs)
 
+        # Pour déplacement raquette
         self.xy_old = [0, 0]
-
-        # Acces a screen manager dans TapOSCApp
-        screen_manager = MultiPongApp.get_running_app().screen_manager
-        # Acces a l'ecran Menu
-        self.menu = screen_manager.get_screen("Menu")
 
         Clock.schedule_interval(self.update, 0.016)
 
     def update(self, dt):
-
-        svr_data = self.menu.network.server_data
-        print(svr_data)
-
-    def on_touch_move(self, touch):
-        """Si move sur l'ecran, n'import ou."""
-
-        x = touch.spos[0]
-        y = touch.spos[1]
-        self.apply_on_touch(x, y)
-
-    def apply_on_touch(self, x, y):
-        """Envoi la position du curseur.
-        Non applique si slider
+        """{'svr_msg': {'dictat': {'transit': 0, 'reset': 0, 'level': 1,
+        'ball': [10, 10]}, 'ip': '192.168.1.17'}}
         """
 
-        print("Valeurs brutes x={0:.2f} y={1:.2f}".format(x, y))
+        # Acces a screen manager dans MultiPongApp
+        screen_manager = MultiPongApp.get_running_app().screen_manager
+        # Acces a l'ecran Menu
+        self.menu = screen_manager.get_screen("Menu")
+        # Acces a Network
+        svr_data = self.menu.network.server_data
+        self.apply_svr_data(svr_data)
 
-        xy_cor = xy_correction(x, y)
-        xy_new = [xy_cor[0], xy_cor[1]]
+    def apply_svr_data(self, svr_data):
+        ball_pos = self.get_ball_position(svr_data)
+        self.apply_ball_position(ball_pos)
 
-        # Pas de None
-        if x and y:
-            if test_old_new_xy(self.xy_old, xy_new):
-                print("Position x={0:.2f} y={1:.2f}".format(x, y))
+    def get_ball_position(self, svr_data):
+        try:
+            svr_msg = svr_data["svr_msg"]
+            dictat = svr_msg["dictat"]
+            # Position de la balle dans le repere de blender
+            ball_pos = dictat["ball"]
+        except:
+            ball_pos = 100, 100
+        return ball_pos
+
+    def apply_ball_position(self, ball_pos):
+
+        cc = carre_correction
+
+        self.ball.pos[0] = int((ball_pos[0]*cc[2]) + cc[0])
+        self.ball.pos[1] = int((ball_pos[1]*cc[2]) + cc[1])
+
+    ##def on_touch_move(self, touch):
+
+        ##Screen1.bat[1] = touch.y
 
 
 class MainScreen(Screen):
@@ -313,9 +323,19 @@ class MainScreen(Screen):
 
         super(MainScreen, self).__init__(**kwargs)
 
+        # Nom du joueur
+        #self.my_name = "j" + str(int(time()))[-6:]
+        # name est déjà attribut de self
+        self.my_name = self.get_user_id()
+
         # Construit le réseau, tourne tout le temps
         self.network = Network()
         self.network.network_start()
+
+    def get_user_id(self):
+        user = os.getlogin()
+        print("User login:", user)
+        return  user
 
 
 class Network:
@@ -359,8 +379,8 @@ class Network:
 
         freq = int(config.get('network', 'freq'))
 
-        if freq > 30:
-            freq = 30
+        if freq > 60:
+            freq = 60
         if freq < 1:
             freq = 1
         print("Fréquence d'envoi en TCP =", freq)
@@ -383,9 +403,8 @@ class Network:
         my_multi = Multicast(   self.multi_addr[0],
                                 self.multi_addr[1],
                                 1024)
-        a = 0
         while self.loop:
-            sleep(0.033)
+            sleep(self.tempo)
             try:
                 data = my_multi.receive()
                 self.server_data = datagram_to_dict(data)
@@ -410,9 +429,9 @@ class Network:
         """Récupère l'ip du serveur, et lance le thread"""
 
         ip = None
-        if "paradis" in resp:
-            if "ip" in resp["paradis"]:
-                ip = resp["paradis"]["ip"]
+        if "svr_msg" in resp:
+            if "ip" in resp["svr_msg"]:
+                ip = resp["svr_msg"]["ip"]
         return ip
 
     def my_tcp_sender_loop(self, addr):
@@ -422,11 +441,9 @@ class Network:
         clt = LabTcpClient(addr[0], addr[1])
 
         while self.loop:
-            msg = {"joueur": {  "my_name":       "toto",
-                                "ball_position": [10, 10],
-                                "my_score":      5,
-                                "bat_position":  [-9.5, 3],
-                                "reset":         0}}
+            msg = {"joueur": {  "name": "toto",
+                                "ball": [10, 10],
+                                "bat":  [-9.5, 3] }}
 
             env = json.dumps(msg).encode("utf-8")
             clt.send(env)
@@ -475,7 +492,8 @@ class MultiPongApp(App):
         for i in range(len(SCREENS)):
             self.screen_manager.add_widget(SCREENS[i][0](name=SCREENS[i][1]))
 
-        #Clock.schedule_interval(self.update, 1.0 / 60.0)
+        ##un = self.screen_manager.get_screen("1")
+        ##Clock.schedule_interval(un.update, 0.0166)
 
         return self.screen_manager
 
@@ -493,7 +511,7 @@ class MultiPongApp(App):
                             { 'multi_ip': '228.0.0.5',
                               'multi_port': '18888',
                               'tcp_port': '8000',
-                              'freq': '30'})
+                              'freq': '60'})
 
         config.setdefaults('kivy',
                             { 'log_level': 'debug',
@@ -516,7 +534,7 @@ class MultiPongApp(App):
 
                       {"type": "numeric",
                       "title": "Frequence d'envoi",
-                      "desc": "Frequence entre 1 et 30 Hz",
+                      "desc": "Frequence entre 1 et 60 Hz",
                       "section": "network", "key": "freq"}
                    ]"""
 
@@ -572,7 +590,8 @@ class MultiPongApp(App):
 if __name__ == '__main__':
     MultiPongApp().run()
 
-
 """
-['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__events__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__le__', '__lt__', '__metaclass__', '__module__', '__ne__', '__new__', '__proxy_getter', '__proxy_setter', '__pyx_vtable__', '__reduce__', '__reduce_ex__', '__repr__', '__self__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '_apply_transform', '_context', '_kwargs_applied_init', '_proxy_ref', '_trigger_layout', '_walk', '_walk_reverse', 'add_widget', 'apply_on_touch', 'apply_property', 'ball', 'bind', 'canvas', 'center', 'center_x', 'center_y', 'children', 'clear_widgets', 'cls', 'collide_point', 'collide_widget', 'create_property', 'disabled', 'dispatch', 'dispatch_children', 'dispatch_generic', 'do_layout', 'events', 'export_to_png', 'fbind', 'funbind', 'get_center_x', 'get_center_y', 'get_parent_window', 'get_property_observers', 'get_right', 'get_root_window', 'get_top', 'get_window_matrix', 'getter', 'height', 'id', 'ids', 'is_event_type', 'layout_hint_with_bounds', 'manager', 'name', 'on_disabled', 'on_enter', 'on_leave', 'on_opacity', 'on_pre_enter', 'on_pre_leave', 'on_touch_down', 'on_touch_move', 'on_touch_up', 'opacity', 'p', 'parent', 'points', 'pos', 'pos_hint', 'properties', 'property', 'proxy_ref', 'register_event_type', 'remove_widget', 'right', 'set_center_x', 'set_center_y', 'set_right', 'set_top', 'setter', 'size', 'size_hint', 'size_hint_max', 'size_hint_max_x', 'size_hint_max_y', 'size_hint_min', 'size_hint_min_x', 'size_hint_min_y', 'size_hint_x', 'size_hint_y', 'to_local', 'to_parent', 'to_widget', 'to_window', 'top', 'transition_progress', 'transition_state', 'uid', 'unbind', 'unbind_uid', 'unregister_event_types', 'walk', 'walk_reverse', 'width', 'x', 'y']
+
+
+['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__events__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__le__', '__lt__', '__metaclass__', '__module__', '__ne__', '__new__', '__proxy_getter', '__proxy_setter', '__pyx_vtable__', '__reduce__', '__reduce_ex__', '__repr__', '__self__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '_apply_transform', '_context', '_kwargs_applied_init', '_proxy_ref', '_walk', '_walk_reverse', 'add_widget', 'apply_property', 'bind', 'canvas', 'center', 'center_x', 'center_y', 'children', 'clear_widgets', 'cls', 'collide_point', 'collide_widget', 'create_property', 'disabled', 'dispatch', 'dispatch_children', 'dispatch_generic', 'events', 'export_to_png', 'fbind', 'funbind', 'get_center_x', 'get_center_y', 'get_parent_window', 'get_property_observers', 'get_right', 'get_root_window', 'get_top', 'get_window_matrix', 'getter', 'height', 'id', 'ids', 'is_event_type', 'move', 'on_disabled', 'on_opacity', 'on_touch_down', 'on_touch_move', 'on_touch_up', 'opacity', 'parent', 'pos', 'pos_hint', 'pos_x', 'pos_y', 'properties', 'property', 'proxy_ref', 'register_event_type', 'remove_widget', 'right', 'set_center_x', 'set_center_y', 'set_right', 'set_top', 'setter', 'size', 'size_hint', 'size_hint_max', 'size_hint_max_x', 'size_hint_max_y', 'size_hint_min', 'size_hint_min_x', 'size_hint_min_y', 'size_hint_x', 'size_hint_y', 'to_local', 'to_parent', 'to_widget', 'to_window', 'top', 'uid', 'unbind', 'unbind_uid', 'unregister_event_types', 'walk', 'walk_reverse', 'width', 'x', 'y']
 """

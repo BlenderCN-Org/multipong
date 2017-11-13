@@ -4,19 +4,17 @@
 ## scene_objet.py
 
 
-'''
+"""
 Récupère:
     - dans les scènes _players :
         les objets ball, goal, bat quelque soit le niveau
-    - dans Name:
-        l'objet name
     - dans Labomedia
         l'objet Cube
     - dans Rank
         l'objet Rank_display
 
 Fort de café !
-'''
+"""
 
 
 from bge import logic as gl
@@ -28,7 +26,7 @@ def main():
     for scn in scenes:
         if "_players" in scn.name:
             for obj in scn.objects:
-                ## Ball
+                # Ball
                 if "ball" in str(obj):
                     gl.ball = obj
 
@@ -45,15 +43,6 @@ def main():
                     # Get goal
                     if str(obj) == "goal" + str(gl.level) + str(n):
                         gl.goal[n] = obj
-                    # Get cache
-                    if str(obj) == "cache" + str(gl.level) + str(n):
-                        gl.cache[n] = obj
-
-        if "Name" in scn.name:
-            for obj in scn.objects:
-                ## Ball
-                if "Name" in str(obj):
-                    gl.name_obj = obj
 
         if "Rank" in scn.name:
             for obj in scn.objects:

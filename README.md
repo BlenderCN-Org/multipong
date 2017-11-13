@@ -53,6 +53,7 @@ sudo apt-get install blender
 ~~~
 
 #### Installation de mylabotools
+TODO ne serait pas utilisé !!!
 mylabotools comprend des scripts pour mes tâches courantes.
 
 [mylabotools](Voir https://github.com/sergeLabo/mylabotools)

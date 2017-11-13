@@ -3,22 +3,16 @@
 
 ## message.py
 
-'''
-* crée le message dans un dict avec les attributs du gl
-
-* à chaque frame, decode, dejson, puis maj des attibuts du gl
-'''
+"""Envoi des messages en TCP"""
 
 
 from bge import logic as gl
 import json
-import ast
 
 
 def main():
 
     gl.msg_to_send = create_msg_to_send()
-    # à commenter pour test twisted
     send_tcp_message()
 
 def send_tcp_message():
@@ -30,67 +24,31 @@ def send_tcp_message():
             print("Client TCP déconnecté")
 
 def create_msg_to_send():
-    '''Retourne le message à envoyer au server.
+    """Retourne le message à envoyer au server.
 
-        msg = {"joueur":    {   'ball_position': [0.5, 3.3],
-                                'bat_position': [-9.4, 0.0],
-                                'my_score': 9,
-                                'my_name': 'ggffg1456048730'}
-    '''
+        msg = {"blend": {"ball": (1,1), "reset": 0}}
+    """
 
-    msg = {"joueur": {  "my_name":       gl.my_name,
-                        "ball_position": get_ball_position(),
-                        "my_score":      get_my_score(),
-                        "bat_position":  get_bat_position(),
-                        "reset":         get_reset()
-                     }}
-
+    msg = {"blend": {"ball":  get_ball_position(),
+                     "reset": get_reset() }}
+    #print("envoi de blend msg", msg)
     return msg
 
-def get_my_score():
-    '''Retourne mon score, je suis 0.'''
-    try:
-        score = gl.goal[gl.I_am]["score"]
-    except:
-        score = 10
-    return score
-
-def get_bat_position():
-    '''Retourne la position x, y de ma bat, je suis 0.'''
-
-    try:
-        x = gl.bat[0].localPosition[0]
-        y = gl.bat[0].localPosition[1]
-    except:
-        x, y = 0, 0
-    #return [round(x, 2), round(y, 2)]
-    return [x, y]
 
 def get_ball_position():
-    '''Retourne la position x, y de ma balle donnée par le moteur physique.
+    """Retourne la position x, y de ma balle donnée par le moteur physique.
     Le joueur 0 du server donne la position pour tous les autres.
-    '''
+    """
+
     try:
         x = gl.ball.localPosition[0]
         y = gl.ball.localPosition[1]
     except:
         x, y = 2, 2
-    #return [round(x, 2), round(y, 2)]
-    return [x, y]
-
-def get_bat_position():
-    '''Position x, y de ma bat.'''
-
-    try:
-        x = gl.bat[gl.I_am].localPosition[0]
-        y = gl.bat[gl.I_am].localPosition[1]
-    except:
-        x, y = 0, 0
-    #return [round(x, 2), round(y, 2)]
     return [x, y]
 
 def get_reset():
-    '''Avec la touches R, envoi sur capture name et rank.'''
+    """Avec la touches R, envoi sur capture name et rank."""
 
     if gl.cube_obj["reset"]:
         gl.reset = 1

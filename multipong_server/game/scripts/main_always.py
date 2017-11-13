@@ -4,15 +4,15 @@
 ## main_always.py
 
 
-'''Ne jamais modifier ce script.
+"""Ne jamais modifier ce script.
 Les scripts:
 - main_once.py
 - main_always.py
-sont les seuls scripts importer directement dans Blender.
+sont les seuls scripts importés directement dans Blender.
 Les autres scripts sont importer en temps que modules.
 Il est alors possible de les modifier dans un éditeur externe
 sans avoir à les recharger dans Blender.
-'''
+"""
 
 
 # imports locaux

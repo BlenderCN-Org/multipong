@@ -4,11 +4,11 @@
 ## rank_display.py
 
 
-'''
+"""
 Ce script est lancé avec la scène Rank
 
 Crée et applique le texte du classement à chaque frame
-'''
+"""
 
 
 
@@ -49,11 +49,6 @@ def create_text():
     b = 0
     for key, value in gl.classement.items():
         if value > 0:
-            if key != "machine":
-                # je coupe les entiers du time(), machine n'a pas de time()
-                key = key[:-4]
-            if len(key) > 11:
-                key = key[:-10]
             # \n\n crée les sauts de ligne
             text_list[value - 1] = str(value) + " .   " + str(key) + "\n\n"
             b += 1
@@ -62,10 +57,10 @@ def create_text():
     gl.text = ""
 
     for c in range(level_corrected):
-        gl.text = gl.text + str(text_list[c])
+        gl.text += str(text_list[c])
 
 def apply_text():
-    '''Récupération de l'objet Rank_display et sa prop Text'''
+    """Récupération de l'objet Rank_display et sa prop Text"""
 
     a = "L'objet rank_obj n'est pas accesssible pour application du texte"
     try:
