@@ -7,7 +7,7 @@
 """
 Récupère:
     - dans les scènes _players :
-        les objets ball, goal, bat quelque soit le niveau
+        les objets ball, goal, paddle quelque soit le niveau
     - dans Labomedia
         l'objet Cube
     - dans Rank
@@ -37,9 +37,10 @@ def main():
                     level_corrected = gl.level
 
                 for n in range(level_corrected):
-                    # Get bat
+                    # Get paddle
+                    # TODO changer les noms bat dans blender
                     if str(obj) == "bat" + str(gl.level) + str(n):
-                        gl.bat[n] = obj
+                        gl.paddle[n] = obj
                     # Get goal
                     if str(obj) == "goal" + str(gl.level) + str(n):
                         gl.goal[n] = obj

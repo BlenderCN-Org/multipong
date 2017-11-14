@@ -48,15 +48,15 @@
 <PongBall>:
     canvas:
         Rectangle:
-            size: 12, 12
             pos: self.pos
+            size: 12, 12 # TODO size fct resolution ecran
 
 <Screen1>:
     ball: pong_ball
 
     PongBall:
         id: pong_ball
-        #center: self.parent.center
+        center: self.parent.center
 
     BoxLayout:
         orientation: 'horizontal'
@@ -74,13 +74,13 @@
                     ##size: 25, 25
                     ##pos: root.ball_pos
                 ##Rectangle:
-                    ##id: bat_0
+                    ##id: paddle_0
                     ##size: 10, 100
-                    ##pos: root.bat[0], root.bat[1]
+                    ##pos: root.paddle[0], root.paddle[1]
                 ##Rectangle:
-                    ##id: bat_1
+                    ##id: paddle_1
                     ##size: 10, 100
-                    ##pos: root.bat[2], root.bat[3]
+                    ##pos: root.paddle[2], root.paddle[3]
         BoxLayout:
             size_hint_x: 0.40
             orientation: 'vertical'

@@ -7,6 +7,7 @@ __version__ = '0.021'
 pas d'accent dans les fichiers !!!!!!!!!!!!!!!
 
 version
+0.022 fullscreen
 0.021 landscape
 0.020 avec balle
 0.019 sans window size
@@ -61,7 +62,7 @@ from labmulticast import Multicast
 # Envoi en TCP
 from labtcpclient import LabTcpClient
 
-Window.size = (int(640*2), int(360*2))
+Window.size = (1280, 720)
 
 """
 1 joueur carre
@@ -154,53 +155,6 @@ def datagram_to_dict(data):
         print("Message reçu: None")
         return None
 
-def test_old_new_xy(xy_old, xy_new):
-    """xy = liste de 2
-    arrondi a 0.01
-    retourne True si different, False sinon
-    La frequence d'envoi des xy peut monter a 73 Hz = beaucoup trop,
-    a 0.01 c'est suffisamment precis.
-    """
-
-    ret = False
-
-    if xy_new[0] != None and xy_new[1] != None:
-        if isinstance(xy_old, list) and len(xy_old) == 2:
-            if isinstance(xy_new, list) and len(xy_new) == 2:
-                # Arrondi a 0.01
-                a_old = [int(100 * xy_old[0]), int(100 * xy_old[1])]
-                a_new = [int(100 * xy_new[0]), int(100 * xy_new[1])]
-                if a_old != a_new:
-                    ret = True
-
-    return ret
-
-def xy_correction(x, y):
-    """Retourne x, y recalcule au dessus du bouton, de 0 a 1."""
-
-    a1 = 0.015
-    a2 = 0.50
-    b1 = 0.09
-    b2 = 0.97
-
-    if x <= a1:
-        x = 0.0
-    elif x >= a2:
-        x = 1.0
-        y = None
-    elif a1 < x < a2:
-        x = (x / (a2 - a1)) - a1 / (a2- a1)
-
-    if y:
-        if y <= b1:
-            y = 0.0
-        elif y >= b2:
-            y = 1.0
-        elif b1 < y < b2:
-            y = (y / (b2 - b1)) - b1 / (b2- b1)
-
-    return x, y
-
 
 class Screen5(Screen):
     """Ecran pour 5 joueurs"""
@@ -247,54 +201,58 @@ class Screen2(Screen):
 
 
 class PongBall(Widget):
-    pos_x = NumericProperty(0)
-    pos_y = NumericProperty(0)
-    pos = ReferenceListProperty(pos_x, pos_y)
+    center_x = NumericProperty(0)
+    center_y = NumericProperty(0)
+    center = ReferenceListProperty(center_x, center_y)
 
     def move(self):
-        self.pos = self.pos + 1
+        pass
 
 
 class Screen1(Screen):
 
-    ball = ObjectProperty(None)
-    ##bat_0 = ObjectProperty(None)
-    ##bat_1 = ObjectProperty(None)
-
     # Ce sont des attibuts de classe
     # Accessible avec root.points dans kv
+    ball = ObjectProperty(None)
     points = ListProperty(lines_points(carre, carre_correction))
-
-    # Les 2 raquettes
-    bat = ListProperty((15, 320, 700, 320))
+    paddle = ListProperty((15, 320, 700, 320))
 
     def __init__(self, **kwargs):
 
         super(Screen1, self).__init__(**kwargs)
-
-        # Pour déplacement raquette
-        self.xy_old = [0, 0]
-
-        Clock.schedule_interval(self.update, 0.016)
+        print(dir(self))
 
     def update(self, dt):
-        """{'svr_msg': {'dictat': {'transit': 0, 'reset': 0, 'level': 1,
+        """Recupere le message du seveur tous les dt lance par Clock:
+        {'svr_msg': {'dictat': {'transit': 0, 'reset': 0, 'level': 1,
         'ball': [10, 10]}, 'ip': '192.168.1.17'}}
+        TODO cette fonction doit etre commune a tous les screen
         """
 
+        svr_data = self.get_svr_data()
+        self.apply_svr_data(svr_data)
+
+    def get_svr_data(self):
         # Acces a screen manager dans MultiPongApp
         screen_manager = MultiPongApp.get_running_app().screen_manager
         # Acces a l'ecran Menu
         self.menu = screen_manager.get_screen("Menu")
         # Acces a Network
         svr_data = self.menu.network.server_data
-        self.apply_svr_data(svr_data)
+
+        return svr_data
 
     def apply_svr_data(self, svr_data):
+        """Recupere la position de la balle dans le message du serveeur,
+        puis applique cette position a la balle.
+        """
         ball_pos = self.get_ball_position(svr_data)
         self.apply_ball_position(ball_pos)
 
     def get_ball_position(self, svr_data):
+        """Recupere la position de la balle dans le message du serveur
+        """
+
         try:
             svr_msg = svr_data["svr_msg"]
             dictat = svr_msg["dictat"]
@@ -302,18 +260,20 @@ class Screen1(Screen):
             ball_pos = dictat["ball"]
         except:
             ball_pos = 100, 100
+
         return ball_pos
 
     def apply_ball_position(self, ball_pos):
+        """Positionne la balle avec position du serveur"""
 
         cc = carre_correction
 
-        self.ball.pos[0] = int((ball_pos[0]*cc[2]) + cc[0])
-        self.ball.pos[1] = int((ball_pos[1]*cc[2]) + cc[1])
+        self.ball.center[0] = int((self.ball.center[0]*cc[2]) + cc[0])
+        self.ball.center[1] = int((self.ball.center[1]*cc[2]) + cc[1])
 
-    ##def on_touch_move(self, touch):
-
-        ##Screen1.bat[1] = touch.y
+    def on_touch_move(self, touch):
+        ##Screen1.paddle[1] = touch.y
+        pass
 
 
 class MainScreen(Screen):
@@ -323,48 +283,67 @@ class MainScreen(Screen):
 
         super(MainScreen, self).__init__(**kwargs)
 
-        # Nom du joueur
-        #self.my_name = "j" + str(int(time()))[-6:]
-        # name est déjà attribut de self
-        self.my_name = self.get_user_id()
-
-        # Construit le réseau, tourne tout le temps
-        self.network = Network()
-        self.network.network_start()
-
-    def get_user_id(self):
-        user = os.getlogin()
-        print("User login:", user)
-        return  user
-
 
 class Network:
-    """Tout le réseau, tourne toujours."""
+    """."""
 
     def __init__(self):
 
-        # Adresse
-        self.tcp_addr = None
-        # True si ip serveur reçu
-        self.tcp = None
-        # Pour les loop
-        self.loop = "Pour toujours"
-
+        # config, obtenu par hasard
+        MultiPongApp.load_config(self)
         config = MultiPongApp.get_running_app().config
+
+        # TCP
+        self.tcp_ip = None
         self.tcp_port = self.get_tcp_port(config)
-        self.tempo = self.get_tempo(config)
-        self.multi_addr = self.get_multicast_addr(config)
-        self.server_data = None
+        self.tcp_clt = None
 
-    def network_start(self):
-        """La réception de l'ip lancera l'envoi"""
+        # Multi
+        self.multi_ip, self.multi_port = self.get_multicast_addr(config)
+        self.my_multi = Multicast(  self.multi_ip,
+                                    self.multi_port,
+                                    1024)
+        self.server_msg = None
 
-        self.receive_thread()
+        # Verif freq
+        self.t = time()
+        self.v_freq = 0
 
-    def get_tcp_port(self, config):
-        """Retourne le port TCP"""
+    def verif_freq(self):
+        self.v_freq += 1
+        a = time()
+        if a - self.t > 1:
+            print("FPS:", self.v_freq)
+            self.v_freq = 0
+            self.t = a
 
-        return int(config.get('network', 'tcp_port'))
+    def network_update(self, dt):
+        """A chaque Clock, maj de reception, maj des datas, envoi
+        level
+        ball
+        paddles
+        scores
+        """
+
+        self.verif_freq()
+
+        # Recup du message su serveur en multicast
+        server_msg = self.get_multicast_msg()
+
+        # Recup ip serveur si pas deffinie
+        self.set_server_addr(server_msg)
+
+        # Création du socket TCP si none
+        self.create_tcp_socket()
+
+        # Recup des datas dans le message
+
+
+        # Maj du jeu
+
+
+        # Envoi au serveur
+        self.send_TCP_msg()
 
     def get_multicast_addr(self, config):
         """Retourne l'adresse multicast"""
@@ -372,105 +351,47 @@ class Network:
         multi_ip = config.get('network', 'multi_ip')
         multi_port = int(config.get('network', 'multi_port'))
 
-        return (multi_ip, multi_port)
+        return multi_ip, multi_port
 
-    def get_tempo(self, config):
-        """pour sleep dans la boucle TCP"""
+    def get_multicast_msg(self):
+        try:
+            data = my_multi.receive()
+            server_msg = datagram_to_dict(data)
+        except:
+            #print("Pas de réception multicast")
+            server_msg = None
+        return server_msg
 
-        freq = int(config.get('network', 'freq'))
+    def get_tcp_port(self, config):
+        """Retourne le port TCP"""
 
-        if freq > 60:
-            freq = 60
-        if freq < 1:
-            freq = 1
-        print("Fréquence d'envoi en TCP =", freq)
+        return int(config.get('network', 'tcp_port'))
 
-        return 1/freq
+    def set_server_addr(self, msg):
+        """Récupère l'ip du serveur, et defini l'adresse serveur."""
 
-    def receive_thread(self):
-        """Thread de réception"""
+        if msg and "svr_msg" in msg:
+            if "ip" in msg["svr_msg"] and not self.tcp_addr:
+                self.tcp_ip = msg["svr_msg"]["ip"]
 
-        # Thread de reception
-        self.thread_multicast = Thread(target=self.my_multicast_loop)
-        self.thread_multicast.start()
-
-    def my_multicast_loop(self):
-        """Boucle infine de réception du serveur
-
-        # TODO: diviser en plusieurs méthodes, ip port de config
-        """
-
-        my_multi = Multicast(   self.multi_addr[0],
-                                self.multi_addr[1],
-                                1024)
-        while self.loop:
-            sleep(self.tempo)
+    def create_tcp_socket(self):
+        if self.tcp_ip and not self.tcp_clt:
             try:
-                data = my_multi.receive()
-                self.server_data = datagram_to_dict(data)
-                # Si ip serveur recu, lancera le thread une fois
-                self.run_tcp_thread(resp)
+                self.tcp_clt = LabTcpClient(self.tcp_addr[0],
+                                            self.tcp_addr[1])
             except:
-                #print("Pas de réception multicast")
-                pass
+                self.tcp_clt = None
+                print("Pas d'ip dans le message du serveur")
 
-    def run_tcp_thread(self, resp):
-        """"""
-
-        if resp:
-            self.ip_server = self.get_server_ip(resp)
-
-        self.tcp_addr = self.ip_server, self.tcp_port
-
-        # Lance le thread si ip_server
-        self.run_send_thread()
-
-    def get_server_ip(self, resp):
-        """Récupère l'ip du serveur, et lance le thread"""
-
-        ip = None
-        if "svr_msg" in resp:
-            if "ip" in resp["svr_msg"]:
-                ip = resp["svr_msg"]["ip"]
-        return ip
-
-    def my_tcp_sender_loop(self, addr):
-        """Envoi en TCP au serveur, lorsque l'ip serveur a été reçue
-        en multicast"""
-
-        clt = LabTcpClient(addr[0], addr[1])
-
-        while self.loop:
-            msg = {"joueur": {  "name": "toto",
-                                "ball": [10, 10],
-                                "bat":  [-9.5, 3] }}
-
-            env = json.dumps(msg).encode("utf-8")
-            clt.send(env)
-            sleep(self.tempo)
-
-    def run_send_thread(self):
-        if not self.tcp:
-            if self.tcp_addr:
-                self.tcp = "tcp tourne"
-                self.send_thread()
-                sleep(0.1)
-
-    def send_thread(self):
-        """Thread d'envoi: ne doit être lancé qu'une seule fois,
-        les reconnexions sont faites par le client.
-        """
-
-        a = "Un thread d'envoi en TCP est lancé ip = {} port {}"
-        print(a.format(self.ip_server, self.tcp_port))
-
-        self.thread_tcp = Thread(target=self.my_tcp_sender_loop,
-                                        args=(self.tcp_addr,))
-        self.thread_tcp.start()
+    def send_TCP_msg(self):
+        msg = {"joueur": {  "name": "toto",
+                    "ball": [10, 10],
+                    "paddle":  [-9.5, 3] }}
+        env = json.dumps(msg).encode("utf-8")
+        if self.tcp_clt:
+            self.tcp_clt.send(env)
 
 
-# Liste des écrans, cette variable appelle les classes ci-dessus
-# et doit être placée après ces classes
 SCREENS = { 0: (MainScreen, "Menu"),
             1: (Screen1,    "1"),
             2: (Screen2,    "2"),
@@ -479,10 +400,13 @@ SCREENS = { 0: (MainScreen, "Menu"),
             5: (Screen5,    "5")}
 
 
-class MultiPongApp(App):
+class MultiPongApp(App, Network):
     """Construction de l'application. Exécuté par __main__,
     app est le parent de cette classe dans kv.
     """
+
+    def __init__(self, **kwargs):
+        super(MultiPongApp, self).__init__(**kwargs)
 
     def build(self):
         """Exécuté en premier apres run()"""
@@ -492,14 +416,40 @@ class MultiPongApp(App):
         for i in range(len(SCREENS)):
             self.screen_manager.add_widget(SCREENS[i][0](name=SCREENS[i][1]))
 
-        ##un = self.screen_manager.get_screen("1")
-        ##Clock.schedule_interval(un.update, 0.0166)
-
         return self.screen_manager
 
-    def on_start(self):
+    def on_start(self, **kwargs):
         """Exécuté apres build()"""
-        pass
+
+        #super(MultiPongApp, self).__init__(**kwargs)
+
+        # Nom du joueur: name est déjà attribut de self
+        self.my_name = self.get_user_id()
+
+        # Construit le réseau, tourne tout le temps
+        #self.network = Network()
+
+        # Rafraichissement du jeu
+        tempo = self.get_tempo()
+        self.event = Clock.schedule_interval(self.network_update, tempo)
+
+    def get_tempo(self):
+        """Retourne la tempo de la boucle de Clock."""
+
+        freq = int(self.config.get('network', 'freq'))
+
+        if freq > 60:
+            freq = 60
+        if freq < 1:
+            freq = 1
+        print("Fréquence d'envoi en TCP =", freq)
+
+        return 1/freq
+
+    def get_user_id(self):
+        user = os.getlogin()
+        print("User login:", user)
+        return  user
 
     def build_config(self, config):
         """Si le fichier *.ini n'existe pas,
@@ -556,10 +506,6 @@ class MultiPongApp(App):
                 #self.screen_manager.get_screen("Menu").restart_server()
                 print("Nouvelle frequence", freq)
 
-        if section == 'graphics' and key == 'rotation':
-            Config.set('graphics', 'rotation', int(value))
-            print("Screen rotation = {}".format(value))
-
     def go_mainscreen(self):
         """Retour au menu principal depuis les autres ecrans."""
 
@@ -571,14 +517,8 @@ class MultiPongApp(App):
 
         print("Quitter proprement")
 
-        # Acces a screen manager dans MultiPongApp
-        screen_manager = MultiPongApp.get_running_app().screen_manager
-
-        # Acces a l'ecran Menu
-        menu = screen_manager.get_screen("Menu")
-
-        # Stop propre des threads reseaux
-        menu.network.loop = None
+        # Stop propre de Clock
+        self.event.cancel()
 
         # Kivy
         MultiPongApp.get_running_app().stop()

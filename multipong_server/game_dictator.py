@@ -27,7 +27,7 @@ De msg =
 {"joueur": {    "my_name":       gl.my_name,
                 "ball_position": get_ball_position(),
                 "my_score":      get_my_score(),
-                "bat_position":  get_bat_position(),
+                "paddle_position":  get_paddle_position(),
                 "reset":         get_reset()}}
 
 Vers
@@ -36,14 +36,14 @@ players = [
                     'my_score': 9,
                     'time': 1456048988.52,
                     'classement': 0,
-                    'bat_position': [-9.4, 0.0],
+                    'paddle_position': [-9.4, 0.0],
                     'my_name': 'gg1456048982'}),
 
 ('gg1456048985', {  'ball_position': [7.4, 9.1],
                     'my_score': 8,
                     'time': 1456048987.50,
                     'classement': 0,
-                    'bat_position': [9.4, 0.0],
+                    'paddle_position': [9.4, 0.0],
                     'my_name': 'gg1456048985'})
 ]
 
@@ -55,7 +55,7 @@ msg =   {   "level": self.level,
             "classement": self.classement,
             "ball_position_server": self.get_ball(),
             "score": self.get_score(),
-            "other_bat_position": self.get_bat(),
+            "other_paddle_position": self.get_paddle(),
             "who_are_you": self.get_who(),
             "rank_end":   self.rank_end,
             "reset": self.get_reset(),
@@ -154,7 +154,7 @@ class GameManagement():
         """Appelé par create_msg_for_all_players
         Passe la dernière valeur des piles dans players dict.
         msg = {'my_score': 10, 'ball_position': [4.39, 9.99],
-        'my_name': 'n1654453', 'bat_position': [1.16, -0.16]}
+        'my_name': 'n1654453', 'paddle_position': [1.16, -0.16]}
         """
 
         # copie du dict pour le libérer
@@ -187,13 +187,13 @@ class GameManagement():
             if msg and msg["my_name"] != "":
                 if msg["my_name"] in self.players:
                     self.players[msg["my_name"]]["ball_position"] = msg["ball_position"]
-                    self.players[msg["my_name"]]["bat_position"] = msg["bat_position"]
+                    self.players[msg["my_name"]]["paddle_position"] = msg["paddle_position"]
                     self.players[msg["my_name"]]["my_score"] = msg["my_score"]
                     self.players[msg["my_name"]]["time"] = time()
                 else:
                     self.players[msg["my_name"]] = {}
                     self.players[msg["my_name"]]["ball_position"] = msg["ball_position"]
-                    self.players[msg["my_name"]]["bat_position"] = msg["bat_position"]
+                    self.players[msg["my_name"]]["paddle_position"] = msg["paddle_position"]
                     self.players[msg["my_name"]]["my_score"] = msg["my_score"]
                     self.players[msg["my_name"]]["my_name"] = msg["my_name"]
                     self.players[msg["my_name"]]["time"] = time()
@@ -216,7 +216,7 @@ class GameManagement():
         """Si transit:
         - bloquage des scores à 10
         - bloquage balle à 1, 1
-        - pas de bloquage des bats
+        - pas de bloquage des paddles
         - question ? ajout d'une scène black en overlay ?
         """
 
@@ -320,32 +320,32 @@ class GameManagement():
 
         return score
 
-    def get_bat(self):
-        """Retourne la position des bats de tous les joueurs.
-        Le dict est ordonné, j'ajoute les bats dans l'ordre.
-        Level 10: bat en auto. TODO méthode spéciale.
-        Les bat en auto n'ont pas d'ordre, il y en a 10,
-        donc plus de bat manuelle.
+    def get_paddle(self):
+        """Retourne la position des paddles de tous les joueurs.
+        Le dict est ordonné, j'ajoute les paddles dans l'ordre.
+        Level 10: paddle en auto. TODO méthode spéciale.
+        Les paddle en auto n'ont pas d'ordre, il y en a 10,
+        donc plus de paddle manuelle.
         """
 
-        bat = {}  # dict
+        paddle = {}  # dict
 
         if self.level != 10:
             b = 0
             for k, v in self.players.items():
-                bat[b] = v["bat_position"]
+                paddle[b] = v["paddle_position"]
                 b += 1
         else:
-            if self.conf["simul"]["bat_simul"]:
+            if self.conf["simul"]["paddle_simul"]:
                 for num in range(10):
-                    bat[num] = self.bat_simul[num].bat
+                    paddle[num] = self.paddle_simul[num].paddle
             else:  # TODO nul répétition
                 b = 0
                 for k, v in self.players.items():
-                    bat[b] = v["bat_position"]
+                    paddle[b] = v["paddle_position"]
                     b += 1
 
-        return bat
+        return paddle
 
     def get_who(self):
         """Retourne le numéro de tous les joueurs dans un dict
@@ -368,7 +368,7 @@ class GameManagement():
                 "classement": {},
                 "ball": [7.19, 7.19],
                 "score": [9, 7],
-                "bat": {0: [-9.4, 0.0], 1: [-9.4, 0.40]},
+                "paddle": {0: [-9.4, 0.0], 1: [-9.4, 0.40]},
                 "who_are_you": {'moi': 0, 'toi': 1},
                 "rank_end":  0,
                 "reset": 0,
@@ -384,7 +384,7 @@ class GameManagement():
                 "classement": self.classement,
                 "ball": self.ball,
                 "score": self.get_score(),
-                "bat": self.get_bat(),
+                "paddle": self.get_paddle(),
                 "who_are_you": self.get_who(),
                 "rank_end":   self.rank_end,
                 "reset": self.reset,

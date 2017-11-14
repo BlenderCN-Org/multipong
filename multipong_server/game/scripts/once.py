@@ -104,8 +104,8 @@ class MulticastClient(DatagramProtocol):
         if "score" in data:
             gl.score = data["score"]
 
-        if "bat_position" in data:
-            gl.bat_position = data["bat_position"]
+        if "paddle_position" in data:
+            gl.paddle_position = data["paddle_position"]
 
         if "classement" in data:
             gl.classement = data["classement"]
@@ -171,7 +171,7 @@ def init_variable():
     # vient du server
     gl.ball_position = [0, 0] # liste
     gl.score = [0] * 10 # liste
-    gl.bat_position = { 0: [0, 0],   # dict !!
+    gl.paddle_position = { 0: [0, 0],   # dict !!
                         1: [0, 0],
                         2: [0, 0],
                         3: [0, 0],
@@ -220,8 +220,8 @@ def init_blender_obj():
                 8 : 8,
                 9 : 9   }
 
-    # All bat
-    gl.bat = {  0 : 0,
+    # All paddle
+    gl.paddle = {  0 : 0,
                 1 : 1,
                 2 : 2,
                 3 : 3,

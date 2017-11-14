@@ -43,7 +43,7 @@ def all_level_not_1_main(scenes):
         set_scene_play(scenes)
         positive_score()
         set_score()
-        bat_position()
+        paddle_position()
         ball_position()
         ball_out()
 
@@ -130,9 +130,9 @@ def level_1_main(scenes):
     ball_out()
     classement_level1(scenes)
 
-    # La bat auto est active si pas de scène rank
+    # La paddle auto est active si pas de scène rank
     if gl.level1_rated == 0:
-        automatic_bat(scenes)
+        automatic_paddle(scenes)
 
     # Retour au level 1 sans bug
     if gl.reset:
@@ -226,16 +226,16 @@ def ball_out():
     except:
         print("Balle non accessible")
 
-def automatic_bat(scenes):
+def automatic_paddle(scenes):
     """Seulement niveau 1. Mouvement auto de la raquette machine."""
 
     for scn in scenes :
         if scn.name == "1_players":
             try:
                 y = 0.7 * gl.ball.localPosition[1]
-                gl.bat[1].localPosition = [9.5, y, 1]
+                gl.paddle[1].localPosition = [9.5, y, 1]
             except:
-                print("Automatic bat non accessible")
+                print("Automatic paddle non accessible")
 
 def set_score():
     """Maj des scores avec les valeurs du server."""
@@ -247,18 +247,18 @@ def set_score():
             except:
                 print("Goal non accessible")
 
-def bat_position():
+def paddle_position():
     """Définir les positions des raquettes avec valeur du serveur."""
 
     for player in range(gl.level):
         try:
-            # les clés de gl.bat_position du serveur sont des str
-            pos = [gl.bat_position[str(player)][0],
-                   gl.bat_position[str(player)][1],
+            # les clés de gl.paddle_position du serveur sont des str
+            pos = [gl.paddle_position[str(player)][0],
+                   gl.paddle_position[str(player)][1],
                    1]
-            gl.bat[player].localPosition = pos
+            gl.paddle[player].localPosition = pos
         except:
-            print("Bat non accessible")
+            print("paddle non accessible")
 
 def positive_score():
     """Tous les scores doivent être >= 0"""

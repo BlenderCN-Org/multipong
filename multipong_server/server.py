@@ -88,7 +88,7 @@ class MyMulticastSender(DatagramProtocol):
                                         'level': 1,
                                         'rank_end': 0,
                                         'who_are_you': {},
-                                        'bat': {},
+                                        'paddle': {},
                                         'scene': 'play',
                                         'classement': {},
                                         'transit': 0},
@@ -145,11 +145,7 @@ class MyMulticastSender(DatagramProtocol):
 
 class MyTcpServer(Protocol):
     """Message reçu de chaque joueur en TCP:
-            {   'ball_position': [0.5, 3.3],
-                'bat_position': [-9.4, 0.0],
-                'my_score': 9,
-                'my_name': 'fg1456048',
-                'reset': 0 }
+
     """
 
     def __init__(self, factory):
