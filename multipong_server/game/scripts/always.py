@@ -29,11 +29,12 @@ def main():
     # Update des tempo
     gl.tempoDict.update()
 
-    if gl.tempoDict["frame_60"].tempo == 10:
+    if gl.tempoDict["frame_60"].tempo == 5:
         gl.scene = "play"
 
     # Update des messages
     message.main()
 
-    # Update du jeu
-    game.main()
+    if gl.tempoDict["always"].tempo > 8:
+        # Update du jeu
+        game.main()

@@ -240,7 +240,7 @@ def init_tempo():
         * tempoDict.update()
     """
 
-    tempo_liste = [("always", 1), ("frame_60", 60)]
+    tempo_liste = [("always", 100000000), ("frame_60", 60)]
     gl.tempoDict = Tempo(tempo_liste)
 
 def multicast():

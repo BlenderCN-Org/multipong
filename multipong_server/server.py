@@ -181,8 +181,13 @@ class MyTcpServer(Protocol):
                 joueur = data["joueur"]
                 self.add_data(joueur)
 
-                if joueur["reset"] == 1:
-                    self.reset_game()
+                if joueur:
+                    #print(joueur)
+                    #{'name': 'toto', 'paddle': [-9.5, 3], 'ball': [10, 10]}
+
+                    ##if joueur["reset"] == 1:
+                        ##self.reset_game()
+                    pass
 
             if "blend" in data:
                 blend = data["blend"]

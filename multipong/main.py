@@ -1,34 +1,17 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = '0.021'
+__version__ = '0.024'
 
 """
 pas d'accent dans les fichiers !!!!!!!!!!!!!!!
+ne pas oublier de commenter le Window.size
 
 version
-0.022 fullscreen
+0.024 avec class Game
+0.023 test user id
+0.022 fullscreen tout construit correct
 0.021 landscape
-0.020 avec balle
-0.019 sans window size
-0.018 sans utf-8
-0.017 avec utf-8
-0.016 plus utf8
-0.015 test labo
-0.014 ajout android.permissions
-0.013 try sur multicast receive
-0.012 print multicast
-0.011 tcp addr fixe
-0.010 avec print
-0.009 frequence 30
-0.008 envoi en tcp, réception en multicast, test débit fréquence
-0.007 sans window size
-0.006 avec import labmulticast
-0.005 avec réception
-0.004 avec Multicast()
-0.003 avec twisted
-0.002 pas d'accent dans kv
-0.001 sans import autre que kivy
 """
 
 
@@ -50,14 +33,13 @@ from kivy.vector import Vector
 from kivy.clock import Clock
 
 import os
-from time import time, sleep
-import socket
+from time import time
 import json
 import ast
 from threading import Thread
 
 # Les fichiers de ces modules sont dans le dossier courrant
-# Réception en multicast
+# Reception en multicast
 from labmulticast import Multicast
 # Envoi en TCP
 from labtcpclient import LabTcpClient
@@ -79,7 +61,7 @@ Window.size = (1280, 720)
 
 # Variables globales
 
-# Points des polygones = coordonnées blender
+# Points des polygones = coordonnees blender
 # et correction [offset_x, offset_y, size]
 
 carre = [-9.93542,  9.935437,
@@ -111,7 +93,7 @@ deca = []
 
 def lines_points(poly, poly_correction):
     """Retourne la liste des points pour dessiner le polygone.
-    poly=liste des points avec coordonnées blender
+    poly=liste des points avec coordonnees blender
     poly_correction=[offset_x, offset_y, size_x, size_y]
     """
 
@@ -140,7 +122,7 @@ def datagram_to_dict(data):
     try:
         dec = data.decode("utf-8")
     except:
-        print("Décodage UTF-8 impossible")
+        print("Decodage UTF-8 impossible")
         dec = data
 
     try:
@@ -154,6 +136,17 @@ def datagram_to_dict(data):
     else:
         print("Message reçu: None")
         return None
+
+def get_user_id():
+    """u0_a73"""
+
+    try:
+        user = os.getlogin()
+        print("User login:", user)
+    except:
+        user = "j" + str(int(time()[-8:]))
+        print("User:", user)
+    return  user
 
 
 class Screen5(Screen):
@@ -200,6 +193,33 @@ class Screen2(Screen):
         super(Screen2, self).__init__(**kwargs)
 
 
+class Screen1(Screen):
+    """Le joueur sera 'Joueur 1'"""
+
+    # Ce sont des attibuts de classe
+    # Accessible avec root.points dans kv
+    ball = ObjectProperty(None)
+    points = ListProperty(lines_points(carre, carre_correction))
+    paddle = ListProperty((15, 320, 700, 320))
+
+    def __init__(self, **kwargs):
+        super(Screen1, self).__init__(**kwargs)
+
+    def apply_ball_position(self, ball_pos):
+        """Positionne la balle avec position du serveur
+        TODO: serait mieux avec center
+        """
+
+        cc = carre_correction
+
+        self.ball.pos[0] = int((ball_pos[0]*cc[2]) + cc[0] - 6)
+        self.ball.pos[1] = int((ball_pos[1]*cc[2]) + cc[1] - 6)
+
+    def on_touch_move(self, touch):
+        ##Screen1.paddle[1] = touch.y
+        pass
+
+
 class PongBall(Widget):
     center_x = NumericProperty(0)
     center_y = NumericProperty(0)
@@ -209,94 +229,30 @@ class PongBall(Widget):
         pass
 
 
-class Screen1(Screen):
-
-    # Ce sont des attibuts de classe
-    # Accessible avec root.points dans kv
-    ball = ObjectProperty(None)
-    points = ListProperty(lines_points(carre, carre_correction))
-    paddle = ListProperty((15, 320, 700, 320))
-
-    def __init__(self, **kwargs):
-
-        super(Screen1, self).__init__(**kwargs)
-        print(dir(self))
-
-    def update(self, dt):
-        """Recupere le message du seveur tous les dt lance par Clock:
-        {'svr_msg': {'dictat': {'transit': 0, 'reset': 0, 'level': 1,
-        'ball': [10, 10]}, 'ip': '192.168.1.17'}}
-        TODO cette fonction doit etre commune a tous les screen
-        """
-
-        svr_data = self.get_svr_data()
-        self.apply_svr_data(svr_data)
-
-    def get_svr_data(self):
-        # Acces a screen manager dans MultiPongApp
-        screen_manager = MultiPongApp.get_running_app().screen_manager
-        # Acces a l'ecran Menu
-        self.menu = screen_manager.get_screen("Menu")
-        # Acces a Network
-        svr_data = self.menu.network.server_data
-
-        return svr_data
-
-    def apply_svr_data(self, svr_data):
-        """Recupere la position de la balle dans le message du serveeur,
-        puis applique cette position a la balle.
-        """
-        ball_pos = self.get_ball_position(svr_data)
-        self.apply_ball_position(ball_pos)
-
-    def get_ball_position(self, svr_data):
-        """Recupere la position de la balle dans le message du serveur
-        """
-
-        try:
-            svr_msg = svr_data["svr_msg"]
-            dictat = svr_msg["dictat"]
-            # Position de la balle dans le repere de blender
-            ball_pos = dictat["ball"]
-        except:
-            ball_pos = 100, 100
-
-        return ball_pos
-
-    def apply_ball_position(self, ball_pos):
-        """Positionne la balle avec position du serveur"""
-
-        cc = carre_correction
-
-        self.ball.center[0] = int((self.ball.center[0]*cc[2]) + cc[0])
-        self.ball.center[1] = int((self.ball.center[1]*cc[2]) + cc[1])
-
-    def on_touch_move(self, touch):
-        ##Screen1.paddle[1] = touch.y
-        pass
-
-
 class MainScreen(Screen):
     """Ecran principal"""
 
     def __init__(self, **kwargs):
-
         super(MainScreen, self).__init__(**kwargs)
+
+        # Construit le reseau, tourne tout le temps
+        scr_manager = self.get_screen_manager()
+        #self.network = Network(scr_manager)
+        self.game = Game(scr_manager)
+
+    def get_screen_manager(self):
+        return MultiPongApp.get_running_app().screen_manager
 
 
 class Network:
-    """."""
+    """Les Screen accede a Network avec
+    MultiPongApp.get_running_app()
+    """
 
-    def __init__(self):
+    def __init__(self, screen_manager):
 
-        # config, obtenu par hasard
-        MultiPongApp.load_config(self)
+        # config, obtenu avec des dir()
         config = MultiPongApp.get_running_app().config
-
-        # TCP
-        self.tcp_ip = None
-        self.tcp_port = self.get_tcp_port(config)
-        self.tcp_clt = None
 
         # Multi
         self.multi_ip, self.multi_port = self.get_multicast_addr(config)
@@ -305,45 +261,38 @@ class Network:
                                     1024)
         self.server_msg = None
 
-        # Verif freq
-        self.t = time()
-        self.v_freq = 0
+        # Serveur data
+        self.dictat = None
 
-    def verif_freq(self):
-        self.v_freq += 1
-        a = time()
-        if a - self.t > 1:
-            print("FPS:", self.v_freq)
-            self.v_freq = 0
-            self.t = a
+        # TCP
+        self.tcp_ip = None
+        self.tcp_port = self.get_tcp_port(config)
+        self.tcp_clt = None
+        self.tcp_msg = {}
 
-    def network_update(self, dt):
-        """A chaque Clock, maj de reception, maj des datas, envoi
-        level
-        ball
-        paddles
-        scores
-        """
-
-        self.verif_freq()
+    def network_update(self):
+        """Maj de reception, maj des datas, envoi"""
 
         # Recup du message su serveur en multicast
-        server_msg = self.get_multicast_msg()
+        svr_msg = self.get_multicast_msg()
+        self.dictat = self.get_svr_data(svr_msg)
 
         # Recup ip serveur si pas deffinie
-        self.set_server_addr(server_msg)
+        self.set_server_addr()
 
-        # Création du socket TCP si none
+        # Creation du socket TCP si None
         self.create_tcp_socket()
 
-        # Recup des datas dans le message
+    def get_svr_data(self, svr_msg):
+        """Retourne dictat"""
 
+        try:
+            sm = svr_msg["svr_msg"]
+            dictat = sm["dictat"]
+        except:
+            dictat = None
 
-        # Maj du jeu
-
-
-        # Envoi au serveur
-        self.send_TCP_msg()
+        return dictat
 
     def get_multicast_addr(self, config):
         """Retourne l'adresse multicast"""
@@ -354,45 +303,159 @@ class Network:
         return multi_ip, multi_port
 
     def get_multicast_msg(self):
+        """{svr_msg = 'svr_msg':
+                    {'ip': '192.168.1.12',
+                    'dictat': {
+                        'level': 1,
+                        'ball': [9.556015014648438, 9.324382781982422],
+                        'transit': 0,
+                        'who_are_you': {},
+                        'rank_end': 0,
+                        'paddle': {},
+                        'score': [],
+                        'scene': 'play',
+                        'classement': {},
+                        'reset': 0}}}
+        """
+
         try:
-            data = my_multi.receive()
-            server_msg = datagram_to_dict(data)
+            data = self.my_multi.receive()
+            svr_msg = datagram_to_dict(data)
         except:
-            #print("Pas de réception multicast")
-            server_msg = None
-        return server_msg
+            print("Pas de reception multicast")
+            svr_msg = None
+        return svr_msg
 
     def get_tcp_port(self, config):
         """Retourne le port TCP"""
 
         return int(config.get('network', 'tcp_port'))
 
-    def set_server_addr(self, msg):
-        """Récupère l'ip du serveur, et defini l'adresse serveur."""
+    def set_server_addr(self):
+        """Recupere l'ip du serveur, et defini l'adresse serveur."""
 
-        if msg and "svr_msg" in msg:
-            if "ip" in msg["svr_msg"] and not self.tcp_addr:
-                self.tcp_ip = msg["svr_msg"]["ip"]
+        if self.dictat and "ip" in self.dictat and not self.tcp_ip:
+            self.tcp_ip = self.svr_data["svr_msg"]["ip"]
 
     def create_tcp_socket(self):
         if self.tcp_ip and not self.tcp_clt:
             try:
-                self.tcp_clt = LabTcpClient(self.tcp_addr[0],
-                                            self.tcp_addr[1])
+                self.tcp_clt = LabTcpClient(self.tcp_ip,
+                                            self.tcp_port)
             except:
                 self.tcp_clt = None
                 print("Pas d'ip dans le message du serveur")
 
-    def send_TCP_msg(self):
-        msg = {"joueur": {  "name": "toto",
-                    "ball": [10, 10],
-                    "paddle":  [-9.5, 3] }}
-        env = json.dumps(msg).encode("utf-8")
+    def send_tcp_msg(self):
+        env = json.dumps(self.tcp_msg).encode("utf-8")
         if self.tcp_clt:
             self.tcp_clt.send(env)
 
 
-SCREENS = { 0: (MainScreen, "Menu"),
+class Game(Network):
+
+    def __init__(self, screen_manager, **kwargs):
+
+        super(Game, self).__init__(screen_manager, **kwargs)
+
+        self.scr_manager = screen_manager
+        self.cur_screen = self.get_current_screen()
+
+        # Rafraichissement du jeu
+        tempo = 0.03 #self.get_tempo()
+        self.event = Clock.schedule_interval(self.game_update, tempo)
+
+        # Verif freq
+        self.t = time()
+        self.v_freq = 0
+
+        self.my_name = get_user_id()
+
+    def get_tempo(self):
+        """Retourne la tempo de la boucle de Clock."""
+
+        config = MultiPongApp.get_running_app().config
+        freq = int(config.get('network', 'freq'))
+
+        if freq > 60:
+            freq = 60
+        if freq < 1:
+            freq = 1
+        print("Frequence d'envoi en TCP =", freq)
+        return 1/freq
+
+    def game_update(self, dt):
+        """self.dictat = {"level":  2,
+                        "scene" : 'play',
+                        "classement": {},
+                        "ball":   [7.19, 7.19],
+                        "score":  [9, 7],
+                        "paddle": {0: [-9.4, 0.0], 1: [-9.4, 0.40]},
+                        "who_are_you": {'moi': 0, 'toi': 1},
+                        "rank_end": 0,
+                        "reset":   0,
+                        "transit": 0 }, "ip": etc ...}}
+        """
+
+        self.verif_freq()
+        self.network_update()
+
+        # Maj du screen courant
+        self.get_current_screen()
+
+        # Apply
+        self.apply_ball_pos()
+        self.apply_paddle_pos()
+
+        # Envoi au serveur
+        self.create_msg()
+        self.send_tcp_msg()
+
+    def apply_ball_pos(self):
+        try:
+            ball_pos = self.dictat["ball"]
+        except:
+            ball_pos = None
+
+        if ball_pos:
+            if self.cur_screen.name != "Main":
+                # Les screen de 1 a 10 doivent avoir apply_ball_position
+                self.cur_screen.apply_ball_position(ball_pos)
+
+    def apply_paddle_pos(self):
+        pass
+
+    def create_msg(self):
+        if "Main" not in self.cur_screen.name:
+            self.tcp_msg = {"joueur": {"name":   self.my_name,
+                                       "paddle": self.get_paddle()}}
+
+    def verif_freq(self):
+        self.v_freq += 1
+        a = time()
+        if a - self.t > 1:
+            print("FPS:", self.v_freq)
+            self.v_freq = 0
+            self.t = a
+
+    def get_current_screen(self):
+        """Set le screen en cours"""
+
+        self.cur_screen = self.scr_manager.current_screen
+
+    def get_paddle(self):
+        """retourne pos de ma paddle"""
+        return [6, 5]
+
+    def get_my_name():
+        if "Main" not in self.cur_screen.name:
+            return "Joueur" + self.cur_screen
+        else:
+            return None
+
+
+
+SCREENS = { 0: (MainScreen, "Main"),
             1: (Screen1,    "1"),
             2: (Screen2,    "2"),
             3: (Screen3,    "3"),
@@ -400,60 +463,27 @@ SCREENS = { 0: (MainScreen, "Menu"),
             5: (Screen5,    "5")}
 
 
-class MultiPongApp(App, Network):
-    """Construction de l'application. Exécuté par __main__,
+class MultiPongApp(App):
+    """Construction de l'application. Execute par __main__,
     app est le parent de cette classe dans kv.
     """
 
-    def __init__(self, **kwargs):
-        super(MultiPongApp, self).__init__(**kwargs)
-
     def build(self):
-        """Exécuté en premier apres run()"""
+        """Execute en premier apres run()"""
 
         # Creation des ecrans
         self.screen_manager = ScreenManager()
         for i in range(len(SCREENS)):
             self.screen_manager.add_widget(SCREENS[i][0](name=SCREENS[i][1]))
-
         return self.screen_manager
 
-    def on_start(self, **kwargs):
-        """Exécuté apres build()"""
-
-        #super(MultiPongApp, self).__init__(**kwargs)
-
-        # Nom du joueur: name est déjà attribut de self
-        self.my_name = self.get_user_id()
-
-        # Construit le réseau, tourne tout le temps
-        #self.network = Network()
-
-        # Rafraichissement du jeu
-        tempo = self.get_tempo()
-        self.event = Clock.schedule_interval(self.network_update, tempo)
-
-    def get_tempo(self):
-        """Retourne la tempo de la boucle de Clock."""
-
-        freq = int(self.config.get('network', 'freq'))
-
-        if freq > 60:
-            freq = 60
-        if freq < 1:
-            freq = 1
-        print("Fréquence d'envoi en TCP =", freq)
-
-        return 1/freq
-
-    def get_user_id(self):
-        user = os.getlogin()
-        print("User login:", user)
-        return  user
+    def on_start(self):
+        """Execute apres build()"""
+        pass
 
     def build_config(self, config):
         """Si le fichier *.ini n'existe pas,
-        il est créé avec ces valeurs par défaut.
+        il est cree avec ces valeurs par defaut.
         Si il manque seulement des lignes, il ne fait rien !
         """
 
@@ -474,10 +504,10 @@ class MultiPongApp(App, Network):
                               'double_tap_distance': 20})
 
     def build_settings(self, settings):
-        """Construit l'interface de l'écran Options,
+        """Construit l'interface de l'ecran Options,
         pour multipong seul,
-        Kivy est par défaut,
-        appelé par app.open_settings() dans .kv
+        Kivy est par defaut,
+        appele par app.open_settings() dans .kv
         """
 
         data = """[{"type": "title", "title": "Configuration du reseau"},
@@ -495,7 +525,7 @@ class MultiPongApp(App, Network):
         """Si modification des options, fonction appelee automatiquement."""
 
         freq = int(self.config.get('network', 'freq'))
-        menu = self.screen_manager.get_screen("Menu")
+        menu = self.screen_manager.get_screen("Main")
 
         if config is self.config:
             token = (section, key)
@@ -503,14 +533,14 @@ class MultiPongApp(App, Network):
             # If frequency change
             if token == ('network', 'freq'):
                 # Restart the server with new address
-                #self.screen_manager.get_screen("Menu").restart_server()
+                #self.screen_manager.get_screen("Main").restart_server()
                 print("Nouvelle frequence", freq)
 
     def go_mainscreen(self):
         """Retour au menu principal depuis les autres ecrans."""
 
         #if touch.is_double_tap:
-        self.screen_manager.current = ("Menu")
+        self.screen_manager.current = ("Main")
 
     def do_quit(self):
         """Quitter proprement."""
@@ -518,7 +548,8 @@ class MultiPongApp(App, Network):
         print("Quitter proprement")
 
         # Stop propre de Clock
-        self.event.cancel()
+        menu = self.screen_manager.get_screen("Main")
+        menu.game.event.cancel()
 
         # Kivy
         MultiPongApp.get_running_app().stop()
@@ -529,9 +560,3 @@ class MultiPongApp(App, Network):
 
 if __name__ == '__main__':
     MultiPongApp().run()
-
-"""
-
-
-['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__events__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__le__', '__lt__', '__metaclass__', '__module__', '__ne__', '__new__', '__proxy_getter', '__proxy_setter', '__pyx_vtable__', '__reduce__', '__reduce_ex__', '__repr__', '__self__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '_apply_transform', '_context', '_kwargs_applied_init', '_proxy_ref', '_walk', '_walk_reverse', 'add_widget', 'apply_property', 'bind', 'canvas', 'center', 'center_x', 'center_y', 'children', 'clear_widgets', 'cls', 'collide_point', 'collide_widget', 'create_property', 'disabled', 'dispatch', 'dispatch_children', 'dispatch_generic', 'events', 'export_to_png', 'fbind', 'funbind', 'get_center_x', 'get_center_y', 'get_parent_window', 'get_property_observers', 'get_right', 'get_root_window', 'get_top', 'get_window_matrix', 'getter', 'height', 'id', 'ids', 'is_event_type', 'move', 'on_disabled', 'on_opacity', 'on_touch_down', 'on_touch_move', 'on_touch_up', 'opacity', 'parent', 'pos', 'pos_hint', 'pos_x', 'pos_y', 'properties', 'property', 'proxy_ref', 'register_event_type', 'remove_widget', 'right', 'set_center_x', 'set_center_y', 'set_right', 'set_top', 'setter', 'size', 'size_hint', 'size_hint_max', 'size_hint_max_x', 'size_hint_max_y', 'size_hint_min', 'size_hint_min_x', 'size_hint_min_y', 'size_hint_x', 'size_hint_y', 'to_local', 'to_parent', 'to_widget', 'to_window', 'top', 'uid', 'unbind', 'unbind_uid', 'unregister_event_types', 'walk', 'walk_reverse', 'width', 'x', 'y']
-"""

@@ -28,7 +28,8 @@
                 text: 'Jouer'
                 color: (0, 1, 0, 1)
                 font_size: "22dp"
-                on_release: root.manager.current = ("1")
+                # erreur ici
+                on_release: app.root.current = "1"
         BoxLayout:
             size_hint_y: 0.04
             orientation: 'horizontal'
@@ -51,12 +52,19 @@
             pos: self.pos
             size: 12, 12 # TODO size fct resolution ecran
 
+<PongPaddle>:
+    size: 25, 200
+    canvas:
+        Rectangle:
+            pos:self.pos
+            size:self.size
+
 <Screen1>:
     ball: pong_ball
 
     PongBall:
         id: pong_ball
-        center: self.parent.center
+        pos: self.pos
 
     BoxLayout:
         orientation: 'horizontal'
@@ -69,10 +77,6 @@
                     points: root.points
                     width: 3
                     close: 1
-                ##Rectangle:
-                    ##id: ball
-                    ##size: 25, 25
-                    ##pos: root.ball_pos
                 ##Rectangle:
                     ##id: paddle_0
                     ##size: 10, 100

@@ -183,25 +183,22 @@ class GameManagement():
                 """
 
         # Seulement si le nom est valide, donc saisi
-        try:
-            if msg and msg["my_name"] != "":
-                if msg["my_name"] in self.players:
-                    self.players[msg["my_name"]]["ball_position"] = msg["ball_position"]
-                    self.players[msg["my_name"]]["paddle_position"] = msg["paddle_position"]
-                    self.players[msg["my_name"]]["my_score"] = msg["my_score"]
-                    self.players[msg["my_name"]]["time"] = time()
-                else:
-                    self.players[msg["my_name"]] = {}
-                    self.players[msg["my_name"]]["ball_position"] = msg["ball_position"]
-                    self.players[msg["my_name"]]["paddle_position"] = msg["paddle_position"]
-                    self.players[msg["my_name"]]["my_score"] = msg["my_score"]
-                    self.players[msg["my_name"]]["my_name"] = msg["my_name"]
-                    self.players[msg["my_name"]]["time"] = time()
-                    self.players[msg["my_name"]]["classement"] = 0
-                    self.players[msg["my_name"]]["user"] = user
-                    print("Dans players, création de:", user)
-        except:
-            print("Pb dans update_data_in_players_dict")
+        if msg and "my_name" in msg:
+            if msg["my_name"] in self.players:
+                self.players[msg["my_name"]]["ball_position"] = msg["ball_position"]
+                self.players[msg["my_name"]]["paddle_position"] = msg["paddle_position"]
+                self.players[msg["my_name"]]["my_score"] = msg["my_score"]
+                self.players[msg["my_name"]]["time"] = time()
+            else:
+                self.players[msg["my_name"]] = {}
+                self.players[msg["my_name"]]["ball_position"] = msg["ball_position"]
+                self.players[msg["my_name"]]["paddle_position"] = msg["paddle_position"]
+                self.players[msg["my_name"]]["my_score"] = msg["my_score"]
+                self.players[msg["my_name"]]["my_name"] = msg["my_name"]
+                self.players[msg["my_name"]]["time"] = time()
+                self.players[msg["my_name"]]["classement"] = 0
+                self.players[msg["my_name"]]["user"] = user
+                print("Dans players, création de:", user)
 
     def update_game_management(self):
         """Appelé par create_msg_for_all_players, tourne donc à 60 fps."""
