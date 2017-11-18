@@ -23,47 +23,14 @@
 #############################################################################
 
 """
-De msg =
-{"joueur": {    "my_name":       gl.my_name,
-                "ball_position": get_ball_position(),
-                "my_score":      get_my_score(),
-                "paddle_position":  get_paddle_position(),
-                "reset":         get_reset()}}
+serveur
+    Reçu de Blender:
+        {'reset': 0, 'paddle': [[-9.5, 0.0], [9.5, -4.008979797363281], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]], 'ball': [8.999176025390625, -5.898959159851074]}
 
-Vers
-players = [
-('gg1456048982', {  'ball_position': [2.1, 4.8],
-                    'my_score': 9,
-                    'time': 1456048988.52,
-                    'classement': 0,
-                    'paddle_position': [-9.4, 0.0],
-                    'my_name': 'gg1456048982'}),
+    Reçu de pierre:
+        {'paddle': [6, 5], 'name': 'pierre'}
 
-('gg1456048985', {  'ball_position': [7.4, 9.1],
-                    'my_score': 8,
-                    'time': 1456048987.50,
-                    'classement': 0,
-                    'paddle_position': [9.4, 0.0],
-                    'my_name': 'gg1456048985'})
-]
 
-msg envoyé:
-lapin = {"svr_msg": {"ip": self.ip_server, "dictat": data}}
-et
-msg =   {   "level": self.level,
-            "scene" : self.scene,
-            "classement": self.classement,
-            "ball_position_server": self.get_ball(),
-            "score": self.get_score(),
-            "other_paddle_position": self.get_paddle(),
-            "who_are_you": self.get_who(),
-            "rank_end":   self.rank_end,
-            "reset": self.get_reset(),
-            "transit": self.transit  }
-
-lapin = {"svr_msg": {"ip": self.ip_server, "dictat": msg}}
-        ou
-lapin = {"svr_msg": {"ip": self.ip_server, "dictat": {'rien': 0}}}
 """
 
 
@@ -71,8 +38,6 @@ from collections import OrderedDict
 from time import time, sleep
 import threading
 import json
-
-from mylabotools.labfifolist import PileFIFO
 
 
 class GameManagement():
@@ -84,6 +49,9 @@ class GameManagement():
         self.conf = conf
 
         t = time()
+
+        # Dict avec dernière valeur reçue de chaque joueur
+        self.raw_dict = {}
 
         # Dict des datas de tous les joueurs
         self.players = OrderedDict()
@@ -100,55 +68,22 @@ class GameManagement():
         self.transit = 0 # pour bloquage des jeux si level change
         self.t_transit = t
         self.tempo_transit = 2
-        self.ball = [2,2]
+        self.ball = [2, 2]
+        self.paddle = []
         self.reset = 0
 
-        # Spécifique protocol twisted 3
+        # Suivi fréquence
         self.t_print = t  # print régulier
         self.t_count = t  # Affichage fréquence régulier
         self.count = 0
-        self.pile_dict = {}
-        self.len_pile = self.conf["pile"]["len_pile"]
 
-    def reset_data(self):
-        """Reset si demandé par un joueur avec R
-        ou à la fin de rank
-        """
+    def add_data_in_raw_dict(self, user, data):
+        """Ajoute les datas reçues d'un user dans le raw dict."""
 
-        print("Reset in Game Dictator")
-        self.players = OrderedDict()
-        self.ranked = []
-        self.scene = "play"
-        self.winner = ""
-        self.rank_end = 0
-        self.t_rank = 0
-        self.classement = {}
-        self.level = 0
-        self.pile_dict = {}
-
-    def add_data_in_pile(self, user, data):
-        """Ajoute les datas reçues d'un user dans sa pile,
-        Demande de la mise à jour de la gestion du jeu à 60 Hz.
-        """
-
-        try:
-            self.pile_dict[user].append(data)
-        except:
-            self.pile_dict[user] = PileFIFO(self.len_pile)
-            print("Création de la pile de:", user)
+        self.raw_dict[user] = data
 
         # Affichage de la fréquence d'appel de cette méthode
         self.frequency()
-
-    def update_blend(self, blend):
-        """Maj de la position de la balle et du reset
-        avec valeurs reçues de blender.
-        {"blend": {"ball": (1,1), "reset": 0}}
-        blend = {"ball": (1,1), "reset": 0}
-        """
-
-        self.ball = blend["ball"]
-        self.reset = blend["reset"]
 
     def pile_to_players(self):
         """Appelé par create_msg_for_all_players
@@ -158,29 +93,13 @@ class GameManagement():
         """
 
         # copie du dict pour le libérer
-        all_data = self.pile_dict.copy()
+        all_data = self.raw_dict.copy()
         for cle, valeur in all_data.items():
-            # cle = user de TCP, valeur = pile, queue = list
-            try:
-                # valeur est un object PileFIFO
-                i = len(valeur.queue) - 1
-                msg = valeur.queue[i]
-            except:
-                msg = None
-            self.update_data_in_players_dict(msg, cle)
+            # cle = user de TCP, valeur = dernière data du user
+            self.update_data_in_players_dict(cle, valeur)
 
-    def frequency(self):
-        self.count += 1
-        t = time()
-        if t - self.t_count > 5:
-            print("Fréquence d'accès par les clients", int(self.count/5))
-            self.count = 0
-            self.t_count = t
-
-    def update_data_in_players_dict(self, msg, user):
-        """A chaque reception de msg par le server, insère in dict.
-        Ajout seulement si name créé dans blender.
-                """
+    def update_data_in_players_dict(self, user, msg):
+        """A chaque reception de msg par le server, insère in dict."""
 
         # Seulement si le nom est valide, donc saisi
         if msg and "my_name" in msg:
@@ -208,6 +127,14 @@ class GameManagement():
         self.update_transit()
         self.update_classement()
         self.update_rank()
+
+    def frequency(self):
+        self.count += 1
+        t = time()
+        if t - self.t_count > 5:
+            print("Fréquence d'accès par les clients", int(self.count/5))
+            self.count = 0
+            self.t_count = t
 
     def update_transit(self):
         """Si transit:
@@ -303,6 +230,16 @@ class GameManagement():
         else:
             self.classement = {}
 
+    def update_blend(self, blend):
+        """Maj de la position de la balle et du reset
+        avec valeurs reçues de blender
+         blend = {"ball": (1,1), "reset": 0}
+        """
+
+        self.ball = blend["ball"]
+        self.reset = blend["reset"]
+        self.paddle = blend["paddle"]
+
     def get_score(self):
         """Retourne les scores de tous les joueurs, dans une liste.
         Le dict est ordonné, j'ajoute les scores dans l'ordre.
@@ -317,15 +254,15 @@ class GameManagement():
 
         return score
 
-    def get_paddle(self):
-        """Retourne la position des paddles de tous les joueurs.
-        Le dict est ordonné, j'ajoute les paddles dans l'ordre.
-        """
+    ##def get_paddle(self):
+        ##"""Retourne la position des paddles de tous les joueurs.
+        ##Le dict est ordonné, j'ajoute les paddles dans l'ordre.
+        ##"""
 
-        paddle = []
-        for k, v in self.players.items():
-            paddle.append(v["paddle_position"])
-        return paddle
+        ##paddle = []
+        ##for k, v in self.players.items():
+            ##paddle.append(v["paddle_position"])
+        ##return paddle
 
     def get_who(self):
         """Retourne le numéro de tous les joueurs dans un dict
@@ -364,7 +301,7 @@ class GameManagement():
                 "classement": self.classement,
                 "ball": self.ball,
                 "score": self.get_score(),
-                "paddle": self.get_paddle(),
+                "paddle": self.paddle,
                 "who_are_you": self.get_who(),
                 "rank_end":   self.rank_end,
                 "reset": self.reset,
@@ -372,12 +309,28 @@ class GameManagement():
 
         return msg
 
+    def reset_data(self):
+        """Reset si demandé par un joueur avec R
+        ou à la fin de rank
+        """
+
+        print("Reset in Game Dictator")
+        self.players = OrderedDict()
+        self.ranked = []
+        self.scene = "play"
+        self.winner = ""
+        self.rank_end = 0
+        self.t_rank = 0
+        self.classement = {}
+        self.level = 0
+        self.raw_dict = {}
+
     def delete_disconnected_players(self, user):
         """Appelé depuis MyTcpServer si conection lost.
         TODO try a revoir pas normal"""
 
         try:
-            del self.pile_dict[user]
+            del self.raw_dict[user]
             print("{} supprimé dans pile_dict".format(user))
         except:
             a = "Le joueur {} n'est plus dans le dictionnaire"
@@ -393,7 +346,7 @@ class GameManagement():
                 print("{} n'est pas dans players".format(key))
 
     def print_some(self, msg):
-        if time() - self.t_print > 2:
+        if time() - self.t_print > 5:
             print("\nMessage to send:")
             for k, v in msg.items():
                 print(k, v)

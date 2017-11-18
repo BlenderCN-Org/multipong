@@ -49,10 +49,10 @@ from labtcpclient import LabTcpClient
 Window.size = (1280, 720)
 
 """
-1 joueur carre
-2 joueur carre
+1 joueur CARRE
+2 joueur CARRE
 3 joueur triangle
-4 joueur carre
+4 joueur CARRE
 5 joueur penta
 6 joueur hexa
 7 joueur hepta
@@ -66,35 +66,35 @@ Window.size = (1280, 720)
 # Points des polygones = coordonnees blender
 # et correction [offset_x, offset_y, size]
 
-carre = [-9.93542,  9.935437,
+CARRE = [-9.93542,  9.935437,
           9.93543,  9.93543,
           9.93543, -9.93543,
          -9.93543, -9.93543]
-carre_correction = [360, 360, 36]
+CARRE_RATIO = [360, 360, 36]
 
-paddle_10 = [-9.66105,  1.43211,
+PADDLE_10 = [-9.66105,  1.43211,
              -9.33895,  1.43211,
              -9.33895, -1.43211,
              -9.66105, -1.43211]
 
-paddle_11 = [ 9.33895,  1.43211,
+PADDLE_11 = [ 9.33895,  1.43211,
               9.66105,  1.43211,
               9.66105, -1.43211,
               9.33895, -1.43211]
 
-triangle = [0, 12.12306,
+TRIANGLE = [0, 12.12306,
             -14.22068, -12.50787,
             14.22068, -12.50787]
 
-triangle_correction = [418, 366, 29]
+TRIANGLE_RATIO = [418, 366, 29]
 
-penta = [   0,        9.34335,
+PENTA = [   0,        9.34335,
             9.74,     2.26683,
             6.01965, -9.18323,
            -6.01965, -9.18323,
            -9.74,     2.26683]
 
-penta_correction = [380, 358, 38.6]
+PENTA_RATIO = [380, 358, 38.6]
 
 hexa = []
 hepta = []
@@ -163,7 +163,7 @@ def get_user_id():
 class Screen5(Screen):
     """Ecran pour 5 joueurs"""
 
-    p = lines_points(penta, penta_correction)
+    p = lines_points(PENTA, PENTA_RATIO)
     points = ListProperty(p)
 
     def __init__(self, **kwargs):
@@ -175,20 +175,25 @@ class Screen5(Screen):
 class Screen4(Screen):
     """Ecran pour 4 joueurs"""
 
-    p = lines_points(carre, carre_correction)
+    p = lines_points(CARRE, CARRE_RATIO)
     points = ListProperty(p)
 
     def __init__(self, **kwargs):
 
         super(Screen4, self).__init__(**kwargs)
+
         print("Initialisation de Screen4 ok")
 
 
 class Screen3(Screen):
     """Ecran pour 3 joueurs"""
 
-    p = lines_points(triangle, triangle_correction)
+    p = lines_points(TRIANGLE, TRIANGLE_RATIO)
     points = ListProperty(p)
+
+    paddle_0 = ObjectProperty(None)
+    paddle_1 = ObjectProperty(None)
+    paddle_2 = ObjectProperty(None)
 
     def __init__(self, **kwargs):
 
@@ -199,7 +204,7 @@ class Screen3(Screen):
 class Screen2(Screen):
     """Ecran pour 2 joueurs"""
 
-    p = lines_points(carre, carre_correction)
+    p = lines_points(CARRE, CARRE_RATIO)
     points = ListProperty(p)
 
     def __init__(self, **kwargs):
@@ -209,40 +214,46 @@ class Screen2(Screen):
 
 
 class Screen1(Screen):
-    """Le joueur sera 'Joueur 1'"""
+    """Le joueur sera 'Joueur 1'
+    dir(self.ball) = 'center', 'center_x', 'center_y'
+    """
 
     # Ce sont des attibuts de classe
     # Accessible avec root.points dans kv
+
+    # Points du terrain carre
+    points = ListProperty(lines_points(CARRE, CARRE_RATIO))
+
     ball = ObjectProperty(None)
-    points = ListProperty(lines_points(carre, carre_correction))
-
     paddle_0 = ObjectProperty(None)
-    points_10 = ListProperty(lines_points(paddle_10, carre_correction))
-
     paddle_1 = ObjectProperty(None)
-    points_11 = ListProperty(lines_points(paddle_11, carre_correction))
 
     def __init__(self, **kwargs):
         super(Screen1, self).__init__(**kwargs)
+
+        self.paddle_0.pos = 9, 310
+        self.paddle_1.pos = 697, 310
+
         print("Initialisation de Screen1 ok")
 
     def apply_ball_position(self, ball_pos):
         """Positionne la balle avec position du serveur."""
 
-        cc = carre_correction
-
+        cc = CARRE_RATIO
         self.ball.pos[0] = int((ball_pos[0]*cc[2]) + cc[0] - 6)
         self.ball.pos[1] = int((ball_pos[1]*cc[2]) + cc[1] - 6)
+        print(dir(self))
 
-    def apply_paddle_position(self, ball_pos):
+    def apply_paddle_position(self, paddle_pos):
+        """[[-9.5, 0.0], [9.5, -1.81], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
+        """
+        cc = CARRE_RATIO
 
-        cc = carre_correction
+        self.paddle_0.pos[0] = int((paddle_pos[0][0]*cc[2]) + cc[0] -6)
+        self.paddle_0.pos[1] = int((paddle_pos[0][1]*cc[2]) + cc[1] -52)
 
-        self.paddle_0.pos[0] = int((ball_pos[0]*cc[2]) + cc[0] - 50)
-        self.paddle_0.pos[1] = int((ball_pos[1]*cc[2]) + cc[1] - 50)
-
-        self.paddle_1.pos[0] = int((ball_pos[0]*cc[2]) + cc[0] - 150)
-        self.paddle_1.pos[1] = int((ball_pos[1]*cc[2]) + cc[1] - 150)
+        self.paddle_1.pos[0] = int((paddle_pos[1][0]*cc[2]) + cc[0] -6)
+        self.paddle_1.pos[1] = int((paddle_pos[1][1]*cc[2]) + cc[1] -52)
 
     def on_touch_move(self, touch):
         ##Screen1.paddle[1] = touch.y
@@ -485,13 +496,15 @@ class Game(Network):
                 self.cur_screen.apply_ball_position(ball_pos)
 
     def apply_paddle_pos(self):
+        """paddle_pos = list de [2, 3]"""
+
         try:
-            ball_pos = self.dictat["ball"]
+            paddle_pos = self.dictat["paddle"]
         except:
-            ball_pos = None
-        if ball_pos:
+            paddle_pos = None
+        if paddle_pos:
             if self.cur_screen.name != "Main":
-                self.cur_screen.apply_paddle_position(ball_pos)
+                self.cur_screen.apply_paddle_position(paddle_pos)
 
     def create_msg(self):
         if "Main" not in self.cur_screen.name:

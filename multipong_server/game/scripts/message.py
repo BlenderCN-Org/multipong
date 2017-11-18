@@ -29,14 +29,35 @@ def create_msg_to_send():
         msg = {"blend": {"ball": (1,1), "reset": 0}}
     """
 
+    # Récupération des paddle pos
+    get_paddle_position()
+
     msg = {"blend": {"ball":  get_ball_position(),
+                     "paddle": gl.paddle_pos,
                      "reset": get_reset() }}
     return msg
 
+def get_paddle_position():
+    """Retourne la position de tuotes les paddle
+    gl.paddle[1] = blender obj
+    paddle_pos[1] = [2, -9]
+    """
+
+    l_cor = gl.level
+    if l_cor == 1: l_cor = 2
+
+    for i in range(l_cor):
+        try:
+            x = gl.paddle[i].localPosition[0]
+            y = gl.paddle[i].localPosition[1]
+        except:
+            x, y = 2, 2
+        gl.paddle_pos[i] = [x, y]
+
 
 def get_ball_position():
-    """Retourne la position x, y de ma balle donnée par le moteur physique.
-    Le joueur 0 du server donne la position pour tous les autres.
+    """Retourne la position x, y de la balle
+    donnée par le moteur physique.
     """
 
     try:

@@ -252,9 +252,9 @@ def paddle_position():
 
     for player in range(gl.level):
         try:
-            # les clés de gl.paddle_position du serveur sont des str
-            pos = [gl.paddle_position[str(player)][0],
-                   gl.paddle_position[str(player)][1],
+            # les clés de gl.paddle_pos du serveur sont des str
+            pos = [gl.paddle_pos[str(player)][0],
+                   gl.paddle_pos[str(player)][1],
                    1]
             gl.paddle[player].localPosition = pos
         except:
@@ -303,7 +303,7 @@ def B_keys():
 def print_some():
     """Print toutes les s des valeurs permettant de debugguer."""
 
-    if gl.tempoDict["frame_60"].tempo == 60:
+    if gl.tempoDict["print"].tempo == 0:
         print(  "Envoi:", gl.msg_to_send, "\n",
                 "Réception", "\n",
                 "transit", gl.transit,
@@ -311,7 +311,7 @@ def print_some():
                 "rank_end", gl.rank_end,
                 "scene", gl.scene,
                 "score", gl.score,
-                "paddle_position", gl.paddle_position,
+                "paddle_position", gl.paddle_pos,
                 "classement", gl.classement)
 
 

@@ -105,7 +105,7 @@ class MulticastClient(DatagramProtocol):
             gl.score = data["score"]
 
         if "paddle_position" in data:
-            gl.paddle_position = data["paddle_position"]
+            gl.paddle_pos = data["paddle_position"]
 
         if "classement" in data:
             gl.classement = data["classement"]
@@ -171,7 +171,7 @@ def init_variable():
     # vient du server
     gl.ball_position = [0, 0] # liste
     gl.score = [0] * 10 # liste
-    gl.paddle_position = [[0, 0],[0, 0], [0, 0], [0, 0], [0, 0],
+    gl.paddle_pos = [[0, 0],[0, 0], [0, 0], [0, 0], [0, 0],
                             [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
 
     gl.ip_server = None
@@ -232,7 +232,7 @@ def init_tempo():
         * tempoDict.update()
     """
 
-    tempo_liste = [("always", 100000000), ("frame_60", 60)]
+    tempo_liste = [("always", 100000000), ("frame_60", 60), ("print", 300)]
     gl.tempoDict = Tempo(tempo_liste)
 
 def multicast():

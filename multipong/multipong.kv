@@ -63,31 +63,26 @@
     paddle_0: paddle_0
     paddle_1: paddle_1
 
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Line:
+            points: self.points
+            width: 3
+            close: 1
+
     PongBall:
         id: pong_ball
         pos: self.pos
+        center: self.center
 
     PongPaddle:
         id: paddle_0
         pos: self.pos
-        canvas.before:
-            PushMatrix
-            Rotate:
-                angle: 10
-                origin: self.center
-        canvas.after:
-            PopMatrix
-            
+
     PongPaddle:
         id: paddle_1
         pos: self.pos
-        canvas.before:
-            PushMatrix
-            Rotate:
-                angle: -10
-                origin: self.center
-        canvas.after:
-            PopMatrix
 
     BoxLayout:
         orientation: 'horizontal'
@@ -128,6 +123,10 @@
             close: 1
 
 <Screen3>:
+    ball:     pong_ball
+    paddle_0: paddle_0
+    paddle_1: paddle_1
+    paddle_2: paddle_2
     canvas:
         Color:
             rgba: 1, 1, 1, 1
@@ -135,6 +134,68 @@
             points: self.points
             width: 3
             close: 1
+    PongBall:
+        id: pong_ball
+        pos: self.pos
+    PongPaddle:
+        id: paddle_0
+        pos: self.pos
+        canvas.before:
+            PushMatrix
+            Rotate:
+                angle: 10
+                origin: self.center
+        canvas.after:
+            PopMatrix
+    PongPaddle:
+        id: paddle_1
+        pos: self.pos
+        canvas.before:
+            PushMatrix
+            Rotate:
+                angle: -10
+                origin: self.center
+        canvas.after:
+            PopMatrix
+    PongPaddle:
+        id: paddle_2
+        pos: self.pos
+        canvas.before:
+            PushMatrix
+            Rotate:
+                angle: -10
+                origin: self.center
+        canvas.after:
+            PopMatrix
+
+    BoxLayout:
+        orientation: 'horizontal'
+        BoxLayout:
+            size_hint_x: 0.60
+            canvas:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Line:
+                    points: root.points
+                    width: 3
+                    close: 1
+        BoxLayout:
+            size_hint_x: 0.40
+            orientation: 'vertical'
+            Button:
+                size_hint_y: 0.08
+                background_color: (0.8, 0.8, 0, 1)
+                text: 'Menu'
+                color: (0, 1, 0, 1)
+                font_size: "20dp"
+                on_release: app.go_mainscreen()
+            Button:
+                size_hint_y: 0.92
+                id: button_size
+                color: (0, 1, 0, 1)
+                background_color: (0, 0.8, 0, 1)
+                font_size: "18dp"
+                text: "Raquette"
 
 <Screen4>:
     canvas:

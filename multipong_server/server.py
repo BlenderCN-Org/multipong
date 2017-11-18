@@ -116,9 +116,9 @@ class MyMulticastSender(DatagramProtocol):
                 self.transport.write(lapin, addr)
                 self.count += 1
                 if time() - self.tempo > 5:
-                    print("Fréquence d'envoi multicast",
-                                                int(self.count/5))
-                    print("Message envoyé:", print_dict(lapin))
+                    print("Fréquence d'envoi multicast", int(self.count/5))
+                    print("Message envoyé:", lapin)
+                    print()
                     self.count = 0
                     self.tempo = time()
 
@@ -178,27 +178,24 @@ class MyTcpServer(Protocol):
 
         # TODO à diviser
         if data:
-            # {'blend': {'reset': 0, 'ball': [-8.7, 9.0]}}
+            # data = {'joueur': {'name': 'toto', 'paddle': [-9.5, 3]}}
             if "joueur" in data:
                 joueur = data["joueur"]
                 self.add_data(joueur)
 
                 if joueur:
-                    #print(joueur)
-                    #{'name': 'toto', 'paddle': [-9.5, 3]}
-
-                    ##if joueur["reset"] == 1:
-                        ##self.reset_game()
                     if time() - self.tempo > 5:
                         de_qui = joueur["name"]
                         print("Reçu de {}:\n{}".format(de_qui, joueur))
                         self.tempo = time()
 
+            # {'blend': {'reset': 0, 'ball': [-8.7, 9.0]}}
             if "blend" in data:
                 blend = data["blend"]
                 self.update_blend(blend)
                 if time() - self.tempo > 5:
                     print("Reçu de Blender:\n{}".format(blend))
+                    print()
                     self.tempo = time()
 
     def update_blend(self, blend):
@@ -207,9 +204,9 @@ class MyTcpServer(Protocol):
         self.factory.game.update_blend(blend)
 
     def add_data(self, data) :
-        """Insère la dernière data reçue dans la pile du user."""
+        """Insère la dernière data reçue dans le dict du user."""
 
-        self.factory.game.add_data_in_pile(self.user, data)
+        self.factory.game.add_data_in_raw_dict(self.user, data)
 
     def reset_game(self) :
         """Insère la dernière data reçue dans la pile du user."""
@@ -295,6 +292,8 @@ def datagram_decode(data):
         return None
 
 def print_dict(d):
+    """Pas utilisé"""
+
     if isinstance(d, dict):
         for k, v in d.items():
             print(k, "\n", v)
