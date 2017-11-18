@@ -28,7 +28,7 @@ def main():
     # Balle au centre
     B_keys()
 
-    #print_some()
+    print_some()
     set_help_resolution()
 
     if gl.level == 1:
@@ -304,7 +304,16 @@ def print_some():
     """Print toutes les s des valeurs permettant de debugguer."""
 
     if gl.tempoDict["frame_60"].tempo == 60:
-        print("level {}".format(gl.level))
+        print(  "Envoi:", gl.msg_to_send, "\n",
+                "Réception", "\n",
+                "transit", gl.transit,
+                "level", gl.level,
+                "rank_end", gl.rank_end,
+                "scene", gl.scene,
+                "score", gl.score,
+                "paddle_position", gl.paddle_position,
+                "classement", gl.classement)
+
 
 def set_help_resolution():
     """Text resolution."""

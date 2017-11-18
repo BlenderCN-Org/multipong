@@ -320,28 +320,11 @@ class GameManagement():
     def get_paddle(self):
         """Retourne la position des paddles de tous les joueurs.
         Le dict est ordonné, j'ajoute les paddles dans l'ordre.
-        Level 10: paddle en auto. TODO méthode spéciale.
-        Les paddle en auto n'ont pas d'ordre, il y en a 10,
-        donc plus de paddle manuelle.
         """
 
-        paddle = {}  # dict
-
-        if self.level != 10:
-            b = 0
-            for k, v in self.players.items():
-                paddle[b] = v["paddle_position"]
-                b += 1
-        else:
-            if self.conf["simul"]["paddle_simul"]:
-                for num in range(10):
-                    paddle[num] = self.paddle_simul[num].paddle
-            else:  # TODO nul répétition
-                b = 0
-                for k, v in self.players.items():
-                    paddle[b] = v["paddle_position"]
-                    b += 1
-
+        paddle = []
+        for k, v in self.players.items():
+            paddle.append(v["paddle_position"])
         return paddle
 
     def get_who(self):
@@ -365,7 +348,7 @@ class GameManagement():
                 "classement": {},
                 "ball": [7.19, 7.19],
                 "score": [9, 7],
-                "paddle": {0: [-9.4, 0.0], 1: [-9.4, 0.40]},
+                "paddle": [[-9.4, 0.0], [-9.4, 0.40]],
                 "who_are_you": {'moi': 0, 'toi': 1},
                 "rank_end":  0,
                 "reset": 0,
@@ -415,10 +398,4 @@ class GameManagement():
             for k, v in msg.items():
                 print(k, v)
             print()
-
-            ##print("Joueurs en cours:")
-            ##for k, v in self.players.items():
-                ##print(v)
-            ##print()
-
             self.t_print = time()

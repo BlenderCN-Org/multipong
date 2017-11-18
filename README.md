@@ -53,10 +53,10 @@ sudo apt-get install blender
 ~~~
 
 #### Installation de mylabotools
-TODO ne serait pas utilisé !!!
-mylabotools comprend des scripts pour mes tâches courantes.
 
-[mylabotools](Voir https://github.com/sergeLabo/mylabotools)
+mylabotools comprend mes scripts pour mes tâches courantes.
+
+Voir  [mylabotools](https://github.com/sergeLabo/mylabotools)
 
 ### Installation sur android
 Récupérer le apk sur votre téléphone, l'installer après avoir autorisé les sources inconnues puisque la source est connue !!

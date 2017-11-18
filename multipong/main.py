@@ -1,13 +1,15 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = '0.024'
+__version__ = '0.026'
 
 """
 pas d'accent dans les fichiers !!!!!!!!!!!!!!!
 ne pas oublier de commenter le Window.size
 
 version
+0.026 None ip corriger
+0.025 labo 1
 0.024 avec class Game
 0.023 test user id
 0.022 fullscreen tout construit correct
@@ -68,8 +70,17 @@ carre = [-9.93542,  9.935437,
           9.93543,  9.93543,
           9.93543, -9.93543,
          -9.93543, -9.93543]
-
 carre_correction = [360, 360, 36]
+
+paddle_10 = [-9.66105,  1.43211,
+             -9.33895,  1.43211,
+             -9.33895, -1.43211,
+             -9.66105, -1.43211]
+
+paddle_11 = [ 9.33895,  1.43211,
+              9.66105,  1.43211,
+              9.66105, -1.43211,
+              9.33895, -1.43211]
 
 triangle = [0, 12.12306,
             -14.22068, -12.50787,
@@ -158,6 +169,7 @@ class Screen5(Screen):
     def __init__(self, **kwargs):
 
         super(Screen5, self).__init__(**kwargs)
+        print("Initialisation de Screen5 ok")
 
 
 class Screen4(Screen):
@@ -169,6 +181,7 @@ class Screen4(Screen):
     def __init__(self, **kwargs):
 
         super(Screen4, self).__init__(**kwargs)
+        print("Initialisation de Screen4 ok")
 
 
 class Screen3(Screen):
@@ -180,6 +193,7 @@ class Screen3(Screen):
     def __init__(self, **kwargs):
 
         super(Screen3, self).__init__(**kwargs)
+        print("Initialisation de Screen3 ok")
 
 
 class Screen2(Screen):
@@ -191,6 +205,7 @@ class Screen2(Screen):
     def __init__(self, **kwargs):
 
         super(Screen2, self).__init__(**kwargs)
+        print("Initialisation de Screen2 ok")
 
 
 class Screen1(Screen):
@@ -200,20 +215,34 @@ class Screen1(Screen):
     # Accessible avec root.points dans kv
     ball = ObjectProperty(None)
     points = ListProperty(lines_points(carre, carre_correction))
-    paddle = ListProperty((15, 320, 700, 320))
+
+    paddle_0 = ObjectProperty(None)
+    points_10 = ListProperty(lines_points(paddle_10, carre_correction))
+
+    paddle_1 = ObjectProperty(None)
+    points_11 = ListProperty(lines_points(paddle_11, carre_correction))
 
     def __init__(self, **kwargs):
         super(Screen1, self).__init__(**kwargs)
+        print("Initialisation de Screen1 ok")
 
     def apply_ball_position(self, ball_pos):
-        """Positionne la balle avec position du serveur
-        TODO: serait mieux avec center
-        """
+        """Positionne la balle avec position du serveur."""
 
         cc = carre_correction
 
         self.ball.pos[0] = int((ball_pos[0]*cc[2]) + cc[0] - 6)
         self.ball.pos[1] = int((ball_pos[1]*cc[2]) + cc[1] - 6)
+
+    def apply_paddle_position(self, ball_pos):
+
+        cc = carre_correction
+
+        self.paddle_0.pos[0] = int((ball_pos[0]*cc[2]) + cc[0] - 50)
+        self.paddle_0.pos[1] = int((ball_pos[1]*cc[2]) + cc[1] - 50)
+
+        self.paddle_1.pos[0] = int((ball_pos[0]*cc[2]) + cc[0] - 150)
+        self.paddle_1.pos[1] = int((ball_pos[1]*cc[2]) + cc[1] - 150)
 
     def on_touch_move(self, touch):
         ##Screen1.paddle[1] = touch.y
@@ -229,6 +258,16 @@ class PongBall(Widget):
         pass
 
 
+class PongPaddle(Widget):
+    center_x = NumericProperty(0)
+    center_y = NumericProperty(0)
+    angle = NumericProperty(10)
+    center = ReferenceListProperty(center_x, center_y)
+
+    def move(self):
+        pass
+
+
 class MainScreen(Screen):
     """Ecran principal"""
 
@@ -237,16 +276,30 @@ class MainScreen(Screen):
 
         # Construit le reseau, tourne tout le temps
         scr_manager = self.get_screen_manager()
-        #self.network = Network(scr_manager)
         self.game = Game(scr_manager)
+
+        print("Initialisation de MainScreen ok")
 
     def get_screen_manager(self):
         return MultiPongApp.get_running_app().screen_manager
 
 
 class Network:
-    """Les Screen accede a Network avec
-    MultiPongApp.get_running_app()
+    """Message recu du serveur:
+        {'svr_msg': {'ip': '192.168.1.12',
+                     'dictat': {'scene': 'play',
+                                'rank_end': 0,
+                                'ball': [-5.4, 3.5],
+                                'who_are_you': {},
+                                'reset': 0,
+                                'paddle': [],
+                                'level': 1,
+                                'classement': {},
+                                'transit': 0,
+                                'score': []}}}
+    Message envoye:
+        {'joueur': {'name':   a1_452,
+                    'paddle': [300, 500]}
     """
 
     def __init__(self, screen_manager):
@@ -254,12 +307,13 @@ class Network:
         # config, obtenu avec des dir()
         config = MultiPongApp.get_running_app().config
 
+        self.t_print = time()
+
         # Multi
         self.multi_ip, self.multi_port = self.get_multicast_addr(config)
         self.my_multi = Multicast(  self.multi_ip,
                                     self.multi_port,
                                     1024)
-        self.server_msg = None
 
         # Serveur data
         self.dictat = None
@@ -270,20 +324,28 @@ class Network:
         self.tcp_clt = None
         self.tcp_msg = {}
 
+        print("Initialisation de Network ok")
+
     def network_update(self):
         """Maj de reception, maj des datas, envoi"""
 
-        # Recup du message su serveur en multicast
+        # Recup du message du serveur en multicast
         svr_msg = self.get_multicast_msg()
-        self.dictat = self.get_svr_data(svr_msg)
+        self.dictat = self.get_dictat(svr_msg)
 
-        # Recup ip serveur si pas deffinie
-        self.set_server_addr()
-
-        # Creation du socket TCP si None
+        # Set TCP
+        self.tcp_ip = self.get_server_ip(svr_msg)
+        #print(self.tcp_ip)
         self.create_tcp_socket()
 
-    def get_svr_data(self, svr_msg):
+    def get_server_ip(self, svr_msg):
+        try:
+            tcp_ip = svr_msg["svr_msg"]["ip"]
+        except:
+            tcp_ip = None
+        return tcp_ip
+
+    def get_dictat(self, svr_msg):
         """Retourne dictat"""
 
         try:
@@ -331,12 +393,6 @@ class Network:
 
         return int(config.get('network', 'tcp_port'))
 
-    def set_server_addr(self):
-        """Recupere l'ip du serveur, et defini l'adresse serveur."""
-
-        if self.dictat and "ip" in self.dictat and not self.tcp_ip:
-            self.tcp_ip = self.svr_data["svr_msg"]["ip"]
-
     def create_tcp_socket(self):
         if self.tcp_ip and not self.tcp_clt:
             try:
@@ -349,6 +405,10 @@ class Network:
     def send_tcp_msg(self):
         env = json.dumps(self.tcp_msg).encode("utf-8")
         if self.tcp_clt:
+            if time() - self.t_print > 2:
+                print("Envoi de:\n", self.tcp_msg)
+                print("Reception de:_n", self.dictat)
+                self.t_print = time()
             self.tcp_clt.send(env)
 
 
@@ -371,6 +431,8 @@ class Game(Network):
 
         self.my_name = get_user_id()
 
+        print("Initialisation de Game ok")
+
     def get_tempo(self):
         """Retourne la tempo de la boucle de Clock."""
 
@@ -390,7 +452,7 @@ class Game(Network):
                         "classement": {},
                         "ball":   [7.19, 7.19],
                         "score":  [9, 7],
-                        "paddle": {0: [-9.4, 0.0], 1: [-9.4, 0.40]},
+                        "paddle": [[-9.4, 0.0], [-9.4, 0.40]],
                         "who_are_you": {'moi': 0, 'toi': 1},
                         "rank_end": 0,
                         "reset":   0,
@@ -417,13 +479,19 @@ class Game(Network):
         except:
             ball_pos = None
 
+        # Les screen de 1 a 10 doivent avoir apply_ball_position
         if ball_pos:
             if self.cur_screen.name != "Main":
-                # Les screen de 1 a 10 doivent avoir apply_ball_position
                 self.cur_screen.apply_ball_position(ball_pos)
 
     def apply_paddle_pos(self):
-        pass
+        try:
+            ball_pos = self.dictat["ball"]
+        except:
+            ball_pos = None
+        if ball_pos:
+            if self.cur_screen.name != "Main":
+                self.cur_screen.apply_paddle_position(ball_pos)
 
     def create_msg(self):
         if "Main" not in self.cur_screen.name:

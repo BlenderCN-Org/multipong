@@ -31,7 +31,6 @@ def create_msg_to_send():
 
     msg = {"blend": {"ball":  get_ball_position(),
                      "reset": get_reset() }}
-    #print("envoi de blend msg", msg)
     return msg
 
 

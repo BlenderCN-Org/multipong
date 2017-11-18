@@ -53,18 +53,41 @@
             size: 12, 12 # TODO size fct resolution ecran
 
 <PongPaddle>:
-    size: 25, 200
     canvas:
         Rectangle:
-            pos:self.pos
-            size:self.size
+            pos: self.pos
+            size: 12, 104
 
 <Screen1>:
     ball: pong_ball
+    paddle_0: paddle_0
+    paddle_1: paddle_1
 
     PongBall:
         id: pong_ball
         pos: self.pos
+
+    PongPaddle:
+        id: paddle_0
+        pos: self.pos
+        canvas.before:
+            PushMatrix
+            Rotate:
+                angle: 10
+                origin: self.center
+        canvas.after:
+            PopMatrix
+            
+    PongPaddle:
+        id: paddle_1
+        pos: self.pos
+        canvas.before:
+            PushMatrix
+            Rotate:
+                angle: -10
+                origin: self.center
+        canvas.after:
+            PopMatrix
 
     BoxLayout:
         orientation: 'horizontal'
@@ -77,14 +100,6 @@
                     points: root.points
                     width: 3
                     close: 1
-                ##Rectangle:
-                    ##id: paddle_0
-                    ##size: 10, 100
-                    ##pos: root.paddle[0], root.paddle[1]
-                ##Rectangle:
-                    ##id: paddle_1
-                    ##size: 10, 100
-                    ##pos: root.paddle[2], root.paddle[3]
         BoxLayout:
             size_hint_x: 0.40
             orientation: 'vertical'
