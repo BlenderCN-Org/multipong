@@ -104,15 +104,14 @@ class MulticastClient(DatagramProtocol):
         if "score" in data:
             gl.score = data["score"]
 
-        if "paddle_position" in data:
-            gl.paddle_pos = data["paddle_position"]
+        if "paddle" in data:
+            gl.paddle_pos = data["paddle"]
 
         if "classement" in data:
             gl.classement = data["classement"]
 
         if "transit" in data:
             gl.transit = data["transit"]
-
 
 def datagram_decode(datagram):
     """Decode la réception qui est des bytes, pour obtenir un dict."""
@@ -171,8 +170,11 @@ def init_variable():
     # vient du server
     gl.ball_position = [0, 0] # liste
     gl.score = [0] * 10 # liste
-    gl.paddle_pos = [[0, 0],[0, 0], [0, 0], [0, 0], [0, 0],
-                            [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
+    # de la réception
+    gl.paddle_pos = [[-9.5, 0], [0, 0], [0, 0], [0, 0], [0, 0],
+                     [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
+    # pour envoi
+    gl.paddle_1_pos = [0, 0]
 
     gl.ip_server = None
     gl.multi_ip = gl.conf["multicast"]["ip"]
@@ -201,28 +203,28 @@ def init_blender_obj():
     gl.help_obj = 0
 
     # permet accès aux objet blender score et leur score
-    gl.goal = {  0 : 0,
-                1 : 1,
-                2 : 2,
-                3 : 3,
-                4 : 4,
-                5 : 5,
-                6 : 6,
-                7 : 7,
-                8 : 8,
-                9 : 9   }
+    gl.goal = { 0 : None,
+                1 : None,
+                2 : None,
+                3 : None,
+                4 : None,
+                5 : None,
+                6 : None,
+                7 : None,
+                8 : None,
+                9 : None }
 
     # All paddle
-    gl.paddle = {  0 : 0,
-                1 : 1,
-                2 : 2,
-                3 : 3,
-                4 : 4,
-                5 : 5,
-                6 : 6,
-                7 : 7,
-                8 : 8,
-                9 : 9}
+    gl.paddle = {   0 : None,
+                    1 : None,
+                    2 : None,
+                    3 : None,
+                    4 : None,
+                    5 : None,
+                    6 : None,
+                    7 : None,
+                    8 : None,
+                    9 : None }
 
     gl.ball = 0  # objet blender ball
 

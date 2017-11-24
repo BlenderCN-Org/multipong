@@ -28,32 +28,27 @@ def create_msg_to_send():
 
         msg = {"blend": {"ball": (1,1), "reset": 0}}
     """
-
-    # Récupération des paddle pos
-    get_paddle_position()
+    # Maj de paddle auto
+    get_paddle_1_pos()
 
     msg = {"blend": {"ball":  get_ball_position(),
-                     "paddle": gl.paddle_pos,
+                     "paddle_1_pos": gl.paddle_1_pos,
                      "reset": get_reset() }}
     return msg
 
-def get_paddle_position():
-    """Retourne la position de tuotes les paddle
-    gl.paddle[1] = blender obj
-    paddle_pos[1] = [2, -9]
-    """
+def get_paddle_1_pos():
+    """Retourne la position de la paddle 1 de level 1"""
 
-    l_cor = gl.level
-    if l_cor == 1: l_cor = 2
-
-    for i in range(l_cor):
+    if gl.level == 1:
         try:
-            x = gl.paddle[i].localPosition[0]
-            y = gl.paddle[i].localPosition[1]
+            x = gl.paddle[1].localPosition[0]
+            y = gl.paddle[1].localPosition[1]
         except:
-            x, y = 2, 2
-        gl.paddle_pos[i] = [x, y]
+            x, y = 0, 0
+    else:
+        x, y = 0, 0
 
+    gl.paddle_1_pos = [x, y]
 
 def get_ball_position():
     """Retourne la position x, y de la balle

@@ -38,7 +38,7 @@ def main():
 
                 for n in range(level_corrected):
                     # Get paddle
-                    # TODO changer les noms bat dans blender
+                    # TODO changer les noms des objets bat dans blender
                     if str(obj) == "bat" + str(gl.level) + str(n):
                         gl.paddle[n] = obj
                     # Get goal

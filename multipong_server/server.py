@@ -98,7 +98,6 @@ class MyMulticastSender(DatagramProtocol):
         global TO_BLEND
         addr = MULTICAST_IP, MULTICAST_PORT
 
-        # TODO à diviser
         while 1:
             # récup dans la pile, un chouilla plus rapide que 60 fps,
             # pour ne pas prendre de retard sur le put() et remplir la queue
@@ -111,16 +110,9 @@ class MyMulticastSender(DatagramProtocol):
 
             # envoi
             lapin = self.create_multi_msg(data)
-
             try:
                 self.transport.write(lapin, addr)
-                self.count += 1
-                if time() - self.tempo > 5:
-                    print("Fréquence d'envoi multicast", int(self.count/5))
-                    print("Message envoyé:", lapin)
-                    print()
-                    self.count = 0
-                    self.tempo = time()
+                self.print_some(lapin)
 
             except OSError as e:
                 if e.errno == 101:
@@ -144,6 +136,19 @@ class MyMulticastSender(DatagramProtocol):
         thread_s = threading.Thread(target=self.send_loop)
         thread_s.start()
 
+    def print_some(self, msg):
+        data = datagram_decode(msg)
+        self.count += 1
+        tt = 5
+        if time() - self.tempo > tt:
+            self.count = 0
+            self.tempo = time()
+            env = data["svr_msg"]["dictat"]
+            print("Message envoyé par le serveur:")
+            for k, v in env.items():
+                print("    ", k, v)
+            print("\nFréquence d'envoi multicast", int(self.count/tt))
+
 
 class MyTcpServer(Protocol):
     """Reception de chaque joueur en TCP."""
@@ -154,9 +159,7 @@ class MyTcpServer(Protocol):
         self.tempo = time()
 
     def create_user(self):
-        """Le plus vieux, donc le plus petit va demander la mise à jour du jeu.
-        """
-
+        """"""
         self.user = str(int(10000* time()))[-8:]
         print("Un user créé: ", self.user)
 
@@ -183,10 +186,12 @@ class MyTcpServer(Protocol):
                 joueur = data["joueur"]
                 self.add_data(joueur)
 
+                # for print only
                 if joueur:
                     if time() - self.tempo > 5:
                         de_qui = joueur["name"]
-                        print("Reçu de {}:\n{}".format(de_qui, joueur))
+                        a = "Message reçu sur le serveur de {}:\n{}"
+                        print(a.format(de_qui, joueur))
                         self.tempo = time()
 
             # {'blend': {'reset': 0, 'ball': [-8.7, 9.0]}}
@@ -206,7 +211,7 @@ class MyTcpServer(Protocol):
     def add_data(self, data) :
         """Insère la dernière data reçue dans le dict du user."""
 
-        self.factory.game.add_data_in_raw_dict(self.user, data)
+        self.factory.game.add_data_in_players(self.user, data)
 
     def reset_game(self) :
         """Insère la dernière data reçue dans la pile du user."""

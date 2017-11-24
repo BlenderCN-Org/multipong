@@ -1,0 +1,6 @@
+#!/bin/bash
+# -*- coding: UTF-8 -*-
+
+cd multipong_server/game
+
+blenderplayer mp.blend
