@@ -1,12 +1,13 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = '0.029'
+__version__ = '0.030'
 
 """
 ne pas oublier de commenter le Window.size
 
 version
+0.30 fin de screen 1
 0.29 erreur dans print
 0.28 ("multipong.kv", encoding='utf-8') marche pas
 0.027 avec import local, 2 paddle 1 balle
@@ -44,17 +45,20 @@ from threading import Thread
 from labmulticast import Multicast
 from labtcpclient import LabTcpClient
 
+
+# Les 3 lignes ci-dessous sont à commenter pour buildozer
+WS = (1280, 720)
+##WS = (640, 360)
+Window.size = WS
+
+# Pass variable between python script http://bit.ly/2n0ksWh
+COEF = Window.size[1]/720
+# Puis import
 from scr1 import Screen1
 ##from scr2 import Screen2
 ##from scr3 import Screen3
 ##from scr4 import Screen4
 ##from scr5 import Screen5
-
-##WS = (1280, 720)
-WS = (640, 360)
-COEF =  720 / WS[1]
-Window.size = WS
-
 
 def datagram_to_dict(data):
     """Decode le message.
@@ -97,7 +101,6 @@ class PongBall(Widget):
 
 class PongPaddle(Widget):
     angle = NumericProperty(0)
-    pass
 
 
 class MainScreen(Screen):
@@ -129,7 +132,7 @@ class Network:
                                 'classement': {},
                                 'transit': 0,
                                 'score': []}}}
-    Message envoye:
+        Message envoyé:
         {'joueur': {'name':   a1_452,
                     'paddle': [300, 500]}
     """
@@ -159,7 +162,7 @@ class Network:
         print("Initialisation de Network ok")
 
     def network_update(self):
-        """Maj de reception, maj des datas, envoi"""
+        """Maj de réception, maj des datas, envoi"""
 
         # Recup du message du serveur en multicast
         svr_msg = self.get_multicast_msg()
@@ -249,7 +252,7 @@ class Network:
             except:
                 pass
 
-            print("\nReception de:")
+            print("\nRéception de:")
 
             if self.dictat:
                 for k, v in self.dictat.items():
@@ -271,7 +274,7 @@ class Game(Network):
         tempo = self.get_tempo()
         self.event = Clock.schedule_interval(self.game_update, tempo)
 
-        # Verif freq
+        # Vérif freq
         self.t = time()
         self.v_freq = 0
 
@@ -322,6 +325,8 @@ class Game(Network):
         self.send_tcp_msg()
 
     def apply_ball_pos(self):
+        """self.dictat = {... "ball": [7.19, 7.19],..."""
+
         try:
             ball_pos = self.dictat["ball"]
         except:
@@ -341,9 +346,11 @@ class Game(Network):
             paddles = None
 
         if paddles:
-            # Les screen de 1 a 10 doivent avoir apply_other_paddles_position()
+            # Les screen de 1 a 10 doivent avoir
+            #   apply_other_paddles_position()
             if self.cur_screen.name != "Main":
-                self.cur_screen.apply_other_paddles_position(paddles, self.my_num)
+                self.cur_screen.apply_other_paddles_position(paddles,
+                                                            self.my_num)
 
     def verif_freq(self):
         self.v_freq += 1
@@ -354,13 +361,12 @@ class Game(Network):
             self.t = a
 
     def get_current_screen(self):
-        """Set le screen en cours"""
+        """Retourne le screen en cours"""
 
         self.cur_screen = self.scr_manager.current_screen
 
     def get_my_number(self):
-        """je suis self.my_name
-
+        """Je suis self.my_name
         self.dictat = { ...,
                         'who_are_you': {'moi': 0, 'toi': 1},
                         ...}
@@ -404,7 +410,7 @@ SCREENS = { 0: (MainScreen, "Main"),
 
 
 class MultiPongApp(App):
-    """Construction de l'application. Execute par __main__,
+    """Construction de l'application. Exécuté par __main__,
     app est le parent de cette classe dans kv.
     """
 
@@ -413,9 +419,9 @@ class MultiPongApp(App):
 
         # Creation des ecrans
         self.screen_manager = ScreenManager()
-        self.coef = COEF
         for i in range(len(SCREENS)):
-            self.screen_manager.add_widget(SCREENS[i][0](name=SCREENS[i][1]))
+            self.screen_manager.add_widget(SCREENS[i][0]\
+                                                (name=SCREENS[i][1]))
 
         return self.screen_manager
 
@@ -425,7 +431,7 @@ class MultiPongApp(App):
 
     def build_config(self, config):
         """Si le fichier *.ini n'existe pas,
-        il est cree avec ces valeurs par defaut.
+        il est créé avec ces valeurs par défaut.
         Si il manque seulement des lignes, il ne fait rien !
         """
 
@@ -446,14 +452,13 @@ class MultiPongApp(App):
                               'double_tap_distance': 20})
 
     def build_settings(self, settings):
-        """Construit l'interface de l'ecran Options,
+        """Construit l'interface de l'écran Options,
         pour multipong seul,
         Kivy est par defaut,
         appele par app.open_settings() dans .kv
         """
 
-        data = """[{"type": "title", "title": "Configuration du reseau"},
-
+        data = """[{"type": "title", "title":"Configuration du reseau"},
                       {"type": "numeric",
                       "title": "Frequence",
                       "desc": "Frequence entre 1 et 60 Hz",
@@ -464,7 +469,8 @@ class MultiPongApp(App):
         settings.add_json_panel('MultiPong', self.config, data=data)
 
     def on_config_change(self, config, section, key, value):
-        """Si modification des options, fonction appelee automatiquement."""
+        """Si modification des options, fonction appelée automatiquement
+        """
 
         freq = int(self.config.get('network', 'freq'))
         menu = self.screen_manager.get_screen("Main")
@@ -479,13 +485,12 @@ class MultiPongApp(App):
                 print("Nouvelle frequence", freq)
 
     def go_mainscreen(self):
-        """Retour au menu principal depuis les autres ecrans."""
+        """Retour au menu principal depuis les autres écrans."""
 
         #if touch.is_double_tap:
         self.screen_manager.current = ("Main")
 
     def do_quit(self):
-        """Quitter proprement."""
 
         print("Je quitte proprement")
 

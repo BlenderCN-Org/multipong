@@ -2,6 +2,12 @@
 # -*- coding: utf-8 -*-
 
 
+# Pass variable between python script http://bit.ly/2n0ksWh
+from __main__ import *
+print("Dans le script terrain.py")
+print("Coefficient de résolution écran:", COEF)
+
+
 # TODO finir les poly de 5 à 10
 def get_poly_name(num):
     """Retourne le polygone a utiliser en fonction du numéro de Screen
@@ -76,20 +82,26 @@ class Terrain:
 
     def __init__(self, num):
 
+        global COEF
+
         # Numéro du terrain = level = Numéro du Screen
         self.num = num
 
         # Nom du polygone
         self.poly_name = get_poly_name(self.num)
 
-        # get ratio
+        # get ratio et coef écran
         self.ratio = get_ratio(self.num)
+        self.coef = COEF
+
+        # Points pour ligne terrain et filet
         self.line = self.line_points()
         self.net_line = self.get_net_line()
 
     def line_points(self):
-        """Retourne la liste des points
-        pour dessiner le polygone dans kivy
+        """Retourne la liste des coordonnées des points
+        pour dessiner le polygone dans kivy,
+        corrigés par ratio blender to kivy et résolution écran
         """
 
         line = []
@@ -102,9 +114,10 @@ class Terrain:
             # Offset
             if i % 2 == 0:
                 pt += self.ratio[0]
+                pt *= self.coef
             if i % 2 != 0:
                 pt += self.ratio[1]
-
+                pt *= self.coef
             line.append(int(pt))
 
         return line
@@ -126,17 +139,31 @@ class Terrain:
 
         return None
 
-    def get_blender_coord(self, point):
+    def get_blender_coord(self, point, centre):
         """Transforme les coordonnées de kivy pour blender
         point = [x, y]
+        widget kivy
+        centre = [6, 52] par rapport au coin inf gauche
         """
 
         r = self.ratio
-        px = (point[0] - r[0] - 6 ) / r[2]
-        py = (point[1] - r[1] - 52) / r[2]
+        x = (point[0] - r[0] - centre[0]) / r[2]
+        y = (point[1] - r[1] - centre[1]) / r[2]
 
-        return [px, py]
+        return x, y
 
+    def get_kivy_coord(self, point, centre):
+        """Transforme les coordonnées de blender pour kivy
+        point = [x, y]
+        widget kivy
+        centre = [6, 52] par rapport au coin inf gauche
+        """
+
+        r = self.ratio
+        x = (point[0]*r[2]) + r[0] + centre[0]
+        y = (point[1]*r[2]) + r[1] + centre[1]
+
+        return x, y
 
 if __name__ == '__main__':
 

@@ -16,17 +16,29 @@ from kivy.core.window import Window
 
 from terrain import Terrain
 
+
 # Points pour kivy
 NUM = 1
 TERRAIN = Terrain(NUM)
 LINE = TERRAIN.line
 NET = TERRAIN.net_line
-print(Window.size)
+
+# Pass variable between python script http://bit.ly/2n0ksWh
+from __main__ import *
+print("Dans le script scr1.py")
+print("Coefficient de résolution écrn:", COEF)
+
+# Recentrage du filet
+def net_recenter():
+    """Origine = [0, 0]
+
+    """
+    pass
+
+
 
 class Screen1(Screen):
-    """Le joueur est 'Joueur 1'.
-    Attibuts de classe
-    """
+    """1 joueur en position 1"""
 
     # Points du terrain carre accessible avec root.points dans kv
     points = ListProperty(LINE)
@@ -39,39 +51,40 @@ class Screen1(Screen):
 
         super(Screen1, self).__init__(**kwargs)
 
-        self.coef = 0.5
-        ##scr_manager = .get_running_app().screen_manager
-        ##print(scr_manager)
-
+        self.coef = COEF
         print("Initialisation de Screen1 ok")
 
     def apply_ball_position(self, ball_pos):
         """Positionne la balle avec position du serveur."""
 
-        bp = ball_pos
-        self.ball.pos[0] = int((bp[0]*self.Ratio[2]) + self.Ratio[0] - 6*self.coef)
-        self.ball.pos[1] = int((bp[1]*self.Ratio[2]) + self.Ratio[1] - 6*self.coef)
-
-    def apply_other_paddles_position(self, paddle_pos, my_num):
-        """paddle auto soit 1
-             moi       paddle auto
-        [[-9.5, 0.0], [9.5, -1.81], [0, 0], [0, 0], ....]
-        """
-
-        pp = paddle_pos
         try:
-            a = (pp[1][0]*self.Ratio[2]) + self.Ratio[0] -6  * self.coef
-            self.paddle_1.pos[0] = int(a)
-            b = (pp[1][1]*self.Ratio[2]) + self.Ratio[1] -52 * self.coef
-            self.paddle_1.pos[1] = int(b)
+            #if len( ball_pos) == 2:
+            # Transformation en coordonnées kivy
+            # TODO [-6, -6] à corriger avec coef
+            x, y = TERRAIN.get_kivy_coord(ball_pos, [-12, -12])
+            self.ball.pos = [int(x), int(y)]
         except:
             pass
 
     def apply_my_paddle_position(self, y):
-        """my paddle soit0"""
+        """my paddle soit0, avec la capture de position sur l'écran"""
 
-        self.paddle_0.pos[0] = int(12*self.coef)
-        self.paddle_0.pos[1] = int(y*self.coef)
+        self.paddle_0.pos[0] = int(12 * self.coef)
+        self.paddle_0.pos[1] = int( y * self.coef)
+
+    def apply_other_paddles_position(self, paddle_pos, my_num):
+        """ paddle auto soit 1
+             moi       paddle auto
+        [[-9.5, 0.0], [9.5, -1.81], [0, 0], [0, 0], ....]
+        """
+        try:
+            #if len(paddle_pos) == 2:
+            # Transformation en coordonnées kivy
+            x, y = TERRAIN.get_kivy_coord(paddle_pos[1], [-6, -52])
+            self.paddle_1.pos[0] = int(x)
+            self.paddle_1.pos[1] = int(y)
+        except:
+            pass
 
     def on_touch_move(self, touch):
 
@@ -84,14 +97,19 @@ class Screen1(Screen):
     def get_my_blender_paddle_pos(self, my_pad):
 
         return TERRAIN.get_blender_coord([my_pad.pos[0],
-                                          my_pad.pos[1]])
+                                          my_pad.pos[1]],
+                                          [-6, -52])
 
 
-class PongApp(App):
+class Scr1App(App):
+    # marche pas pb avec coef
     def build(self):
-        game = Screen1()
+        coef = 1
+        Window.size = (1280, 720)
+        game = Screen1(coef)
         return game
 
+
 if __name__ == '__main__':
-    # marche pas, pas de *.kv
-    PongApp().run()
+    # marche pas pb avec coef
+    Scr1App().run()

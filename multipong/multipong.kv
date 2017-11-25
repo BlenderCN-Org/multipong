@@ -50,13 +50,13 @@
     canvas:
         Rectangle:
             pos: self.pos
-            size: root.height/60, root.height/60
+            size: root.height/33, root.height/33
 
 <PongPaddle>:
     canvas:
         Rectangle:
             pos: self.pos
-            size: root.height/60, root.height/8
+            size: root.height/65, root.height/7
 
 <Screen1>:
     ball: pong_ball
@@ -82,6 +82,10 @@
                     rgba: 1, 1, 1, 1
                 Line:
                     points: root.points
+                    width: 3
+                    close: 1
+                Line:
+                    points: root.net
                     width: 3
                     close: 1
         BoxLayout:
