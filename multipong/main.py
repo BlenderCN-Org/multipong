@@ -47,7 +47,8 @@ from labtcpclient import LabTcpClient
 
 
 # Les 3 lignes ci-dessous sont à commenter pour buildozer
-WS = (1280, 720)
+k = 1
+WS = (int(1280*k), int(720*k))
 ##WS = (640, 360)
 Window.size = WS
 
@@ -131,7 +132,7 @@ class Network:
                                 'level': 1,
                                 'classement': {},
                                 'transit': 0,
-                                'score': []}}}
+                                'score': [8, 6]}}}
         Message envoyé:
         {'joueur': {'name':   a1_452,
                     'paddle': [300, 500]}
@@ -208,7 +209,7 @@ class Network:
                                 'who_are_you': {'moi': 0, 'toi': 1},
                                 'rank_end': 0,
                                 'paddle': {},
-                                'score': [],
+                                'score': [8,9],
                                 'scene': 'play',
                                 'classement': {},
                                 'reset': 0}}}
@@ -319,11 +320,25 @@ class Game(Network):
         # Apply
         self.apply_ball_pos()
         self.apply_other_paddles_position()
+        self.apply_score()
 
         # Envoi au serveur
         self.create_msg()
         self.send_tcp_msg()
+    
+    def apply_score(self):
+        """self.dictat = {... "score": [8, 9],..."""
 
+        try:
+            score = self.dictat["score"]
+        except:
+            score = None
+
+        # Les screen de 1 a 10 doivent avoir apply_score()
+        if score:
+            if self.cur_screen.name != "Main":
+                self.cur_screen.apply_score(score)
+                
     def apply_ball_pos(self):
         """self.dictat = {... "ball": [7.19, 7.19],..."""
 

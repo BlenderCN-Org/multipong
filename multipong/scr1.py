@@ -25,16 +25,8 @@ NET = TERRAIN.net_line
 
 # Pass variable between python script http://bit.ly/2n0ksWh
 from __main__ import *
-print("Dans le script scr1.py")
-print("Coefficient de résolution écrn:", COEF)
-
-# Recentrage du filet
-def net_recenter():
-    """Origine = [0, 0]
-
-    """
-    pass
-
+print("Dans le script scr1.py, ")
+print("    coefficient de résolution écran:", COEF)
 
 
 class Screen1(Screen):
@@ -46,14 +38,23 @@ class Screen1(Screen):
     ball     = ObjectProperty(None)
     paddle_0 = ObjectProperty(None)
     paddle_1 = ObjectProperty(None)
-
+    score_0 = NumericProperty(10)
+    score_1 = NumericProperty(5)
+    
     def __init__(self, **kwargs):
 
         super(Screen1, self).__init__(**kwargs)
 
         self.coef = COEF
+        self.score_0 = 10
+        self.score_1 = 10
         print("Initialisation de Screen1 ok")
-
+        
+    def apply_score(self, score):
+        """Set les scores"""
+        
+        pass  #score[0]
+        
     def apply_ball_position(self, ball_pos):
         """Positionne la balle avec position du serveur."""
 
@@ -61,7 +62,9 @@ class Screen1(Screen):
             #if len( ball_pos) == 2:
             # Transformation en coordonnées kivy
             # TODO [-6, -6] à corriger avec coef
-            x, y = TERRAIN.get_kivy_coord(ball_pos, [-12, -12])
+            # hauteur, largeur balle = height / 66
+            h = int(720 * COEF / 66)  # 12 pour 720
+            x, y = TERRAIN.get_kivy_coord(ball_pos, [-h, -h])
             self.ball.pos = [int(x), int(y)]
         except:
             pass

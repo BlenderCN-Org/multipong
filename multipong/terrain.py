@@ -1,13 +1,6 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
-# Pass variable between python script http://bit.ly/2n0ksWh
-from __main__ import *
-print("Dans le script terrain.py")
-print("Coefficient de résolution écran:", COEF)
-
-
 # TODO finir les poly de 5 à 10
 def get_poly_name(num):
     """Retourne le polygone a utiliser en fonction du numéro de Screen
@@ -27,7 +20,9 @@ def get_poly_name(num):
     return poly[num]
 
 def get_points_dict(num):
-    """Points des polygones en coordonnees blender"""
+    """Points des polygones en coordonnees blender
+    TODO finir
+    """
 
     points = {}
 
@@ -62,7 +57,7 @@ def get_ratio(num):
     ratio["CARRE"]    = [360, 360, 36]
     ratio["TRIANGLE"] = [418, 366, 29]
     ratio["PENTA"]    = [380, 358, 38.6]
-    # TODO
+    # TODO finir
 
     name = get_poly_name(num)
     return ratio[name]
@@ -82,8 +77,6 @@ class Terrain:
 
     def __init__(self, num):
 
-        global COEF
-
         # Numéro du terrain = level = Numéro du Screen
         self.num = num
 
@@ -92,7 +85,6 @@ class Terrain:
 
         # get ratio et coef écran
         self.ratio = get_ratio(self.num)
-        self.coef = COEF
 
         # Points pour ligne terrain et filet
         self.line = self.line_points()
@@ -101,7 +93,8 @@ class Terrain:
     def line_points(self):
         """Retourne la liste des coordonnées des points
         pour dessiner le polygone dans kivy,
-        corrigés par ratio blender to kivy et résolution écran
+        corrigés par ratio blender to kivy
+        coef résolution écran fait dans le kv
         """
 
         line = []
@@ -114,24 +107,24 @@ class Terrain:
             # Offset
             if i % 2 == 0:
                 pt += self.ratio[0]
-                pt *= self.coef
             if i % 2 != 0:
                 pt += self.ratio[1]
-                pt *= self.coef
             line.append(int(pt))
 
         return line
 
     def get_net_line(self):
-        """TODO avec scale"""
+        """Le filet est centré dans le terrain dans le kv
+        avec
+        [(x + (root.top/2)-10) for x in root.net]
+        10 correspond en gros au rayon du filet
+        """
 
         net_line = []
         net_scale = get_net_scale(self.num)
         # Scale de chaque coordonnée
         for co in self.line:
             net_line.append(co * net_scale)
-        # Mais il n'est pas au bon endroit
-
         return net_line
 
     def get_score_pos(self):
@@ -165,6 +158,7 @@ class Terrain:
 
         return x, y
 
+
 if __name__ == '__main__':
 
     num = 1
@@ -181,7 +175,7 @@ if __name__ == '__main__':
 
     # Conversion d'un point
     point = [12, 400]
-    cb = terrain.get_blender_coord(point)
+    cb = terrain.get_blender_coord(point, [10, 10])
     print("\nCoordonnées du point ", point, " pour blender")
     print("    ", cb)
 

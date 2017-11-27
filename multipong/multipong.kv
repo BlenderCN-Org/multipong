@@ -63,6 +63,20 @@
     paddle_0: paddle0
     paddle_1: paddle1
 
+    Label:
+        font_size: int(root.top/20)
+        color: 1, 0, 0  
+        center_x: int(root.top/8 - 600)
+        center_y: int(root.top * 4/8)
+        text: "0"  #str(root.score_0)
+    
+    Label:
+        font_size: int(root.top/20)
+        color: 0, 1, 0  
+        center_x: int(root.top * 7/8 - 600)
+        center_y: int(root.top * 4/8)
+        text: "1"  #str(root.score_1)
+                
     PongBall:
         id: pong_ball
         pos: self.pos
@@ -72,20 +86,22 @@
     PongPaddle:
         id: paddle1
         pos: self.pos
-
+                
     BoxLayout:
         orientation: 'horizontal'
+            
+            
         BoxLayout:
             size_hint_x: 0.70
             canvas:
                 Color:
                     rgba: 1, 1, 1, 1
                 Line:
-                    points: root.points
+                    points: [int(x*(root.top/720)) for x in root.points]
                     width: 3
                     close: 1
                 Line:
-                    points: root.net
+                    points: [(x*(root.top/720) + (root.top/2) - 10) for x in root.net]
                     width: 3
                     close: 1
         BoxLayout:
