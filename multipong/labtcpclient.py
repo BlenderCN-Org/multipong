@@ -3,24 +3,25 @@
 
 ## labtcpclient.py
 
-#############################################################################
-# Copyright (C) Labomedia  March 2017
+
+#######################################################################
+# Copyright (C) Labomedia November 2017
 #
-#  This program is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU General Public License
-#  as published by the Free Software Foundation; either version 2
-#  of the License, or (at your option) any later version.
+# This file is part of multipong.
 #
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+# multipong is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software Foundation,
-#  Inc., 51 Franproplin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# multipong is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #
-#############################################################################
+# You should have received a copy of the GNU General Public License
+# along with multipong.  If not, see <http://www.gnu.org/licenses/>.
+#######################################################################
 
 
 # 2017 07 09 modif send pour retour d'erreur si envoi raté
@@ -49,9 +50,11 @@ class LabTcpClient:
         """Création du socket sans try, et avec connexion."""
 
         while not self.sock:
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock = socket.socket(socket.AF_INET,
+                                      socket.SOCK_STREAM)
             self.connect_sock()
-            print("    Création du socket client {}".format(self.server_address))
+            print("    Création du socket client {}".format(\
+                                                self.server_address))
             sleep(0.1)
 
     def connect_sock(self):
@@ -67,7 +70,7 @@ class LabTcpClient:
             return None
 
     def send(self, msg):
-        """Envoi d'un message, avec send, msg doit être encodé avant."""
+        """Envoi d'un message, avec send, msg doit être encodé avant"""
 
         # Création d'un socket si besoin
         if not self.sock:

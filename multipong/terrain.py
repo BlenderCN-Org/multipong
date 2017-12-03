@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+
 # TODO finir les poly de 5 à 10
 def get_poly_name(num):
     """Retourne le polygone a utiliser en fonction du numéro de Screen
@@ -57,7 +58,6 @@ def get_ratio(num):
     ratio["CARRE"]    = [360, 360, 36]
     ratio["TRIANGLE"] = [418, 366, 29]
     ratio["PENTA"]    = [380, 358, 38.6]
-    # TODO finir
 
     name = get_poly_name(num)
     return ratio[name]
@@ -73,6 +73,8 @@ def get_net_scale(num):
         return 0.07
 
 
+# coeff ecran fait dans kv sauf get_kivy_coord()
+
 class Terrain:
 
     def __init__(self, num):
@@ -83,7 +85,7 @@ class Terrain:
         # Nom du polygone
         self.poly_name = get_poly_name(self.num)
 
-        # get ratio et coef écran
+        # get ratio du level
         self.ratio = get_ratio(self.num)
 
         # Points pour ligne terrain et filet
@@ -94,7 +96,6 @@ class Terrain:
         """Retourne la liste des coordonnées des points
         pour dessiner le polygone dans kivy,
         corrigés par ratio blender to kivy
-        coef résolution écran fait dans le kv
         """
 
         line = []
@@ -123,8 +124,9 @@ class Terrain:
         net_line = []
         net_scale = get_net_scale(self.num)
         # Scale de chaque coordonnée
+        k = 0.85 # pour compenser épaisseur ligne de 3 pixels
         for co in self.line:
-            net_line.append(co * net_scale)
+            net_line.append(co * net_scale * k)
         return net_line
 
     def get_score_pos(self):
@@ -148,13 +150,13 @@ class Terrain:
     def get_kivy_coord(self, point, centre):
         """Transforme les coordonnées de blender pour kivy
         point = [x, y]
-        widget kivy
+        paddle kivy
         centre = [6, 52] par rapport au coin inf gauche
         """
 
         r = self.ratio
-        x = (point[0]*r[2]) + r[0] + centre[0]
-        y = (point[1]*r[2]) + r[1] + centre[1]
+        x = (point[0]*r[2]) + r[0] - centre[0]
+        y = (point[1]*r[2]) + r[1] - centre[1]
 
         return x, y
 

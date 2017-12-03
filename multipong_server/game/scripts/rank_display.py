@@ -3,6 +3,24 @@
 
 ## rank_display.py
 
+#######################################################################
+# Copyright (C) Labomedia November 2017
+#
+# This file is part of multipong.
+#
+# multipong is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# multipong is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with multipong.  If not, see <http://www.gnu.org/licenses/>.
+#######################################################################
 
 """
 Ce script est lancé avec la scène Rank
@@ -26,15 +44,12 @@ def main():
     apply_text()
 
 def create_text():
-    # Pour tous les niveaux, y compris le 1
-    if gl.level == 1:
-        level_corrected = 2 # 2 joueurs même au niveau 1
-        gl.classement = gl.classement_level1
-    else :
-        level_corrected = gl.level
+
+    lev = gl.level
+    if lev == 1: lev = 2
 
     # Création d'une liste avec 1 élément = 1 joueur
-    text_list = [0] * level_corrected # exemple c=3 donne [0, 0, 0]
+    text_list = [0] * lev # exemple c=3 donne [0, 0, 0]
 
     # Si value=0, le joueur est en cours et non classé,
     # le texte sera vide, affichage du rang seulement
@@ -56,7 +71,7 @@ def create_text():
     # String de l'ensemble du texte à afficher
     gl.text = ""
 
-    for c in range(level_corrected):
+    for c in range(lev):
         gl.text += str(text_list[c])
 
 def apply_text():

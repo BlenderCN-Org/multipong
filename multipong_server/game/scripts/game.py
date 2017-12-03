@@ -1,7 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-## game.py
+#######################################################################
+# Copyright (C) Labomedia November 2017
+#
+# This file is part of multipong.
+#
+# multipong is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# multipong is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with multipong.  If not, see <http://www.gnu.org/licenses/>.
+#######################################################################
 
 """
 game.py
@@ -13,6 +30,8 @@ from bge import logic as gl
 from time import sleep
 from scripts import rank_display
 from scripts import message
+from random import uniform
+import os
 
 
 def main():
@@ -24,14 +43,33 @@ def main():
     if gl.scene == "play":
         set_scene_play(scenes)
         set_positive_score()
-        set_score()
         set_paddle_position()
-        automatic_paddle(scenes)
+        if gl.level == 1:
+            automatic_paddle()
         ball_out()
 
     if gl.scene == "rank":
         overlay_scene_rank(scenes)
         rank_display.main()
+
+def set_paddle_position():
+    """Définit les positions des raquettes avec valeur du serveur.
+    si level 1,  paddle_auto overwrite ensuite
+    """
+
+    for player in range(len(gl.paddle_pos)):
+        if gl.paddle[player]:
+            pos = [gl.paddle_pos[player][0],
+                   gl.paddle_pos[player][1],
+                   1]
+            gl.paddle[player].localPosition = pos
+
+def automatic_paddle():
+    """Seulement niveau 1. Mouvement auto de la raquette machine."""
+
+    if gl.paddle[1] and gl.ball:
+        y = 0.7 * gl.ball.localPosition[1]
+        gl.paddle[1].localPosition = [9.5, y, 1]
 
 def set_scene_play(scenes):
     """Ajoute les scenes."""
@@ -63,7 +101,7 @@ def set_good_level_scene(scenes):
             for scn in scenes :
                 if scn.name == str(n) + "_players" :
                     scn.end()
-                    print("Suppression de la scène", str(n) + "_players")
+                    print("Suppression de la scène",str(n)+"_players")
 
         # Lancement du bon niveau
         overlay_scene(str(gl.level) + "_players")
@@ -94,6 +132,14 @@ def overlay_scene_rank(scenes):
         # Overlay la scène rank
         gl.addScene("Rank", 1)
 
+    if gl.rank_end:
+        print("Fin de rank:", gl.rank_end)
+        l = gl.level
+        if l == 1: l = 2
+        for i in range(l):
+            if gl.goal[i]:
+                gl.goal[i]["score"] = 10
+
 def del_rank_scene(scenes):
     """Supprime la scène rank."""
 
@@ -102,33 +148,9 @@ def del_rank_scene(scenes):
             scn.end()
             print("Suppression de Rank")
 
-def reset_variables():
-    """Reset de variables pour repartir à zéro."""
-
-    print("Reset variables in game.py")
-    l = gl.level
-    if l == 1:
-        l = 2
-    try:
-        for i in range(l):
-            gl.goal[i]["score"] = 10
-    except:
-        print("Goal non accessible")
-
-    gl.tempo_globale = 0
-    gl.level1_rated = 0
-    gl.classement_level1 = {}
-    gl.tempo_rank_level1 = 0
-    gl.classement = {}
-    gl.block = 0
-    gl.transit = 0
-    gl.scene = "play"
-    gl.level = 1
-
 def ball_out():
     """Remet la Ball dans le jeu si la balle sort du jeu."""
 
-    #try:
     if gl.ball :
         if gl.ball.localPosition[0] < -15:
             gl.ball.localPosition = [3, -3, 1]
@@ -138,54 +160,14 @@ def ball_out():
             gl.ball.localPosition = [3, -3, 1]
         elif gl.ball.localPosition[1] > 15:
             gl.ball.localPosition = [3, -3, 1]
-    ##except:
-        ##print("Balle non accessible")
-
-def automatic_paddle(scenes):
-    """Seulement niveau 1. Mouvement auto de la raquette machine."""
-
-    for scn in scenes :
-        if scn.name == "1_players":
-            try:
-                y = 0.7 * gl.ball.localPosition[1]
-                gl.paddle[1].localPosition = [9.5, y, 1]
-            except:
-                print("Automatic paddle non accessible")
-
-def set_score():
-    """Maj des scores avec les valeurs du server."""
-
-    if gl.level > 1:
-        for player in range(gl.level):
-            if gl.goal:
-            #try:
-                gl.goal[player]["score"] = gl.score[player]
-            ##except:
-                ##print("Goal non accessible")
-
-def set_paddle_position():
-    """Définit les positions des raquettes avec valeur du serveur.
-    level 1 paddle 0
-    level 2 paddle 0 et 1
-    """
-
-    for player in range(gl.level):
-        if len(gl.paddle_pos) > 1:
-            pos = [gl.paddle_pos[player][0],
-                   gl.paddle_pos[player][1],
-                   1]
-            if gl.paddle:
-                gl.paddle[player].localPosition = pos
 
 def set_positive_score():
     """Tous les scores doivent être >= 0"""
 
-    if gl.level == 1:
-        b = 2 # le niveau 1 a 2 joueurs
-    else:
-        b = gl.level
+    l = gl.level
+    if l == 1: l = 2
 
-    for g in range(b):
+    for g in range(l):
         if gl.goal[g]:
             if gl.goal[g]["score"] <= 0:
                 gl.goal[g]["score"] = 0
@@ -198,25 +180,25 @@ def B_keys():
         if gl.cube_obj["ball"]:
             gl.cube_obj["ball"] = False
             print("Balle au centre")
-            try: # pb si b dans name capture
-                gl.ball.localPosition = [3, -3, 1]
-            except:
-                print("Accès balle impossible")
+            if gl.ball:
+                x = uniform(-8, 8)
+                y = uniform(-8, 8)
+                gl.ball.localPosition = [x, y, 1]
 
 def print_some():
     """Print toutes les s des valeurs permettant de debugguer."""
 
     if gl.tempoDict["print"].tempo == 0:
+        os.system('clear')
         print("Dans Blender:")
 
         print(  "    Envoi:\n", gl.msg_to_send)
 
-        print(  "    Réception",
+        print(  "\n    Réception",
                 "\n    transit", gl.transit,
                 "\n    level", gl.level,
                 "\n    rank_end", gl.rank_end,
                 "\n    scene", gl.scene,
-                "\n    score", gl.score,
                 "\n    paddle_position", gl.paddle_pos,
                 "\n    classement", gl.classement,
                 "\n")

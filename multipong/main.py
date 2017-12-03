@@ -1,6 +1,26 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+#######################################################################
+# Copyright (C) Labomedia November 2017
+#
+# This file is part of multipong.
+#
+# multipong is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# multipong is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with multipong.  If not, see <http://www.gnu.org/licenses/>.
+#######################################################################
+
+
 __version__ = '0.030'
 
 """
@@ -20,15 +40,19 @@ version
 """
 
 
+"""
+
+"""
+
+
 import kivy
 kivy.require('1.10.0')
 
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.widget import Widget
-from kivy.properties import ListProperty
-from kivy.properties import ReferenceListProperty
 from kivy.properties import NumericProperty
+from kivy.properties import ListProperty
 from kivy.properties import ObjectProperty
 from kivy.core.window import Window
 from kivy.config import Config
@@ -39,7 +63,6 @@ import os
 from time import time
 import json
 import ast
-from threading import Thread
 
 # Les fichiers de ces modules sont dans le dossier courant
 from labmulticast import Multicast
@@ -49,14 +72,14 @@ from labtcpclient import LabTcpClient
 # Les 3 lignes ci-dessous sont à commenter pour buildozer
 k = 1
 WS = (int(1280*k), int(720*k))
-##WS = (640, 360)
 Window.size = WS
+
 
 # Pass variable between python script http://bit.ly/2n0ksWh
 COEF = Window.size[1]/720
 # Puis import
 from scr1 import Screen1
-##from scr2 import Screen2
+from scr2 import Screen2
 ##from scr3 import Screen3
 ##from scr4 import Screen4
 ##from scr5 import Screen5
@@ -89,9 +112,11 @@ def get_user_id():
 
     try:
         user = os.getlogin()
+        # Ajout de qq chiffre pour distonction en debug sur mon PC
+        user += str(int(100*time()))[-5:]
         print("User login:", user)
     except:
-        user = "j" + str(int(time()[-8:]))
+        user = "j" + str(int(100*time()))[-8:]
         print("User:", user)
     return  user
 
@@ -101,6 +126,7 @@ class PongBall(Widget):
 
 
 class PongPaddle(Widget):
+    rect_color = ListProperty([1, 1, 1])
     angle = NumericProperty(0)
 
 
@@ -171,7 +197,6 @@ class Network:
 
         # Set TCP
         self.tcp_ip = self.get_server_ip(svr_msg)
-        #print(self.tcp_ip)
         self.create_tcp_socket()
 
     def get_dictat(self, svr_msg):
@@ -219,8 +244,8 @@ class Network:
             data = self.my_multi.receive()
             svr_msg = datagram_to_dict(data)
         except:
-            #print("Pas de reception multicast")
             svr_msg = None
+
         return svr_msg
 
     def get_tcp_port(self, config):
@@ -245,6 +270,7 @@ class Network:
 
     def print_stuff(self):
         if time() - self.t_print > 2:
+            os.system('clear')
             print("Envoi de:")
             try:
                 msg = self.tcp_msg["joueur"]
@@ -280,7 +306,7 @@ class Game(Network):
         self.v_freq = 0
 
         self.my_name = get_user_id()
-        self.my_num = 0
+        self.my_num = self.get_my_number()
 
         print("Initialisation de Game ok")
 
@@ -312,20 +338,50 @@ class Game(Network):
 
         self.verif_freq()
         self.network_update()
+        self.apply_good_screen()
         self.my_num = self.get_my_number()
+        self.apply_paddle_red_color()
 
         # Maj du screen courant
         self.get_current_screen()
 
         # Apply
+        self.apply_my_num()
         self.apply_ball_pos()
-        self.apply_other_paddles_position()
+        self.apply_other_paddles_pos()
         self.apply_score()
+        self.apply_classement()
 
         # Envoi au serveur
         self.create_msg()
         self.send_tcp_msg()
-    
+
+    def apply_good_screen(self):
+        """Défini l'écran correspondant au nombre de joueurs
+        calculé avec len()
+        """
+
+        if "who_are_you" in self.dictat:
+            combien = len(self.dictat["who_are_you"])
+            if combien and self.cur_screen:
+                if str(combien) not in self.cur_screen.name:
+                    self.scr_manager.current = (str(combien))
+                    print("Glissement vers l'écran", str(combien))
+
+    def apply_my_num(self):
+        """tous les écrans 1 à 10 doivent avoir ces méthodes"""
+
+        if self.cur_screen:
+            if self.cur_screen.name != "Main":
+                self.cur_screen.apply_my_num(self.my_num)
+
+    def apply_paddle_red_color(self):
+        # Les screen de 1 a 10 doivent avoir apply_paddle_red_color()
+
+        if self.cur_screen:
+            if self.cur_screen.name != "Main":
+                self.cur_screen.apply_paddle_red_color()
+
     def apply_score(self):
         """self.dictat = {... "score": [8, 9],..."""
 
@@ -338,7 +394,19 @@ class Game(Network):
         if score:
             if self.cur_screen.name != "Main":
                 self.cur_screen.apply_score(score)
-                
+
+    def apply_classement(self):
+        """self.dictat = {'classement': {'pierre': 1, 'AI': 2} """
+
+        try:
+            classement = self.dictat["classement"]
+        except:
+            classement = None
+
+        # Les screen de 1 a 10 doivent avoir apply_(classement)
+        if self.cur_screen.name != "Main":
+            self.cur_screen.apply_classement(classement)
+
     def apply_ball_pos(self):
         """self.dictat = {... "ball": [7.19, 7.19],..."""
 
@@ -347,12 +415,12 @@ class Game(Network):
         except:
             ball_pos = None
 
-        # Les screen de 1 a 10 doivent avoir apply_ball_position()
+        # Les screen de 1 a 10 doivent avoir apply_ball_pos()
         if ball_pos:
             if self.cur_screen.name != "Main":
-                self.cur_screen.apply_ball_position(ball_pos)
+                self.cur_screen.apply_ball_pos(ball_pos)
 
-    def apply_other_paddles_position(self):
+    def apply_other_paddles_pos(self):
         """paddle_pos = [[2, 3], [5, 6], ... """
 
         try:
@@ -362,10 +430,9 @@ class Game(Network):
 
         if paddles:
             # Les screen de 1 a 10 doivent avoir
-            #   apply_other_paddles_position()
+            #   apply_other_paddles_pos()
             if self.cur_screen.name != "Main":
-                self.cur_screen.apply_other_paddles_position(paddles,
-                                                            self.my_num)
+                self.cur_screen.apply_other_paddles_pos(paddles)
 
     def verif_freq(self):
         self.v_freq += 1
@@ -390,7 +457,7 @@ class Game(Network):
         try:
             num = self.dictat['who_are_you'][self.my_name]
         except:
-            num = 0
+            num = None
         return num
 
     def create_msg(self):
@@ -401,13 +468,23 @@ class Game(Network):
                                        "paddle": paddle        }}
 
     def get_my_blender_paddle_pos(self):
-
+        """Valable pour tous les niveaux"""
+        # TODO
+        my_pad = None
         if self.my_num == 0:
             my_pad = self.cur_screen.paddle_0
+        if self.my_num == 1:
+            my_pad = self.cur_screen.paddle_1
+        if self.my_num == 2:
+            my_pad = self.cur_screen.paddle_2
+        if self.my_num == 3:
+            my_pad = self.cur_screen.paddle_3
 
-        p = self.cur_screen.get_my_blender_paddle_pos(my_pad)
-
-        return p[0], p[1]
+        if my_pad:
+            p = self.cur_screen.get_my_blender_paddle_pos(my_pad)
+            return p[0], p[1]
+        else:
+            return 0, 0
 
     def get_my_name():
         if "Main" not in self.cur_screen.name:
@@ -417,8 +494,9 @@ class Game(Network):
 
 
 SCREENS = { 0: (MainScreen, "Main"),
-            1: (Screen1,    "1")}
-            ##2: (Screen2,    "2"),
+            1: (Screen1,    "1"),
+            2: (Screen2,    "2")
+            }
             ##3: (Screen3,    "3"),
             ##4: (Screen4,    "4"),
             ##5: (Screen5,    "5")}
@@ -435,8 +513,7 @@ class MultiPongApp(App):
         # Creation des ecrans
         self.screen_manager = ScreenManager()
         for i in range(len(SCREENS)):
-            self.screen_manager.add_widget(SCREENS[i][0]\
-                                                (name=SCREENS[i][1]))
+            self.screen_manager.add_widget(SCREENS[i][0](name=SCREENS[i][1]))
 
         return self.screen_manager
 

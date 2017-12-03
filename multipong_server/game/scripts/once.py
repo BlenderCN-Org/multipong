@@ -3,6 +3,25 @@
 
 ## once.py
 
+#######################################################################
+# Copyright (C) Labomedia November 2017
+#
+# This file is part of multipong.
+#
+# multipong is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# multipong is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with multipong.  If not, see <http://www.gnu.org/licenses/>.
+#######################################################################
+
 
 """
 Ce script est appelé par main_init.main dans blender
@@ -85,24 +104,15 @@ class MulticastClient(DatagramProtocol):
 
         if "reset" in data:
             if data["reset"]:
-                game.reset_variables()
+                print("Reset reçu du serveur")
+                init_variable()
+                reset_scores()
 
         if "rank_end" in data:
             gl.rank_end = data["rank_end"]
-            # TODO fonction dans game
-            if gl.rank_end:
-                print("Fin de rank:", gl.rank_end)
-                try:
-                    for i in range(gl.level):
-                        gl.goal[i]["score"] = 10
-                except:
-                    print("Goal non accessible pour reset score")
 
         if "scene" in data:
             gl.scene = data["scene"]
-
-        if "score" in data:
-            gl.score = data["score"]
 
         if "paddle" in data:
             gl.paddle_pos = data["paddle"]
@@ -112,6 +122,20 @@ class MulticastClient(DatagramProtocol):
 
         if "transit" in data:
             gl.transit = data["transit"]
+
+
+def reset_scores():
+    """Reset de variables pour repartir à zéro."""
+
+    print("Reset variables in game.py")
+    l = gl.level
+    if l == 1:
+        l = 2
+
+    for i in range(l):
+        if gl.goal[i]:
+            gl.goal[i]["score"] = 10
+            print("Tous les scores = 10")
 
 def datagram_decode(datagram):
     """Decode la réception qui est des bytes, pour obtenir un dict."""
@@ -142,7 +166,6 @@ def get_conf():
     print("Dossier courant depuis once.py {}".format(current_dir))
     gl.once = 0
 
-    # TODO: trouver le *.ini en auto
     gl.ma_conf = MyConfig(current_dir + ini_file)
     gl.conf = gl.ma_conf.conf
 
@@ -169,12 +192,10 @@ def init_variable():
 
     # vient du server
     gl.ball_position = [0, 0] # liste
-    gl.score = [0] * 10 # liste
+    gl.score = []
+
     # de la réception
-    gl.paddle_pos = [[-9.5, 0], [0, 0], [0, 0], [0, 0], [0, 0],
-                     [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
-    # pour envoi
-    gl.paddle_1_pos = [0, 0]
+    gl.paddle_pos = [[0, 0]] * 10
 
     gl.ip_server = None
     gl.multi_ip = gl.conf["multicast"]["ip"]
@@ -182,10 +203,6 @@ def init_variable():
     gl.multi_addr = gl.multi_ip, gl.multi_port
     gl.tcp_port = gl.conf["tcp"]["port"]
 
-    # level 1 only TODO utile ????
-    gl.level1_rated = 0 # si classement du level 1 fait dans game.py
-    gl.classement_level1 = {}
-    gl.tempo_rank_level1 = 0
     gl.reset = 0
 
     # gestion du changement du nombre de joueur
@@ -195,7 +212,7 @@ def init_blender_obj():
     """Définit les variables qui permettront d'accéder aux objects de blender.
     """
 
-    #Cube de Labomedia
+    # Cube de Labomedia
     gl.cube_obj = 0
     # L'objet qui permet d'afficher le texte du classement
     gl.rank_obj = 0

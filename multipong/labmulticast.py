@@ -3,24 +3,25 @@
 
 ## labmulticast.py
 
-#############################################################################
-# Copyright (C) Labomedia  October 2016
+
+#######################################################################
+# Copyright (C) Labomedia November 2017
 #
-#  This program is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU General Public License
-#  as published by the Free Software Foundation; either version 2
-#  of the License, or (at your option) any later version.
+# This file is part of multipong.
 #
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+# multipong is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software Foundation,
-#  Inc., 51 Franproplin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# multipong is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #
-#############################################################################
+# You should have received a copy of the GNU General Public License
+# along with multipong.  If not, see <http://www.gnu.org/licenses/>.
+#######################################################################
 
 import socket
 
@@ -41,7 +42,8 @@ class Multicast():
         # Création d'un socket
 
         # Create a UDP socket
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
+                                                  socket.IPPROTO_UDP)
 
         # Allow multiple sockets to use the same PORT number
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -50,10 +52,11 @@ class Multicast():
         self.sock.bind((self.ANY, self.MCAST_PORT))
 
         # Tell the kernel that we are a multicast socket
-        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL,
+                                                                     2)
 
-        # Tell the kernel that we want to add ourselves to a multicast group
-        # The address for the multicast group is the third param
+        # Tell the kernel that we want to add ourselves to a multicast
+        # group. The address for the multicast group is the third param
         status = self.sock.setsockopt(socket.IPPROTO_IP,
                                       socket.IP_ADD_MEMBERSHIP,
                                       socket.inet_aton(self.MCAST_ADDR)\
@@ -63,7 +66,8 @@ class Multicast():
 
         # Limite la taille du buffer UDP pour éviter la latence,
         # le buffer est vidé à chaque lecture
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, self.buffer_size)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF,
+                                                self.buffer_size)
 
         s = "Socket multicast créé avec IP = {} Port = {} Buffer = {}\n"
         print(s.format(self.MCAST_ADDR, self.MCAST_PORT,

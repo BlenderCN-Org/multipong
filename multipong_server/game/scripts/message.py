@@ -3,6 +3,26 @@
 
 ## message.py
 
+#######################################################################
+# Copyright (C) Labomedia November 2017
+#
+# This file is part of multipong.
+#
+# multipong is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# multipong is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with multipong.  If not, see <http://www.gnu.org/licenses/>.
+#######################################################################
+
+
 """Envoi des messages en TCP"""
 
 
@@ -28,27 +48,39 @@ def create_msg_to_send():
 
         msg = {"blend": {"ball": (1,1), "reset": 0}}
     """
-    # Maj de paddle auto
-    get_paddle_1_pos()
 
     msg = {"blend": {"ball":  get_ball_position(),
-                     "paddle_1_pos": gl.paddle_1_pos,
+                     "paddle_1_pos": get_paddle_1_position(),
+                     "score": get_score(),
                      "reset": get_reset() }}
     return msg
 
-def get_paddle_1_pos():
-    """Retourne la position de la paddle 1 de level 1"""
+def get_paddle_1_position():
+    """Retourne la position de la paddle1 à level 1."""
 
     if gl.level == 1:
-        try:
+        if gl.paddle[1]:
             x = gl.paddle[1].localPosition[0]
             y = gl.paddle[1].localPosition[1]
-        except:
-            x, y = 0, 0
+            return  [x, y]
     else:
-        x, y = 0, 0
+        return [0, 0]
 
-    gl.paddle_1_pos = [x, y]
+def get_score():
+    """Reourne la liste des scores
+    [2,3,4]
+    """
+
+    score = []
+    l = gl.level
+    if l == 1: l = 2
+
+    for p in range(l):
+        if gl.goal[p]:
+            s = gl.goal[p]["score"]
+            score.append(s)
+
+    return score
 
 def get_ball_position():
     """Retourne la position x, y de la balle

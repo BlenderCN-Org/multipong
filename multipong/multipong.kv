@@ -54,6 +54,8 @@
 
 <PongPaddle>:
     canvas:
+        Color:
+            rgb: self.rect_color
         Rectangle:
             pos: self.pos
             size: root.height/65, root.height/7
@@ -62,35 +64,130 @@
     ball: pong_ball
     paddle_0: paddle0
     paddle_1: paddle1
-
-    Label:
-        font_size: int(root.top/20)
-        color: 1, 0, 0  
-        center_x: int(root.top/8 - 600)
-        center_y: int(root.top * 4/8)
-        text: "0"  #str(root.score_0)
-    
-    Label:
-        font_size: int(root.top/20)
-        color: 0, 1, 0  
-        center_x: int(root.top * 7/8 - 600)
-        center_y: int(root.top * 4/8)
-        text: "1"  #str(root.score_1)
-                
-    PongBall:
+    score_0: score0
+    score_1: score1
+    titre: Titre
+    classement: clsmt
+    Label:  # score_0
+        id: score0
+        font_size: root.width/30
+        color: 1, 0, 0
+        center_x: -int(root.width * 3.2/8)
+        center_y:  int(root.top * 3.5/8)
+        text: root.score_0.text
+    Label:  # score_1
+        id: score1
+        font_size: root.width/30
+        color: 0, 1, 0
+        center_x: int(root.width/30)
+        center_y:  int(root.top * 3.5/8)
+        text: root.score_1.text
+    Label:  # titre
+        id: Titre
+        color: 1, 0.27, 0
+        font_size:  root.width/28
+        center_x: -int(root.width/5.5)
+        center_y: int(root.top * 3.6/8)
+        text: root.titre.text
+    Label:  # classement
+        id: clsmt
+        color: 1, 0.27, 0
+        font_size: root.width/40
+        center_x: -int(root.width/3.5)
+        center_y: int(root.width/8)
+        text: "toto" #root.classement.text
+    PongBall:  # pong_ball
         id: pong_ball
         pos: self.pos
-    PongPaddle:
+    PongPaddle:  # paddle_0
         id: paddle0
         pos: self.pos
-    PongPaddle:
+    PongPaddle:   #paddle_1
         id: paddle1
         pos: self.pos
-                
     BoxLayout:
         orientation: 'horizontal'
-            
-            
+        BoxLayout:
+            size_hint_x: 0.65
+            canvas:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Line:
+                    points: [int(x*(root.top/720)) for x in root.points]
+                    joint: 'miter'
+                    width: 3
+                    close: 1
+                Line:
+                    points: [(x*(root.top/720) + (root.top/2) - 10) for x in root.net]
+                    joint: 'miter'
+                    width: 3
+                    close: 1
+        BoxLayout:
+            size_hint_x: 0.35
+            orientation: 'vertical'
+            Button:
+                size_hint_y: 0.08
+                background_color: (0.5, 0.5, 0.5, 1)
+                text: 'Menu'
+                color: (0, 1, 0, 1)
+                font_size: "20dp"
+                on_release: app.go_mainscreen()
+            Button:
+                size_hint_y: 0.92
+                id: button_size
+                color: (0, 1, 0, 1)
+                background_color: (0.95, 0.95, 0.95, 1)
+                font_size: "18dp"
+                text: "Raquette"
+
+
+<Screen2>:
+    ball: pong_ball
+    paddle_0: paddle0
+    paddle_1: paddle1
+    score_0: score0
+    score_1: score1
+    titre: Titre
+    classement: clsmt
+    Label:  #score0
+        id: score0
+        font_size: root.width/30
+        color: 1, 0, 0
+        center_x: -int(root.width * 3.2/8)
+        center_y:  int(root.top * 3.5/8)
+        text: root.score_0.text
+    Label:  #score1
+        id: score1
+        font_size: root.width/30
+        color: 0, 1, 0
+        center_x: int(root.width/30)
+        center_y:  int(root.top * 3.5/8)
+        text: root.score_1.text
+    Label:  #Titre
+        id: Titre
+        color: 1, 0.27, 0
+        font_size:  root.width/28
+        center_x: -int(root.width/5.5)
+        center_y: int(root.top * 3.6/8)
+        text: root.titre.text
+    Label:  #clsmt
+        id: clsmt
+        color: 1, 0.27, 0
+        font_size: root.width/40
+        center_x: -int(root.width/3.5)
+        center_y: int(root.width/8)
+        text: "toto" #root.classement.text
+    PongBall:  #pong_ball
+        id: pong_ball
+        pos: self.pos
+    PongPaddle:  #paddle0
+        id: paddle0
+        pos: self.pos
+    PongPaddle:  #paddle1
+        id: paddle1
+        pos: self.pos
+    BoxLayout:
+        orientation: 'horizontal'
         BoxLayout:
             size_hint_x: 0.70
             canvas:
@@ -98,10 +195,12 @@
                     rgba: 1, 1, 1, 1
                 Line:
                     points: [int(x*(root.top/720)) for x in root.points]
+                    joint: 'miter'
                     width: 3
                     close: 1
                 Line:
                     points: [(x*(root.top/720) + (root.top/2) - 10) for x in root.net]
+                    joint: 'miter'
                     width: 3
                     close: 1
         BoxLayout:
@@ -122,14 +221,6 @@
                 font_size: "18dp"
                 text: "Raquette"
 
-<Screen2>:
-    canvas:
-        Color:
-            rgba: 1, 1, 1, 1
-        Line:
-            points: self.points
-            width: 3
-            close: 1
 
 <Screen3>:
     ball:     pong_ball
