@@ -21,12 +21,13 @@
 #######################################################################
 
 
-__version__ = '0.030'
+__version__ = '0.031'
 
 """
 ne pas oublier de commenter le Window.size
 
 version
+0.31 jouable à deux
 0.30 fin de screen 1
 0.29 erreur dans print
 0.28 ("multipong.kv", encoding='utf-8') marche pas
@@ -70,9 +71,9 @@ from labtcpclient import LabTcpClient
 
 
 # Les 3 lignes ci-dessous sont à commenter pour buildozer
-k = 1
-WS = (int(1280*k), int(720*k))
-Window.size = WS
+# #k = 1
+# #WS = (int(1280*k), int(720*k))
+# #Window.size = WS
 
 
 # Pass variable between python script http://bit.ly/2n0ksWh
@@ -85,14 +86,14 @@ from scr2 import Screen2
 ##from scr5 import Screen5
 
 def datagram_to_dict(data):
-    """Decode le message.
+    """Décode le message.
     Retourne un dict ou None
     """
 
     try:
         dec = data.decode("utf-8")
     except:
-        print("Decodage UTF-8 impossible")
+        print("Décodage UTF-8 impossible")
         dec = data
 
     try:
@@ -108,11 +109,11 @@ def datagram_to_dict(data):
         return None
 
 def get_user_id():
-    """u0_a73"""
+    """u0_a73 sur android"""
 
     try:
         user = os.getlogin()
-        # Ajout de qq chiffre pour distonction en debug sur mon PC
+        # Ajout de qq chiffre pour distinction en debug sur mon PC
         user += str(int(100*time()))[-5:]
         print("User login:", user)
     except:
@@ -136,7 +137,7 @@ class MainScreen(Screen):
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
 
-        # Construit le jeu, le reseau, tourne tout le temps
+        # Construit le jeu, le réseau, tourne tout le temps
         scr_manager = self.get_screen_manager()
         self.game = Game(scr_manager)
 
@@ -271,6 +272,7 @@ class Network:
     def print_stuff(self):
         if time() - self.t_print > 2:
             os.system('clear')
+            print("  Joueur")
             print("Envoi de:")
             try:
                 msg = self.tcp_msg["joueur"]
@@ -331,7 +333,7 @@ class Game(Network):
                         "score":  [9, 7],
                         "paddle": [[-9.4, 0.0], [-9.4, 0.40]],
                         "who_are_you": {'moi': 0, 'toi': 1},
-                        "rank_end": 0,
+                        "match_end": 0,
                         "reset":   0,
                         "transit": 0 }, "ip": etc ...}}
         """
@@ -369,14 +371,15 @@ class Game(Network):
                     print("Glissement vers l'écran", str(combien))
 
     def apply_my_num(self):
-        """tous les écrans 1 à 10 doivent avoir ces méthodes"""
+        """Tous les écrans 1 à 10 doivent avoir ces méthodes"""
 
         if self.cur_screen:
             if self.cur_screen.name != "Main":
                 self.cur_screen.apply_my_num(self.my_num)
 
     def apply_paddle_red_color(self):
-        # Les screen de 1 a 10 doivent avoir apply_paddle_red_color()
+        """Les screen de 1 a 10 doivent avoir apply_paddle_red_color()
+        """
 
         if self.cur_screen:
             if self.cur_screen.name != "Main":
@@ -448,7 +451,8 @@ class Game(Network):
         self.cur_screen = self.scr_manager.current_screen
 
     def get_my_number(self):
-        """Je suis self.my_name
+        """Retourne le numéro attribué par le serveur.
+        Je suis self.my_name
         self.dictat = { ...,
                         'who_are_you': {'moi': 0, 'toi': 1},
                         ...}
@@ -469,7 +473,7 @@ class Game(Network):
 
     def get_my_blender_paddle_pos(self):
         """Valable pour tous les niveaux"""
-        # TODO
+        # TODO mettre les objets dans un dict
         my_pad = None
         if self.my_num == 0:
             my_pad = self.cur_screen.paddle_0
@@ -484,7 +488,7 @@ class Game(Network):
             p = self.cur_screen.get_my_blender_paddle_pos(my_pad)
             return p[0], p[1]
         else:
-            return 0, 0
+            return 20, 20
 
     def get_my_name():
         if "Main" not in self.cur_screen.name:
@@ -508,7 +512,7 @@ class MultiPongApp(App):
     """
 
     def build(self):
-        """Execute en premier apres run()"""
+        """Exécuté en premier après run()"""
 
         # Creation des ecrans
         self.screen_manager = ScreenManager()
@@ -518,7 +522,7 @@ class MultiPongApp(App):
         return self.screen_manager
 
     def on_start(self):
-        """Execute apres build()"""
+        """Exécuté apres build()"""
         pass
 
     def build_config(self, config):
@@ -546,14 +550,14 @@ class MultiPongApp(App):
     def build_settings(self, settings):
         """Construit l'interface de l'écran Options,
         pour multipong seul,
-        Kivy est par defaut,
-        appele par app.open_settings() dans .kv
+        Kivy est par défaut,
+        appelé par app.open_settings() dans .kv
         """
 
-        data = """[{"type": "title", "title":"Configuration du reseau"},
+        data = """[{"type": "title", "title":"Configuration du réseau"},
                       {"type": "numeric",
-                      "title": "Frequence",
-                      "desc": "Frequence entre 1 et 60 Hz",
+                      "title": "Fréquence",
+                      "desc": "Fréquence entre 1 et 60 Hz",
                       "section": "network", "key": "freq"}
                    ]"""
 
@@ -572,9 +576,8 @@ class MultiPongApp(App):
 
             # If frequency change
             if token == ('network', 'freq'):
-                # Restart the server with new address
-                #self.screen_manager.get_screen("Main").restart_server()
-                print("Nouvelle frequence", freq)
+                # TODO recalcul tempo
+                print("Nouvelle fréquence", freq)
 
     def go_mainscreen(self):
         """Retour au menu principal depuis les autres écrans."""

@@ -76,11 +76,33 @@ class Game():
             self.update_paddle_auto()
 
         if not self.match_end:
-            self.get_match_end()
+            # d'abord qui a perdu
             self.update_loser()
+            # puis classement
+            self.get_match_end()
+
             # On ne passe plus ici si self.match_end=1
         else:
             self.update_match_end_tempo()
+
+    def get_name_with_index(self, index):
+        """Retourne le nom du joueur
+        self.players = {
+        'TCP117', {'name': 'p117', 'paddle': [-9.5, 3.44]}),
+        'TCP122', {'name': 'p122', 'paddle': [9.6, 1.30]})]}
+
+        list = [ {'paddle': [-9.5, 7.5], 'name': 'pierre14'},
+                 {'paddle': [ 9.6, 5.3], 'name': 'pierre53'} ]
+        """
+
+        # TODO delete try
+        try:
+            l = list(self.players.values())
+            d =  l[index]
+            name = d['name']
+            return name
+        except:
+            return "Isac  Asimov"
 
     def update_loser(self):
         """Enregistrement du time des loser dans self.loser
@@ -92,7 +114,53 @@ class Game():
 
         for i in range(len(self.score)):
             if self.score[i] <= 0:
+                print("Le joueur", i, "a perdu")
                 self.loser[i] = time()
+
+    def get_winner(self):
+        """ Qui a gagné ? celui qui n'est pas dans loser"""
+
+        winner = 0
+        print("self.loser", self.loser)
+        loser_nums = list(self.loser.keys())
+        print("loser_nums", loser_nums)
+        for i in range(len(loser_nums)):
+            if i not in loser_nums:
+                print(i, "a gagné")
+                winner = i
+        return winner
+
+    def get_classement(self):
+        """retourne le classement dans un dict non ordonné
+        le json perd l'ordre
+
+        self.loser = { 0: 345.9, 3: 345.4, 2: 345.8}
+        winner_index = 1
+        self.classement = {'pierre':1, 'AI':2, 'toi':4,'moi':3}
+        blender attend {'toto': 3, 'labomedia': 2, 'gddgsg': 1}
+        """
+
+        self.classement = {}
+
+        winner_index = self.get_winner()
+        winner_name = self.get_name_with_index(winner_index)
+        self.classement[winner_name] = 1
+
+        time_list = list(self.loser.values())
+
+        # Le time le plus grand est le 2ème
+        time_list_sort = sorted(time_list, reverse=True)
+
+        n = 2
+        for t in time_list_sort:
+            for k, v in self.loser.items():
+                if v == t:
+                    # k est le suivant
+                    print("k", k)
+                    k_name = self.get_name_with_index(k)
+                    print("k_name", k_name)
+                    self.classement[k_name] = n
+                    n += 1
 
     def get_match_end(self):
         """Obtenu avec self.score qui vient blender
@@ -115,8 +183,9 @@ class Game():
             self.match_end = 1
             # Lancement de la tempo
             self.match_end_tempo = time()
-            # Calcul de classement
-            self.update_classement()
+            # Calcul de classement une seule fois
+            self.get_classement()
+            print("Classement", self.classement)
         else:
             self.match_end = 0
 
@@ -128,6 +197,9 @@ class Game():
 
         self.scene = "rank"
 
+        if time() - self.match_end_tempo < 3:
+            print("Classement", self.classement)
+
         if time() - self.match_end_tempo > 3:
             self.scene = "play"
             self.reset_data()
@@ -138,7 +210,10 @@ class Game():
             self.match_end = 0
 
     def add_data_in_players(self, user, data):
-        """Ajoute les datas reçues d'un user dans le raw dict."""
+        """Ajoute les datas reçues d'un joueur.
+        self.players = {
+        'TCP117', {'name': 'p117', 'paddle': [-9.5, 3.44]}
+        """
 
         self.players[user] = data
 
@@ -207,54 +282,6 @@ class Game():
 
         return players_list
 
-    def update_classement(self):
-        """Les 0 ont perdu
-        self.score      = [ 0,         4]
-        players_list = [['pierre', score], ['AI', score]]
-        classement = {"toto": 2, "AI": 1}
-        """
-
-        players_list = self.get_players_list()
-        if len(players_list) >= 1:
-            if self.level == 1:
-                self.update_classement_1(players_list)
-            else:
-                self.update_classement_other(self, players_list)
-
-    def update_classement_1(self, players_list):
-        """Classement level 1 seul"""
-
-        # c'est ordonné
-        self.classement = OrderedDict()
-
-        if players_list[0][1] == 0:
-            # j'ai perdu
-            self.classement["AI"] = 1
-            self.classement[players_list[0][0]] = 2
-        if players_list[1][1] == 0:
-            # AI a perdu
-            self.classement[players_list[0][0]] = 1
-            self.classement["AI"] = 2
-
-    def update_classement_other(self, players_list):
-        """Calcul du classement avec self.loser
-                      joueur   time de lose
-        self.loser = [   2:    12345.123    , 4: 345.457, 3: 363.729]
-        len(self.loser) = len(players_list) - 1
-        self.classement = {} ordonné
-                        = {1: "toto", 2: "moi moi", etc ...}
-        """
-
-        self.classement = OrderedDict()
-
-        # Qui a gagné ? celui qui n'est pas dans loser
-        winner = self.get_winner(players_list)
-        for k, v in self.loser.items():
-
-    def get_winner(self, players_list):
-        # Qui a gagné ? celui qui n'est pas dans loser
-        return winner
-
     def update_blend(self, blend):
         """Maj de la position de la balle et du reset
         avec valeurs reçues de blender
@@ -305,7 +332,7 @@ class Game():
                 "score": [9, 7],
                 "paddle": [[-9.4, 2.5], [-9.4, 0.40]],
                 "who_are_you": {'moi': 0, 'toi': 1},
-                "rank_end":  0,
+                "match_end":  0,
                 "reset": 0,
                 "transit": 0 }
         """
@@ -321,7 +348,7 @@ class Game():
                 "score": self.score,
                 "paddle": self.paddle,
                 "who_are_you": self.get_who(),
-                "rank_end":  self.match_end,
+                "match_end":  self.match_end,
                 "reset": self.reset,
                 "transit": self.match_end  }
 

@@ -108,8 +108,8 @@ class MulticastClient(DatagramProtocol):
                 init_variable()
                 reset_scores()
 
-        if "rank_end" in data:
-            gl.rank_end = data["rank_end"]
+        if "match_end" in data:
+            gl.rank_end = data["match_end"]
 
         if "scene" in data:
             gl.scene = data["scene"]

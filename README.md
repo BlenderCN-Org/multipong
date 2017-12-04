@@ -31,7 +31,7 @@ pour l'installation de buildozer et son utilisation.
 
 ### Installation du serveur sur un PC
 
-#### Pricipe du serveur
+#### Principe du serveur
 Le script sh lance un script python et un blend avec le blenderplayer.
 
 Le serveur envoie en multi-cast en permanence à tous les joueurs et blender toutes les datas nécessaires avec en plus l'IP du serveur pour que les joueurs envoient en TCP.

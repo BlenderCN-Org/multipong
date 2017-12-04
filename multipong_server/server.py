@@ -63,7 +63,7 @@ class MyMulticastSender(DatagramProtocol):
         self.tempo = time()
         self.count = 0
         self.ip_server = get_my_ip()
-        print("self.ip_server", self.ip_server)
+
         print("Envoi en multicast sur", MULTICAST_IP,
                                         MULTICAST_PORT, "\n")
 
@@ -177,7 +177,6 @@ class MyTcpServer(Protocol):
         print("Connection lost, reason:", reason)
         print("Connexion fermée avec le client {}".format(self.addr))
         self.factory.game.delete_disconnected_players(self.user)
-        self.user = None
 
     def dataReceived(self, data):
         """ TODO: rajouter decode sorting"""
@@ -209,11 +208,10 @@ class MyTcpServer(Protocol):
 
         self.factory.game.update_blend(blend)
 
-    def add_data(self, joueur) :
+    def add_data(self, joueur):
         """Insère la dernière data reçue dans le dict du user."""
 
-        name = joueur["name"]
-        self.factory.game.add_data_in_players(name, joueur)
+        self.factory.game.add_data_in_players(self.user, joueur)
 
     def reset_game(self) :
         """Insère la dernière data reçue dans la pile du user."""
