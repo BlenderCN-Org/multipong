@@ -42,7 +42,6 @@ class Screen1(Screen):
     titre = ObjectProperty()
     classement = ObjectProperty()
 
-
     def __init__(self, **kwargs):
 
         super(Screen1, self).__init__(**kwargs)
@@ -69,20 +68,18 @@ class Screen1(Screen):
     def apply_classement(self, classement):
         """Applique le classement
         classement = {'pierre': 1, 'AI': 2}
-                     {'pierre16061': 2, 'pierre15653': 1}
         str = 'pierre': 1, 'AI': 2
         """
 
+        text = "\n"
         if classement:
+            for i in range(len(classement)):
+                for name, rank in classement.items():
+                    if rank == i + 1:
+                        text += ". " + str(i+1) + "  " + name + "\n\n"
+
+            self.classement.text = text
             self.titre.text = "Classement"
-            t = ""
-            # Pour réordonner, le json perd le OrderedDict()
-            n = 1
-            for k, v in classement.items():
-                if v == n:
-                    t += ". " + str(v) + "   " + k + "\n\n"
-                n += 1
-            self.classement.text = t
         else:
             self.titre.text = ""
             self.classement.text = ""
@@ -92,8 +89,11 @@ class Screen1(Screen):
         score = [4, 2]
         """
 
-        self.score_0.text = str(score[0])
-        self.score_1.text = str(score[1])
+        try:
+            self.score_0.text = str(score[0])
+            self.score_1.text = str(score[1])
+        except:
+            print("pb avec score")
 
     def apply_ball_pos(self, ball_pos):
         """Positionne la balle avec position du serveur."""

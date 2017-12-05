@@ -80,7 +80,6 @@ class Game():
             self.update_loser()
             # puis classement
             self.get_match_end()
-
             # On ne passe plus ici si self.match_end=1
         else:
             self.update_match_end_tempo()
@@ -110,12 +109,14 @@ class Game():
         = {    1:    345.123,   4:       345.457, 3: 363.729}
 
         players_list = [['pierre', score], ['AI', score]]
+        Il ne faut l'ajouter dans la liste qu'une seule fois
         """
 
         for i in range(len(self.score)):
             if self.score[i] <= 0:
-                print("Le joueur", i, "a perdu")
-                self.loser[i] = time()
+                # Si pas encore dans le dict
+                if not i+1 in self.loser:
+                    self.loser[i + 1] = time()
 
     def get_winner(self):
         """ Qui a gagné ? celui qui n'est pas dans loser"""
@@ -197,10 +198,10 @@ class Game():
 
         self.scene = "rank"
 
-        if time() - self.match_end_tempo < 3:
+        if time() - self.match_end_tempo < 5:
             print("Classement", self.classement)
 
-        if time() - self.match_end_tempo > 3:
+        if time() - self.match_end_tempo > 5:
             self.scene = "play"
             self.reset_data()
 

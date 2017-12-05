@@ -68,34 +68,36 @@
     score_1: score1
     titre: Titre
     classement: clsmt
+    canvas:
+        Clear
     Label:  # score_0
         id: score0
-        font_size: root.width/30
-        color: 1, 0, 0
+        font_size: int(root.width/30)
+        color: 1, 0, 0 , 1
         center_x: -int(root.width * 3.2/8)
         center_y:  int(root.top * 3.5/8)
         text: root.score_0.text
     Label:  # score_1
         id: score1
-        font_size: root.width/30
-        color: 0, 1, 0
+        font_size: int(root.width/30)
+        color: 0, 1, 0, 1
         center_x: int(root.width/30)
         center_y:  int(root.top * 3.5/8)
         text: root.score_1.text
     Label:  # titre
         id: Titre
-        color: 1, 0.27, 0
-        font_size:  root.width/28
+        color: 1, 0.27, 0, 1
+        font_size:  int(root.width/28)
         center_x: -int(root.width/5.5)
         center_y: int(root.top * 3.6/8)
         text: root.titre.text
     Label:  # classement
         id: clsmt
-        color: 1, 0.27, 0
-        font_size: root.width/40
+        color: 1, 0.27, 0, 1
+        font_size: int(root.width/40)
         center_x: -int(root.width/3.5)
         center_y: int(root.width/8)
-        text: "toto" #root.classement.text
+        text: root.classement.text
     PongBall:  # pong_ball
         id: pong_ball
         pos: self.pos
@@ -140,7 +142,6 @@
                 font_size: "18dp"
                 text: "Raquette"
 
-
 <Screen2>:
     ball: pong_ball
     paddle_0: paddle0
@@ -149,6 +150,10 @@
     score_1: score1
     titre: Titre
     classement: clsmt
+
+    canvas:
+        Clear
+
     Label:  #score0
         id: score0
         font_size: root.width/30
@@ -176,7 +181,8 @@
         font_size: root.width/40
         center_x: -int(root.width/3.5)
         center_y: int(root.width/8)
-        text: "toto" #root.classement.text
+        text: root.classement.text
+
     PongBall:  #pong_ball
         id: pong_ball
         pos: self.pos
@@ -221,49 +227,92 @@
                 font_size: "18dp"
                 text: "Raquette"
 
-
 <Screen3>:
-    ball:     pong_ball
-    paddle_0: paddle_0
-    paddle_1: paddle_1
-    paddle_2: paddle_2
+    ball: pong_ball
+    paddle_0: paddle0
+    paddle_1: paddle1
+    paddle_2: paddle2
+    score_0: score0
+    score_1: score1
+    score_2: score2
+    titre: Titre
+    classement: clsmt
+
     canvas:
-        Color:
-            rgba: 1, 1, 1, 1
-        Line:
-            points: self.points
-            width: 3
-            close: 1
-    PongBall:
+        Clear
+    Label:  #score0
+        id: score0
+        font_size: root.width/30
+        color: 1, 0, 0
+        center_x: -int(root.width * 2.8/8)  # -448
+        center_y:  int(root.top   * 1/8)    # 160
+        text: root.score_0.text
+
+    Label:  #score1
+        id: score1
+        font_size: root.width/30
+        color: 0, 1, 0
+        center_x: int(root.width * 0.8/8)  # 128
+        center_y: int(root.top   * 1/8)    # 160
+        text: root.score_1.text
+
+    Label:  #score2
+        id: score2
+        font_size: root.width/30
+        color: 0, 1, 0
+        center_x: -int(root.width * 1.1/8)  # -176
+        center_y: -int(root.top   * 2.8/8)  # -252 soit depuis le bas 360-252=108
+        text: root.score_2.text
+
+    Label:  #Titre
+        id: Titre
+        color: 1, 0.27, 0
+        font_size:  root.width/28
+        center_x: -int(root.width/5.5)
+        center_y: int(root.top * 3.6/8)
+        text: root.titre.text
+
+    Label:  #clsmt
+        id: clsmt
+        color: 1, 0.27, 0
+        font_size: root.width/40
+        center_x: -int(root.width/3.5)
+        center_y: int(root.width/8)
+        text: root.classement.text
+
+    PongBall:  #pong_ball
         id: pong_ball
         pos: self.pos
-    PongPaddle:
-        id: paddle_0
+
+    PongPaddle:  #paddle0
+        id: paddle0
         pos: self.pos
         canvas.before:
             PushMatrix
             Rotate:
-                angle: 10
+                angle: 30
                 origin: self.center
         canvas.after:
             PopMatrix
-    PongPaddle:
-        id: paddle_1
+
+    PongPaddle:  #paddle1
+        id: paddle1
         pos: self.pos
         canvas.before:
             PushMatrix
             Rotate:
-                angle: -10
+                angle: -30
                 origin: self.center
         canvas.after:
             PopMatrix
-    PongPaddle:
-        id: paddle_2
+
+    PongPaddle:  #paddle0
+        id: paddle2
         pos: self.pos
         canvas.before:
             PushMatrix
             Rotate:
-                angle: -10
+                angle: 90
                 origin: self.center
         canvas.after:
             PopMatrix
@@ -271,20 +320,27 @@
     BoxLayout:
         orientation: 'horizontal'
         BoxLayout:
-            size_hint_x: 0.60
+            size_hint_x: 0.70
             canvas:
                 Color:
                     rgba: 1, 1, 1, 1
                 Line:
-                    points: root.points
+                    points: [int(x*(root.top/720)) for x in root.points]
+                    joint: 'miter'
                     width: 3
                     close: 1
+                Line:
+                    points: [(x*(root.top/720) + (root.top/2) - 10) for x in root.net]
+                    joint: 'miter'
+                    width: 3
+                    close: 1
+
         BoxLayout:
-            size_hint_x: 0.40
+            size_hint_x: 0.30
             orientation: 'vertical'
             Button:
                 size_hint_y: 0.08
-                background_color: (0.8, 0.8, 0, 1)
+                background_color: (0.5, 0.5, 0.5, 1)
                 text: 'Menu'
                 color: (0, 1, 0, 1)
                 font_size: "20dp"
@@ -293,18 +349,157 @@
                 size_hint_y: 0.92
                 id: button_size
                 color: (0, 1, 0, 1)
-                background_color: (0, 0.8, 0, 1)
+                background_color: (0.95, 0.95, 0.95, 1)
                 font_size: "18dp"
                 text: "Raquette"
 
 <Screen4>:
+    ball: pong_ball
+    paddle_0: paddle0
+    paddle_1: paddle1
+    paddle_2: paddle2
+    paddle_3: paddle3
+    score_0: score0
+    score_1: score1
+    score_2: score2
+    score_3: score3
+    titre: Titre
+    classement: clsmt
+
     canvas:
-        Color:
-            rgba: 1, 1, 1, 1
-        Line:
-            points: self.points
-            width: 3
-            close: 1
+        Clear
+
+    Label:  #score0
+        id: score0
+        font_size: root.width/30
+        color: 1, 0, 0
+        center_x: -int(root.width * 2.8/8)  # -448
+        center_y:  int(root.top   * 1/8)    # 160
+        text: root.score_0.text
+
+    Label:  #score1
+        id: score1
+        font_size: root.width/30
+        color: 0, 1, 0
+        center_x: int(root.width * 0.8/8)  # 128
+        center_y: int(root.top   * 1/8)    # 160
+        text: root.score_1.text
+
+    Label:  #score2
+        id: score2
+        font_size: root.width/30
+        color: 0, 1, 0
+        center_x: -int(root.width * 1.1/8)  # -176
+        center_y: -int(root.top   * 3.2/8)  # -252 soit depuis le bas 360-252=108
+        text: root.score_2.text
+
+    Label:  #score3
+        id: score3
+        font_size: root.width/30
+        color: 0, 1, 0
+        center_x: -int(root.width * 1.1/8)  # -176
+        center_y:  int(root.top   * 3.2/8)  # -252 soit depuis le bas 360-252=108
+        text: root.score_2.text
+
+    Label:  #Titre
+        id: Titre
+        color: 1, 0.27, 0
+        font_size:  root.width/28
+        center_x: -int(root.width/5.5)
+        center_y: int(root.top * 3.6/8)
+        text: root.titre.text
+
+    Label:  #clsmt
+        id: clsmt
+        color: 1, 0.27, 0
+        font_size: root.width/40
+        center_x: -int(root.width/3.5)
+        center_y: int(root.width/8)
+        text: root.classement.text
+
+    PongBall:  #pong_ball
+        id: pong_ball
+        pos: self.pos
+
+    PongPaddle:  #paddle0
+        id: paddle0
+        pos: self.pos
+        canvas.before:
+            PushMatrix
+            Rotate:
+                angle: 30
+                origin: self.center
+        canvas.after:
+            PopMatrix
+
+    PongPaddle:  #paddle1
+        id: paddle1
+        pos: self.pos
+        canvas.before:
+            PushMatrix
+            Rotate:
+                angle: -30
+                origin: self.center
+        canvas.after:
+            PopMatrix
+
+    PongPaddle:  #paddle2
+        id: paddle2
+        pos: self.pos
+        canvas.before:
+            PushMatrix
+            Rotate:
+                angle: 90
+                origin: self.center
+        canvas.after:
+            PopMatrix
+
+    PongPaddle:  #paddle3
+        id: paddle3
+        pos: self.pos
+        canvas.before:
+            PushMatrix
+            Rotate:
+                angle: 90
+                origin: self.center
+        canvas.after:
+            PopMatrix
+
+    BoxLayout:
+        orientation: 'horizontal'
+        BoxLayout:
+            size_hint_x: 0.70
+            canvas:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Line:
+                    points: [int(x*(root.top/720)) for x in root.points]
+                    joint: 'miter'
+                    width: 3
+                    close: 1
+                Line:
+                    points: [(x*(root.top/720) + (root.top/2) - 10) for x in root.net]
+                    joint: 'miter'
+                    width: 3
+                    close: 1
+
+        BoxLayout:
+            size_hint_x: 0.30
+            orientation: 'vertical'
+            Button:
+                size_hint_y: 0.08
+                background_color: (0.5, 0.5, 0.5, 1)
+                text: 'Menu'
+                color: (0, 1, 0, 1)
+                font_size: "20dp"
+                on_release: app.go_mainscreen()
+            Button:
+                size_hint_y: 0.92
+                id: button_size
+                color: (0, 1, 0, 1)
+                background_color: (0.95, 0.95, 0.95, 1)
+                font_size: "18dp"
+                text: "Raquette"
 
 <Screen5>:
     canvas:

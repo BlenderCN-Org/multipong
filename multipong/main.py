@@ -21,12 +21,20 @@
 #######################################################################
 
 
-__version__ = '0.031'
+__version__ = '0.39'
 
 """
 ne pas oublier de commenter le Window.size
 
 version
+0.39 attributs text remis
+0.38 text size int(root.width/30) au lieu de 20
+0.37 canvas clear
+0.36 text = str fixe
+0.35 int sur text size
+0.34 scr1 avec text stringproperty
+0.33 ajout scr1 ligne 95
+0.32 ajout ligne 366
 0.31 jouable à deux
 0.30 fin de screen 1
 0.29 erreur dans print
@@ -38,11 +46,6 @@ version
 0.023 test user id
 0.022 fullscreen tout construit correct
 0.021 landscape
-"""
-
-
-"""
-
 """
 
 
@@ -71,9 +74,9 @@ from labtcpclient import LabTcpClient
 
 
 # Les 3 lignes ci-dessous sont à commenter pour buildozer
-# #k = 1
-# #WS = (int(1280*k), int(720*k))
-# #Window.size = WS
+k = 1
+WS = (int(1280*k), int(720*k))
+Window.size = WS
 
 
 # Pass variable between python script http://bit.ly/2n0ksWh
@@ -81,7 +84,7 @@ COEF = Window.size[1]/720
 # Puis import
 from scr1 import Screen1
 from scr2 import Screen2
-##from scr3 import Screen3
+from scr3 import Screen3
 ##from scr4 import Screen4
 ##from scr5 import Screen5
 
@@ -363,12 +366,13 @@ class Game(Network):
         calculé avec len()
         """
 
-        if "who_are_you" in self.dictat:
-            combien = len(self.dictat["who_are_you"])
-            if combien and self.cur_screen:
-                if str(combien) not in self.cur_screen.name:
-                    self.scr_manager.current = (str(combien))
-                    print("Glissement vers l'écran", str(combien))
+        if self.dictat:
+            if "who_are_you" in self.dictat:
+                combien = len(self.dictat["who_are_you"])
+                if combien and self.cur_screen:
+                    if str(combien) not in self.cur_screen.name:
+                        self.scr_manager.current = (str(combien))
+                        print("Glissement vers l'écran", str(combien))
 
     def apply_my_num(self):
         """Tous les écrans 1 à 10 doivent avoir ces méthodes"""
@@ -499,9 +503,9 @@ class Game(Network):
 
 SCREENS = { 0: (MainScreen, "Main"),
             1: (Screen1,    "1"),
-            2: (Screen2,    "2")
-            }
-            ##3: (Screen3,    "3"),
+            2: (Screen2,    "2"),
+            3: (Screen3,    "3")}
+
             ##4: (Screen4,    "4"),
             ##5: (Screen5,    "5")}
 

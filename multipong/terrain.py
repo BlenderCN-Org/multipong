@@ -2,6 +2,14 @@
 # -*- coding: utf-8 -*-
 
 
+from __main__ import *
+
+# coeff ecran fait dans kv
+# sauf get_kivy_coord() et triangle_correction
+print("Dans le script scr1.py, ")
+print("    coefficient de résolution écran:", COEF)
+
+
 # TODO finir les poly de 5 à 10
 def get_poly_name(num):
     """Retourne le polygone a utiliser en fonction du numéro de Screen
@@ -73,8 +81,6 @@ def get_net_scale(num):
         return 0.07
 
 
-# coeff ecran fait dans kv sauf get_kivy_coord()
-
 class Terrain:
 
     def __init__(self, num):
@@ -115,19 +121,48 @@ class Terrain:
         return line
 
     def get_net_line(self):
-        """Le filet est centré dans le terrain dans le kv
-        avec
+        """Le filet est le terrain multiplié
+        par un coeff = net_scale < 1
+        Il est centré dans le terrain dans le kv avec
         [(x + (root.top/2)-10) for x in root.net]
-        10 correspond en gros au rayon du filet
+
+        Mais ce n'est pas toujours centré !!
+        carré:      root.top/2 ok
+        triangle:   les x + root.top/10
+                    les y - root.top/6
+        10 correspond en gros à l'épaisseur du filet
         """
 
         net_line = []
+
+        # Multiplicateur à appliquer sur le terrain
+        # pour obtenir le filet
         net_scale = get_net_scale(self.num)
-        # Scale de chaque coordonnée
-        k = 0.85 # pour compenser épaisseur ligne de 3 pixels
-        for co in self.line:
-            net_line.append(co * net_scale * k)
+
+        # Scale de chaque coordonnée pour compenser l'épaisseur
+        # de ligne de 3 pixels
+        k = 0.85
+
+        # Application de self.ratio
+        for coord in self.line:
+            net_line.append(coord * net_scale * k)
+
+        # le centre du triangle est décalé
+        if self.num == 3:
+            net_line = self.triangle_correction(net_line)
+
         return net_line
+
+    def triangle_correction(self, net_line):
+
+        line = []
+        for i in range(len(net_line)):
+            if i % 2 == 0:
+                net_line[i] += COEF*720/20
+            if i % 2 != 0:
+                net_line[i] -=  COEF*720/6
+            line.append(int(net_line[i]))
+        return line
 
     def get_score_pos(self):
         """Retourne la position des scores"""
