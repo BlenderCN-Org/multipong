@@ -77,7 +77,6 @@ class Screen3(Screen):
     def apply_my_num(self, my_num):
         """Appelé par main Game apply_my_num"""
 
-        #TODO trouver mieux !
         self.my_num = my_num
 
     def apply_paddle_red_color(self):

@@ -23,6 +23,7 @@ TERRAIN = Terrain(NUM)
 LINE = TERRAIN.line
 NET = TERRAIN.net_line
 
+
 # Pass variable between python script http://bit.ly/2n0ksWh
 from __main__ import *
 print("Dans le script scr1.py, ")
@@ -35,10 +36,13 @@ class Screen1(Screen):
     points = ListProperty(LINE)
     net = ListProperty(NET)
     ball = ObjectProperty()
+
     paddle_0 = ObjectProperty()
     paddle_1 = ObjectProperty()
+
     score_0 = ObjectProperty()
     score_1 = ObjectProperty()
+
     titre = ObjectProperty()
     classement = ObjectProperty()
 
@@ -48,11 +52,15 @@ class Screen1(Screen):
 
         self.coef = COEF
 
-        self.score_0.text = str(10)
-        self.score_1.text = str(5)
-        self.titre.text = "test"
-        self.classement.text = ""
         self.my_num = 0
+
+        # Dict des paddles
+        self.paddle_d = {   0: self.paddle_0,
+                            1: self.paddle_1}
+
+        # Dict des scores
+        self.score_d = {    0: self.score_0,
+                            1: self.score_1}
 
         print("Initialisation de Screen1 ok")
 
@@ -62,8 +70,10 @@ class Screen1(Screen):
         self.my_num = my_num
 
     def apply_paddle_red_color(self):
-        if self.my_num == 0:
-            self.paddle_0.rect_color = 1, 0, 0
+        """J'applique le rouge à ma paddle"""
+
+        if self.my_num != None:
+            self.paddle_d[self.my_num].rect_color = 1, 0, 0
 
     def apply_classement(self, classement):
         """Applique le classement
@@ -107,33 +117,32 @@ class Screen1(Screen):
         except:
             pass
 
-    def apply_my_paddle_pos(self, y):
-        """my paddle soit0, avec la capture de position sur l'écran"""
-
-        self.paddle_0.pos[0] = int(12 * self.coef)
-        self.paddle_0.pos[1] = int( y * self.coef)
-
     def apply_other_paddles_pos(self, paddle_pos):
-        """ level 1 paddle auto soit 1
-             moi       paddle auto
+        """  Toutes les paddles sauf la mienne
+             moi         l'autre
         [[-9.5, 0.0], [9.5, -1.81], [0, 0], [0, 0], ....]
-        ou autres level
-            joueur1      moi           joueur2
-        [[-9.5, 0.0], [9.5, -1.81], [2.455, 5.66]]
+        au reset len(paddle_pos) = 10
         """
-        try:
-            x, y = TERRAIN.get_kivy_coord(paddle_pos[1], [10, 52])
-            x, y = x * self.coef, y * self.coef
 
-            self.paddle_1.pos = [int(x), int(y)]
-        except:
-            pass
+        n = min(len(paddle_pos), NUM+1)
+        for pp in range(n):
+            if pp != self.my_num and paddle_pos[pp]!= [0, 0]:
+                x, y = TERRAIN.get_kivy_coord(paddle_pos[pp], [10, 52])
+                x, y = x * self.coef, y * self.coef
+                self.paddle_d[pp].pos = [int(x), int(y)]
 
     def on_touch_move(self, touch):
 
         # scale décalage
-        y = int((((touch.y/700)*840) - 80)/self.coef)
+        y = int((((touch.y/700)*840) - 80))
         self.apply_my_paddle_pos(y)
+
+    def apply_my_paddle_pos(self, y):
+        """my paddle soit0, avec la capture de position sur l'écran"""
+
+        if self.my_num == 0:
+            self.paddle_d[0].pos = [int(12 * self.coef),
+                                    int( y * self.coef)]
 
     def get_my_blender_paddle_pos(self, my_pad):
 
