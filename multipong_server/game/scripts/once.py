@@ -244,6 +244,7 @@ def init_blender_obj():
                     9 : None }
 
     gl.ball = 0  # objet blender ball
+    gl.ball_start = 0
 
 def init_tempo():
     """ * tempo_liste = [("intro", 60), ("print", 12), ("sound", 6)]

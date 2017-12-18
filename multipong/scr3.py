@@ -29,6 +29,20 @@ print("Dans le script scr1.py, ")
 print("    coefficient de résolution écran:", COEF)
 
 
+def droite(x1, y1, x2, y2):
+    """ Retourne les valeurs de a et b de y=ax+b
+        à partir des coordonnées de 2 points.
+    """
+
+    if x2 - x1 != 0:
+        a = (y2 - y1) / (x2 - x1)
+        b = y1 - (a * x1)
+    else:
+        a, b = 0, 0
+
+    return a, b
+
+
 class Screen3(Screen):
     """Ecran pour 3 joueurs en position 0 1 2"""
 
@@ -167,17 +181,3 @@ class Screen3(Screen):
 
         self.paddle_d[self.my_num].pos = [int(x * self.coef),
                                           int(y * self.coef)]
-
-
-def droite(x1, y1, x2, y2):
-    """ Retourne les valeurs de a et b de y=ax+b
-        à partir des coordonnées de 2 points.
-    """
-
-    if x2 - x1 != 0:
-        a = (y2 - y1) / (x2 - x1)
-        b = y1 - (a * x1)
-    else:
-        a, b = 0, 0
-
-    return a, b

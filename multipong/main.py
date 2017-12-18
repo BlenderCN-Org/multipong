@@ -21,12 +21,13 @@
 #######################################################################
 
 
-__version__ = '0.432'
+__version__ = '0.433'
 
 """
 ne pas oublier de commenter le Window.size
 
 version
+0.433 test scr3 propre angle pos text ok
 0.432 scr2 idem scr1
 0.431 sans canvas de mainscreen, avec canvas clear
 0.430 Box pour label à la fin, sans canvas clear
@@ -77,7 +78,7 @@ COEF = Window.size[1]/720
 # Puis import
 from scr1 import Screen1
 from scr2 import Screen2
-#from scr3 import Screen3
+from scr3 import Screen3
 ##from scr4 import Screen4
 ##from scr5 import Screen5
 
@@ -469,9 +470,8 @@ class Game(Network):
 
 SCREENS = { 0: (MainScreen, "Main"),
             1: (Screen1,    "1"),
-            2: (Screen2,    "2")}  #,
-
-            #3: (Screen3,    "3")}
+            2: (Screen2,    "2"),
+            3: (Screen3,    "3")}
 
             ##4: (Screen4,    "4"),
             ##5: (Screen5,    "5")}

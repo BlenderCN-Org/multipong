@@ -42,6 +42,7 @@ def main():
 
     if gl.scene == "play":
         set_scene_play(scenes)
+        #ball_init()
         set_positive_score()
         set_paddle_position()
         if gl.level == 1:
@@ -51,6 +52,15 @@ def main():
     if gl.scene == "rank":
         overlay_scene_rank(scenes)
         rank_display.main()
+
+def ball_init():
+    # pas utilisé
+    gl.ball_start += 1
+    if gl.ball_start == 10:
+        # Lancement de la balle
+        if gl.ball:
+            print("Lancement de la balle")
+            gl.ball.setLinearVelocity((0.2, 0.2, 0.0), True)
 
 def set_paddle_position():
     """Définit les positions des raquettes avec valeur du serveur.
@@ -105,6 +115,7 @@ def set_good_level_scene(scenes):
 
         # Lancement du bon niveau
         overlay_scene(str(gl.level) + "_players")
+        gl.ball_start =0
 
         # Je viens de demander l'ajout de la scène,
         # elle ne sera effective qu'à la frame suivante
@@ -189,7 +200,7 @@ def print_some():
     """Print toutes les s des valeurs permettant de debugguer."""
 
     if gl.tempoDict["print"].tempo == 0:
-        os.system('clear')
+        #os.system('clear')
         print("Dans Blender:")
 
         print(  "    Envoi:\n", gl.msg_to_send)
