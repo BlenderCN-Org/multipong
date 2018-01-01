@@ -6,11 +6,11 @@ from __main__ import *
 
 # coeff ecran fait dans kv
 # sauf get_kivy_coord() et triangle_correction
+COEF = 1
 print("Dans le script scr1.py, ")
 print("    coefficient de résolution écran:", COEF)
 
 
-# TODO finir les poly de 5 à 10
 def get_poly_name(num):
     """Retourne le polygone a utiliser en fonction du numéro de Screen
     """
@@ -29,34 +29,69 @@ def get_poly_name(num):
     return poly[num]
 
 def get_points_dict(num):
-    """Points des polygones en coordonnees blender
-    TODO finir
-    """
+    """Points des polygones en coordonnees blender."""
 
     points = {}
 
-    points["CARRE"] = [  -9.93542,  9.935437,
-                          9.93543,  9.93543,
-                          9.93543, -9.93543,
-                         -9.93543, -9.93543]
+    points["CARRE"] = [  -9.93542,  -9.935437,
+                         -9.93543,   9.93543,
+                          9.93543,   9.93543,
+                          9.93543,  -9.93543]
 
     points["TRIANGLE"] = [ 14.22068, -12.50787,
                           -14.22068, -12.50787,
                             0,        12.12306 ]
 
-    points["PENTA"] = [ 0,        9.34335,
-                        9.74,     2.26683,
-                        6.01965, -9.18323,
+    points["PENTA"] = [ 6.01965, -9.18323,
                        -6.01965, -9.18323,
-                       -9.74,     2.26683]
+                       -9.74,     2.26683,
+                        0,        9.34335,
+                        9.74,     2.26683]
 
-    points["HEXA"] = []
+    points["HEXA"] = [   0,        -9.8772,
+                        -8.55391,  -4.9386,
+                        -8.55391,   4.9386,
+                         0,         9.8772,
+                         8.55391,   4.9386,
+                         8.5539,   -4.9386]
+
     points["HEPTA"] = []
     points["OCTA"] = []
     points["ENNEA"] = []
     points["DECA"] = []
 
     return points[num]
+
+def get_paths_dict(num):
+    """Points des polygones des paths en coordonnees blender.
+    Les paddles se déplacent sur les paths
+    """
+
+    path = {}
+
+    path["CARRE"] = [   -9.51, -9.51,
+                        -9.51,  9.51,
+                         9.51,  9.51,
+                         9.51, -9.51 ]
+
+    path["TRIANGLE"] = [ 13.293, -7.946,
+                        -13.293, -7.946,
+                              0,  15.077 ]
+
+    path["PENTA"] = [    5.780, -8.854,
+                        -5.780, -8.854,
+                        -9.353,  2.141,
+                             0,  8.937,
+                         9.353,  2.141 ]
+
+    path["HEXA"] = [     0,      -9.564,
+                        -8.283,  -4.782,
+                        -8.283,   4.782,
+                         0,       9.564,
+                         8.283,   4.782,
+                         8.283,  -4.782]
+
+    return path[num]
 
 def get_ratio(num):
     """[360, 360, 36] [décalage x, décalage y, scale] """
@@ -65,7 +100,12 @@ def get_ratio(num):
 
     ratio["CARRE"]    = [360, 360, 36]
     ratio["TRIANGLE"] = [418, 366, 29]
-    ratio["PENTA"]    = [380, 358, 38.6]
+    ratio["PENTA"]    = [358, 358, 36]
+    ratio["HEXA"]     = [380, 358, 36]
+    ratio["HEPTA"]    = [380, 358, 36]
+    ratio["OCTA"]     = [380, 358, 36]
+    ratio["ENNEA"]    = [380, 358, 36]
+    ratio["DECA"]     = [380, 358, 36]
 
     name = get_poly_name(num)
     return ratio[name]
@@ -94,9 +134,10 @@ class Terrain:
         # get ratio du level
         self.ratio = get_ratio(self.num)
 
-        # Points pour ligne terrain et filet
+        # Points pour ligne terrain, filet, path
         self.line = self.line_points()
         self.net_line = self.get_net_line()
+        self.path_line = self.get_line_path()
 
     def line_points(self):
         """Retourne la liste des coordonnées des points
@@ -119,6 +160,29 @@ class Terrain:
             line.append(int(pt))
 
         return line
+
+    def get_line_path(self):
+        """Retourne la liste des coordonnées des points
+        pour définir le polygone du path (chemin de déplacement des
+        paddles) dans kivy,
+        corrigés par ratio blender to kivy
+        """
+
+        path = []
+        points = get_paths_dict(self.poly_name)
+
+        for i in range(len(points)):
+            # size
+            pt =  points[i] * self.ratio[2]
+
+            # Offset
+            if i % 2 == 0:
+                pt += self.ratio[0]
+            if i % 2 != 0:
+                pt += self.ratio[1]
+            path.append(int(pt))
+
+        return path
 
     def get_net_line(self):
         """Le filet est le terrain multiplié
@@ -164,41 +228,34 @@ class Terrain:
             line.append(int(net_line[i]))
         return line
 
-    def get_score_pos(self):
-        """Retourne la position des scores"""
-
-        return None
-
-    def get_blender_coord(self, point, centre):
+    def get_blender_coord(self, point):
         """Transforme les coordonnées de kivy pour blender
         point = [x, y]
-        widget kivy
+        widget kivy scr 1 et 2
         centre = [6, 52] par rapport au coin inf gauche
         """
 
         r = self.ratio
-        x = (point[0] - r[0] - centre[0]) / r[2]
-        y = (point[1] - r[1] - centre[1]) / r[2]
+        x = (point[0] - r[0]) / r[2]
+        y = (point[1] - r[1]) / r[2]
 
         return x, y
 
-    def get_kivy_coord(self, point, centre):
+    def get_kivy_coord(self, point):
         """Transforme les coordonnées de blender pour kivy
         point = [x, y]
-        paddle kivy
-        centre = [6, 52] par rapport au coin inf gauche
         """
 
         r = self.ratio
-        x = (point[0]*r[2]) + r[0] - centre[0]
-        y = (point[1]*r[2]) + r[1] - centre[1]
+        x = (point[0]*r[2]) + r[0]
+        y = (point[1]*r[2]) + r[1]
 
         return x, y
 
 
 if __name__ == '__main__':
 
-    num = 1
+    num = 6
     terrain = Terrain(num)
 
     # Nom du terrain
@@ -210,9 +267,14 @@ if __name__ == '__main__':
     print("\nPoints pour kivy du polygone", name)
     print("line\n", line)
 
+    # Le terrain pour kivy
+    path_line = terrain.path_line
+    print("\nPoints pour kivy du polygone", name)
+    print("path_line\n", path_line)
+
     # Conversion d'un point
     point = [12, 400]
-    cb = terrain.get_blender_coord(point, [10, 10])
+    cb = terrain.get_blender_coord(point)
     print("\nCoordonnées du point ", point, " pour blender")
     print("    ", cb)
 

@@ -37,7 +37,7 @@ import os
 def main():
     scenes = gl.getSceneList()
     B_keys()
-    print_some()
+    #print_some()
     set_help_resolution()
 
     if gl.scene == "play":
@@ -67,12 +67,12 @@ def set_paddle_position():
     si level 1,  paddle_auto overwrite ensuite
     """
 
-    for player in range(len(gl.paddle_pos)):
-        if gl.paddle[player]:
-            pos = [gl.paddle_pos[player][0],
-                   gl.paddle_pos[player][1],
-                   1]
-            gl.paddle[player].localPosition = pos
+    for p in range(len(gl.paddle_pos)):
+        pos = [gl.paddle_pos[p][0],
+               gl.paddle_pos[p][1],
+               1]
+        if gl.paddle[p]:
+            gl.paddle[p].localPosition = pos
 
 def automatic_paddle():
     """Seulement niveau 1. Mouvement auto de la raquette machine."""
@@ -111,7 +111,7 @@ def set_good_level_scene(scenes):
             for scn in scenes :
                 if scn.name == str(n) + "_players" :
                     scn.end()
-                    print("Suppression de la scène",str(n)+"_players")
+                    #print("Suppression de la scène",str(n)+"_players")
 
         # Lancement du bon niveau
         overlay_scene(str(gl.level) + "_players")
@@ -119,7 +119,7 @@ def set_good_level_scene(scenes):
 
         # Je viens de demander l'ajout de la scène,
         # elle ne sera effective qu'à la frame suivante
-        print("Ajout de la scène ", str(gl.level))
+        #print("Ajout de la scène ", str(gl.level))
 
 def overlay_scene(scn, overlay=1):
     """Note de la doc:
@@ -144,7 +144,7 @@ def overlay_scene_rank(scenes):
         gl.addScene("Rank", 1)
 
     if gl.rank_end:
-        print("Fin de rank:", gl.rank_end)
+        #print("Fin de rank:", gl.rank_end)
         l = gl.level
         if l == 1: l = 2
         for i in range(l):

@@ -114,8 +114,12 @@ class MulticastClient(DatagramProtocol):
         if "scene" in data:
             gl.scene = data["scene"]
 
+        if "who_are_you" in data:
+            gl.who = data["who_are_you"]
+
         if "paddle" in data:
             gl.paddle_pos = data["paddle"]
+            sorted_paddle()
 
         if "classement" in data:
             gl.classement = data["classement"]
@@ -123,6 +127,24 @@ class MulticastClient(DatagramProtocol):
         if "transit" in data:
             gl.transit = data["transit"]
 
+def sorted_paddle():
+    """Crée une liste avec les paddles des joueurs 0, 1, 2, ....
+    gl.paddle_pos = {   'toto': [1.2, 5.6],
+                        'qui': [],
+                        'quoi': []}
+    gl.who = {'toto':1, 'qui':2, 'quoi':0}
+    """
+
+    p_pos = []
+    l = gl.level
+    if l == 1: l = 2
+
+    for i in range(l):
+        for k, v in gl.who.items():
+            if v == i:
+                p_pos.append(gl.paddle_pos[v])
+
+    gl.paddle_pos = p_pos
 
 def reset_scores():
     """Reset de variables pour repartir à zéro."""
@@ -169,7 +191,7 @@ def get_conf():
     gl.ma_conf = MyConfig(current_dir + ini_file)
     gl.conf = gl.ma_conf.conf
 
-    print("\nConfiguration du jeu MPFF:")
+    print("\nConfiguration du jeu multipong:")
     print(gl.conf, "\n")
 
 def init_variable():
@@ -185,6 +207,7 @@ def init_variable():
     gl.level = 1
     gl.block = 0
     gl.rank_end = 0
+    gl.who = {}
 
     # Rank
     gl.text = ""

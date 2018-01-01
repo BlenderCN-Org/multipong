@@ -94,10 +94,7 @@ class MyMulticastSender(DatagramProtocol):
             lapin = {"svr_msg": {"ip": self.ip_server, "dictat": {'rien': 0}}}
 
         lapin_enc = json.dumps(lapin).encode("utf-8")
-        # #try:
-            # #print("dictat", lapin["svr_msg"]["dictat"]["ball"])
-        # #except:
-            # #pass
+
         return lapin_enc
 
     def send_loop(self):
@@ -132,6 +129,8 @@ class MyMulticastSender(DatagramProtocol):
             except OSError as e:
                 if e.errno == 101:
                     print("Network is unreachable")
+
+            #self.print_some(lapin)
 
     def send_loop_thread(self):
         thread_s = threading.Thread(target=self.send_loop)
@@ -192,7 +191,7 @@ class MyTcpServer(Protocol):
                 if time() - self.tempo > 5:
                     # Des joueurs
                     a = "\nReçu de {}:\n{}"
-                    print(a.format(joueur["name"], joueur))
+                    #print(a.format(joueur["name"], joueur))
                     self.tempo = time()
 
             # {'blend': {'reset': 0, 'ball': [-8.7, 9.0]}}
@@ -200,7 +199,7 @@ class MyTcpServer(Protocol):
                 blend = data["blend"]
                 self.update_blend(blend)
                 if time() - self.tempo > 5:
-                    print("\nReçu de Blender:\n{}".format(blend))
+                    #print("\nReçu de Blender:\n{}".format(blend))
                     self.tempo = time()
 
     def update_blend(self, blend):

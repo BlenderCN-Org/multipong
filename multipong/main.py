@@ -21,12 +21,14 @@
 #######################################################################
 
 
-__version__ = '0.433'
+__version__ = '0.435'
 
 """
 ne pas oublier de commenter le Window.size
 
 version
+0.435 avec images, bug level 3
+0.434 recherche paddle level 3
 0.433 test scr3 propre angle pos text ok
 0.432 scr2 idem scr1
 0.431 sans canvas de mainscreen, avec canvas clear
@@ -56,9 +58,9 @@ Window.size = WS
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.widget import Widget
-from kivy.properties import NumericProperty
-from kivy.properties import ListProperty
-from kivy.properties import ObjectProperty
+from kivy.properties import NumericProperty, ListProperty
+from kivy.properties import ReferenceListProperty
+from kivy.properties import StringProperty, ObjectProperty
 from kivy.config import Config
 from kivy.lang import Builder
 from kivy.clock import Clock
@@ -75,21 +77,27 @@ from labtcpclient import LabTcpClient
 
 # Pass variable between python script http://bit.ly/2n0ksWh
 COEF = Window.size[1]/720
+
 # Puis import
 from scr1 import Screen1
 from scr2 import Screen2
 from scr3 import Screen3
-##from scr4 import Screen4
-##from scr5 import Screen5
-
+from scr4 import Screen4
+from scr5 import Screen5
+from scr6 import Screen6
 
 class PongBall(Widget):
     pass
 
 
 class PongPaddle(Widget):
-    rect_color = ListProperty([1, 1, 1])
-    angle = NumericProperty(0)
+    color = ListProperty([1, 1, 1])
+    source = StringProperty()
+
+
+class PongPaddle6(Widget):
+    color = ListProperty([1, 1, 1])
+    source = StringProperty()
 
 
 class MainScreen(Screen):
@@ -193,7 +201,7 @@ class Network:
                     'dictat': { 'level': 1,
                                 'ball': [9.55, 9.32],
                                 'transit': 0,
-                                'who_are_you': {'moi': 0, 'toi': 1},
+                                'who_are_you': {'alice': 0, 'bob': 1},
                                 'rank_end': 0,
                                 'paddle': {},
                                 'score': [8,9],
@@ -227,12 +235,12 @@ class Network:
     def send_tcp_msg(self):
         env = json.dumps(self.tcp_msg).encode("utf-8")
         if self.tcp_clt:
-            self.print_stuff()
+            #self.print_stuff()
             self.tcp_clt.send(env)
 
     def print_stuff(self):
         if time() - self.t_print > 2:
-            os.system('clear')
+            #os.system('clear')
             print("  Joueur")
             print("Envoi de:")
             try:
@@ -323,14 +331,14 @@ class Game(Network):
         """Défini l'écran correspondant au nombre de joueurs
         calculé avec len()
         """
-        # TODO faire avec self.level
+
         if self.dictat:
             if "who_are_you" in self.dictat:
+                #print(len(self.dictat["who_are_you"]))
                 combien = len(self.dictat["who_are_you"])
                 if combien and self.cur_screen:
                     if str(combien) not in self.cur_screen.name:
                         self.scr_manager.current = (str(combien))
-                        print("Glissement vers l'écran", str(combien))
 
     def apply_my_num(self):
         """Tous les écrans 1 à 10 doivent avoir ces méthodes"""
@@ -403,7 +411,7 @@ class Game(Network):
         self.v_freq += 1
         a = time()
         if a - self.t > 1:
-            print("FPS:", self.v_freq)
+            #print("FPS:", self.v_freq)
             self.v_freq = 0
             self.t = a
 
@@ -424,11 +432,11 @@ class Game(Network):
             num = self.dictat['who_are_you'][self.my_name]
         except:
             num = None
+
         return num
 
     def create_msg(self):
         if "Main" not in self.cur_screen.name:
-
             paddle = self.get_my_blender_paddle_pos()
             self.tcp_msg = {"joueur": {"name":   self.my_name,
                                        "paddle": paddle        }}
@@ -436,30 +444,7 @@ class Game(Network):
     def get_my_blender_paddle_pos(self):
         """Valable pour tous les niveaux"""
 
-        my_pad = None
-
-        if self.dictat and "level" in self.dictat:
-            level = self.dictat["level"]
-            if level == 1: level = 2
-            # TODO mettre des dict partout et supprimer level
-
-            if level < 3:
-                if self.my_num == 0:
-                    my_pad = self.cur_screen.paddle_0
-                if self.my_num == 1:
-                    my_pad = self.cur_screen.paddle_1
-                if self.my_num == 2:
-                    my_pad = self.cur_screen.paddle_2
-
-            # A partir de level 3, les paddles sont dans un dict
-            if level >= 3:
-                my_pad = self.cur_screen.paddle_d[self.my_num]
-
-        if my_pad:
-            p = self.cur_screen.get_my_blender_paddle_pos(my_pad)
-            return p[0], p[1]
-        else:
-            return 20, 20
+        return self.cur_screen.get_my_blender_paddle_pos()
 
     def get_my_name():
         if "Main" not in self.cur_screen.name:
@@ -471,10 +456,10 @@ class Game(Network):
 SCREENS = { 0: (MainScreen, "Main"),
             1: (Screen1,    "1"),
             2: (Screen2,    "2"),
-            3: (Screen3,    "3")}
-
-            ##4: (Screen4,    "4"),
-            ##5: (Screen5,    "5")}
+            3: (Screen3,    "3"),
+            4: (Screen4,    "4"),
+            5: (Screen5,    "5"),
+            6: (Screen6,    "6")}
 
 
 class MultiPongApp(App):

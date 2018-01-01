@@ -22,11 +22,10 @@ NUM = 3
 TERRAIN = Terrain(NUM)
 LINE = TERRAIN.line
 NET = TERRAIN.net_line
+PATH = TERRAIN.path_line
 
 # Pass variable between python script http://bit.ly/2n0ksWh
 from __main__ import *
-print("Dans le script scr1.py, ")
-print("    coefficient de résolution écran:", COEF)
 
 
 def droite(x1, y1, x2, y2):
@@ -53,10 +52,12 @@ class Screen3(Screen):
     paddle_0 = ObjectProperty()
     paddle_1 = ObjectProperty()
     paddle_2 = ObjectProperty()
+    paddle_3 = ObjectProperty()
 
     score_0 = ObjectProperty()
     score_1 = ObjectProperty()
     score_2 = ObjectProperty()
+    score_3 = ObjectProperty()
 
     titre = ObjectProperty()
     classement = ObjectProperty()
@@ -67,7 +68,7 @@ class Screen3(Screen):
 
         self.coef = COEF
 
-        # mon numéro dans
+        # mon numéro
         self.my_num = 0
 
         # Dict des paddles
@@ -75,36 +76,37 @@ class Screen3(Screen):
                             1: self.paddle_1,
                             2: self.paddle_2}
 
+        self.paddle_d[0].source = './images/g_h.png'
+        self.paddle_d[1].source = './images/g_30.png'
+        self.paddle_d[2].source = './images/g_60.png'
+
+        # Ma paddle position
+        self.my_pad_pos = [0, 0]
+
         # Dict des scores
         self.score_d = {    0: self.score_0,
                             1: self.score_1,
                             2: self.score_2}
 
-        print("Initialisation de Screen3 ok")
+    def apply_paddle_red_color(self):
+        """J'applique le rouge à ma paddle"""
 
-    def get_my_blender_paddle_pos(self, my_pad):
-        """Retourne la position de ma paddle, pour envoyer au serveur
-        """
-
-        return TERRAIN.get_blender_coord([my_pad.pos[0],
-                                          my_pad.pos[1]],
-                                          [-6, -52])
+        if self.my_num == 0:
+            self.paddle_d[0].source = './images/r_h.png'
+        if self.my_num == 1:
+            self.paddle_d[1].source = './images/r_30.png'
+        if self.my_num == 2:
+            self.paddle_d[2].source = './images/r_60.png'
 
     def apply_my_num(self, my_num):
         """Appelé par main Game apply_my_num"""
 
         self.my_num = my_num
 
-    def apply_paddle_red_color(self):
-        """J'applique le rouge à ma paddle"""
-
-        if self.my_num != None:
-            self.paddle_d[self.my_num].rect_color = 1, 0, 0
-
     def apply_score(self, score):
         """Set les scores
         apply_score(score)
-        score = [4, 2]
+        score = [4, 2, 5]
         """
 
         n = min(len(score), NUM)
@@ -115,10 +117,21 @@ class Screen3(Screen):
         """Positionne la balle avec position du serveur."""
 
         if ball_pos:
-            x, y = TERRAIN.get_kivy_coord(ball_pos, [16, 16])
-            x, y = x*self.coef + 5, y*self.coef - 50
+            x, y = TERRAIN.get_kivy_coord(ball_pos)
 
-            self.ball.pos = [int(x), int(y)]
+            # Correction de Window size
+            x *= self.coef
+            y *= self.coef
+
+            # Ajout du décalage de centre de ball, pas de coef
+            s = self.height/66
+            x -= s
+            y -= s
+
+            X = int(x)
+            Y = int(y)
+
+            self.ball.pos = [X, Y]
 
     def apply_other_paddles_pos(self, paddle_pos):
         """  Toutes les paddles sauf la mienne
@@ -130,9 +143,21 @@ class Screen3(Screen):
         n = min(len(paddle_pos), NUM)
         for pp in range(n):
             if pp != self.my_num and paddle_pos[pp]!= [0, 0]:
-                x, y = TERRAIN.get_kivy_coord(paddle_pos[pp], [10, 52])
-                x, y = x * self.coef, y * self.coef
-                self.paddle_d[pp].pos = [int(x), int(y)]
+                x, y = TERRAIN.get_kivy_coord(paddle_pos[pp])
+
+                # Correction de Window size
+                x *= self.coef
+                y *= self.coef
+
+                # Ajout du décalage de centre de paddle
+                s = 70  #self.height/14
+                x -= s
+                y -= s
+
+                X = int(x)
+                Y = int(y)
+
+                self.paddle_d[pp].pos = [X, Y]
 
     def apply_classement(self, classement):
         """Applique le classement
@@ -156,28 +181,54 @@ class Screen3(Screen):
     def on_touch_move(self, touch):
         """Capture de la position de touch"""
 
-        x = touch.x
-        y = touch.y
-        self.apply_touch(x, y)
+        x = touch.x/self.coef
+        y = touch.y/self.coef
+
+        if self.my_num is not None:
+            self.apply_touch(x, y)
 
     def apply_touch(self, x, y):
-        """Retourne le calcul du déplacement de ma paddle"""
+        """Calcul du déplacement de ma paddle."""
 
-        if self.my_num:
-            n = self.my_num
-            x1, y1, x2, y2 = LINE[n+0], LINE[n+1], LINE[n+2], LINE[n+3]
-            # y = a * x + b
+        if self.my_num == 0:
+            x1, y1, x2, y2 = (PATH[0], PATH[1], PATH[2], PATH[3])
+
+        if self.my_num == 1:
+            x1, y1, x2, y2 = (PATH[2], PATH[3], PATH[4], PATH[5])
+
+        if self.my_num == 2:
+            x1, y1, x2, y2 = (PATH[4], PATH[5], PATH[0], PATH[1])
+
+        # Les non verticales
+        if self.my_num in [0, 1, 2]:
             a, b = droite(x1, y1, x2, y2)
-            # correction de x, y
-            x = 1.1 * x - 500
-            y = int(a * x + b) - 436
+            y = a * x + b
 
-            self.apply_my_paddle_pos(x, y)
+        self.my_pad_pos = [x, y]
+        self.apply_my_paddle_pos(x, y)
 
     def apply_my_paddle_pos(self, x, y):
-        """Positionne ma paddle, avec la capture de position x, y
-        sur l'écran
+        """Avec la capture de position sur l'écran"""
+
+        # Correction de Window size
+        x *= self.coef
+        y *= self.coef
+
+        # Ajout du décalage de centre de ball, pas de coef
+        s = 70  #self.height/14
+        x -= s
+        y -= s
+
+        X = int(x)
+        Y = int(y)
+
+        if self.my_num is not None:
+            self.paddle_d[self.my_num].pos = [X, Y]
+
+    def get_my_blender_paddle_pos(self):
+        """Retourne la position de ma paddle, pour envoyer au serveur
         """
 
-        self.paddle_d[self.my_num].pos = [int(x * self.coef),
-                                          int(y * self.coef)]
+        [x, y] = TERRAIN.get_blender_coord(self.my_pad_pos)
+
+        return [x, y]

@@ -122,12 +122,12 @@ class Game():
         """ Qui a gagné ? celui qui n'est pas dans loser"""
 
         winner = 0
-        print("self.loser", self.loser)
+        #print("self.loser", self.loser)
         loser_nums = list(self.loser.keys())
-        print("loser_nums", loser_nums)
+        #print("loser_nums", loser_nums)
         for i in range(len(loser_nums)):
             if i not in loser_nums:
-                print(i, "a gagné")
+                #print(i, "a gagné")
                 winner = i
         return winner
 
@@ -157,9 +157,9 @@ class Game():
             for k, v in self.loser.items():
                 if v == t:
                     # k est le suivant
-                    print("k", k)
+                    #print("k", k)
                     k_name = self.get_name_with_index(k)
-                    print("k_name", k_name)
+                    #print("k_name", k_name)
                     self.classement[k_name] = n
                     n += 1
 
@@ -186,7 +186,7 @@ class Game():
             self.match_end_tempo = time()
             # Calcul de classement une seule fois
             self.get_classement()
-            print("Classement", self.classement)
+            #print("Classement", self.classement)
         else:
             self.match_end = 0
 
@@ -198,14 +198,14 @@ class Game():
 
         self.scene = "rank"
 
-        if time() - self.match_end_tempo < 5:
-            print("Classement", self.classement)
+        # #if time() - self.match_end_tempo < 5:
+            # #print("Classement", self.classement)
 
-        if time() - self.match_end_tempo > 5:
+        if time() - self.match_end_tempo > 3:
             self.scene = "play"
             self.reset_data()
 
-        if time() - self.match_end_tempo > 6:
+        if time() - self.match_end_tempo > 4:
             # Le jeu a repris depuis longtemps
             # je peux rescanner les scores
             self.match_end = 0
@@ -234,7 +234,7 @@ class Game():
         self.count += 1
         t = time()
         if t - self.t_count > 5:
-            print("Fréquence d'accès par les clients", int(self.count/5))
+            #print("Fréquence d'accès par les clients", int(self.count/5))
             self.count = 0
             self.t_count = t
 
@@ -360,7 +360,7 @@ class Game():
         self.players n'est pas reseter
         """
 
-        print("Reset in Game")
+        #print("Reset in Game")
 
         # Classement
         self.classement = OrderedDict()
