@@ -24,6 +24,7 @@ LINE = TERRAIN.line
 NET = TERRAIN.net_line
 PATH = TERRAIN.path_line
 
+
 # Pass variable between python script http://bit.ly/2n0ksWh
 from __main__ import *
 
@@ -88,6 +89,13 @@ class Screen3(Screen):
                             1: self.score_1,
                             2: self.score_2}
 
+        # height = 100 --> bidouille
+        h = 720 * self.coef
+        # 1/2 Taille de la balle
+        self.BALL = h/(33*2)
+        # 1/2 Taille de paddle
+        self.PADDLE = h/(8*2)
+
     def apply_paddle_red_color(self):
         """J'applique le rouge à ma paddle"""
 
@@ -124,9 +132,9 @@ class Screen3(Screen):
             y *= self.coef
 
             # Ajout du décalage de centre de ball, pas de coef
-            s = self.height/66
-            x -= s
-            y -= s
+            s = self.BALL
+            x = x - s
+            y = y - s #- 50
 
             X = int(x)
             Y = int(y)
@@ -150,9 +158,9 @@ class Screen3(Screen):
                 y *= self.coef
 
                 # Ajout du décalage de centre de paddle
-                s = 70  #self.height/14
-                x -= s
-                y -= s
+                s = self.PADDLE
+                x = x - s
+                y = y - s
 
                 X = int(x)
                 Y = int(y)
@@ -204,7 +212,6 @@ class Screen3(Screen):
             a, b = droite(x1, y1, x2, y2)
             y = a * x + b
 
-        self.my_pad_pos = [x, y]
         self.apply_my_paddle_pos(x, y)
 
     def apply_my_paddle_pos(self, x, y):
@@ -215,14 +222,17 @@ class Screen3(Screen):
         y *= self.coef
 
         # Ajout du décalage de centre de ball, pas de coef
-        s = 70  #self.height/14
-        x -= s
-        y -= s
+        s = self.PADDLE
+        x = x - s #- 40
+        y = y - s #- 120
 
         X = int(x)
         Y = int(y)
 
         if self.my_num is not None:
+            # Les x, y envoyés à blender
+            self.my_pad_pos = [X, Y]#[X + 40, Y + 90]
+            # Ma position
             self.paddle_d[self.my_num].pos = [X, Y]
 
     def get_my_blender_paddle_pos(self):

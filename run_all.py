@@ -13,6 +13,7 @@ def server():
 def blender():
     subprocess.Popen(   [   'blenderplayer',
                             './multipong_server/game/mp.blend'])
+
 def kivy():
     subprocess.Popen(   [   'python3',
                             './multipong/main.py'])
@@ -31,7 +32,7 @@ thread_b.start()
 sleep(1)
 
 # Nombre de joueurs
-N = 1
+N = 3
 
 l = []
 for i in range(N):

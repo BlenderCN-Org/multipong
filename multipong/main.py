@@ -95,6 +95,15 @@ class PongPaddle(Widget):
     source = StringProperty()
 
 
+class PongPaddle3(Widget):
+    color = ListProperty([1, 1, 1])
+    source = StringProperty()
+
+class PongPaddle5(Widget):
+    color = ListProperty([1, 1, 1])
+    source = StringProperty()
+
+
 class PongPaddle6(Widget):
     color = ListProperty([1, 1, 1])
     source = StringProperty()

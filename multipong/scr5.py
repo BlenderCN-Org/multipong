@@ -24,6 +24,7 @@ LINE = TERRAIN.line
 NET = TERRAIN.net_line
 PATH = TERRAIN.path_line
 
+
 # Pass variable between python script http://bit.ly/2n0ksWh
 from __main__ import *
 
@@ -96,6 +97,13 @@ class Screen5(Screen):
                             3: self.score_3,
                             4: self.score_4}
 
+        # height = 100 --> bidouille
+        h = 720 * self.coef
+        # 1/2 Taille de la balle
+        self.BALL = h/(33*2)
+        # 1/2 Taille de paddle
+        self.PADDLE = h/(8.5*2)
+
     def apply_paddle_red_color(self):
         """J'applique le rouge à ma paddle"""
 
@@ -136,9 +144,9 @@ class Screen5(Screen):
             y *= self.coef
 
             # Ajout du décalage de centre de ball, pas de coef
-            s = self.height/66
-            x = x - s + 8
-            y = y - s - 12
+            s = self.BALL
+            x = x - s
+            y = y - s
 
             X = int(x)
             Y = int(y)
@@ -162,9 +170,9 @@ class Screen5(Screen):
                 y *= self.coef
 
                 # Ajout du décalage de centre de paddle
-                s = 70  #self.height/14
-                x -= s
-                y -= s
+                s = self.PADDLE
+                x = x - s
+                y = y - s
 
                 X = int(x)
                 Y = int(y)
@@ -223,7 +231,6 @@ class Screen5(Screen):
             a, b = droite(x1, y1, x2, y2)
             y = a * x + b
 
-        self.my_pad_pos = [x, y]
         self.apply_my_paddle_pos(x, y)
 
     def apply_my_paddle_pos(self, x, y):
@@ -234,14 +241,15 @@ class Screen5(Screen):
         y *= self.coef
 
         # Ajout du décalage de centre de ball, pas de coef
-        s = 70  #self.height/14
-        x -= s
-        y -= s
+        s = self.PADDLE
+        x = x - s
+        y = y - s
 
         X = int(x)
         Y = int(y)
 
         if self.my_num is not None:
+            self.my_pad_pos = [x, y]
             self.paddle_d[self.my_num].pos = [X, Y]
 
     def get_my_blender_paddle_pos(self):

@@ -24,6 +24,7 @@ LINE = TERRAIN.line
 NET = TERRAIN.net_line
 PATH = TERRAIN.path_line
 
+
 # Pass variable between python script http://bit.ly/2n0ksWh
 from __main__ import *
 
@@ -56,10 +57,6 @@ class Screen1(Screen):
         self.paddle_d = {   0: self.paddle_0,
                             1: self.paddle_1}
 
-        s = 70  #int(self.height*0.1432)
-        for k, v in self.paddle_d.items():
-            v.size = (s, s)
-
         self.paddle_d[0].source = './images/g_v.png'
         self.paddle_d[1].source = './images/g_v.png'
 
@@ -69,6 +66,13 @@ class Screen1(Screen):
         # Dict des scores
         self.score_d = {    0: self.score_0,
                             1: self.score_1}
+
+        # height = 100 --> bidouille
+        h = 720 * self.coef
+        # 1/2 Taille de la balle
+        self.BALL = h/(33*2)
+        # 1/2 Taille de paddle
+        self.PADDLE = h/(5.142*2)
 
     def apply_paddle_red_color(self):
         """J'applique le rouge à ma paddle"""
@@ -119,7 +123,7 @@ class Screen1(Screen):
             y *= self.coef
 
             # Ajout du décalage de centre de ball, pas de coef
-            s = self.height/66
+            s = self.BALL
             x -= s
             y -= s
 
@@ -145,7 +149,7 @@ class Screen1(Screen):
             y *= self.coef
 
             # Ajout du décalage de centre de paddle
-            s = self.height/16
+            s = self.PADDLE
             x -= s
             y -= s
 
@@ -181,7 +185,7 @@ class Screen1(Screen):
         y *= self.coef
 
         # Ajout du décalage de centre de ball, pas de coef
-        s = self.height/16
+        s = self.PADDLE
         x -= s
         y -= s
 

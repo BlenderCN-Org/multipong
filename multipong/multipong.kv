@@ -47,20 +47,32 @@
             size: int(root.height/33), int(root.height/33) # 22 pour 720
 
 <PongPaddle>:
-    size: int(root.height/5.142), int(root.height/5.142)
     canvas:
         Rectangle:
             pos: self.pos
             source: self.source
             size: int(root.height/5.142), int(root.height/5.142)
 
-<PongPaddle6>:
-    #size: int(root.height/8), int(root.height/8)
+<PongPaddle3>:
     canvas:
         Rectangle:
             pos: self.pos
             source: self.source
             size: int(root.height/8), int(root.height/8)
+
+<PongPaddle5>:
+    canvas:
+        Rectangle:
+            pos: self.pos
+            source: self.source
+            size: int(root.height/8.5), int(root.height/8.5)
+
+<PongPaddle6>:
+    canvas:
+        Rectangle:
+            pos: self.pos
+            source: self.source
+            size: int(root.height/10.8), int(root.height/10.8)
 
 <Screen1>:
     ball: pong_ball
@@ -81,7 +93,7 @@
             width: 3
             close: 1
         Line:
-            points: [(x*(root.top/720) + (root.top/2) - 10) for x in root.net]
+            points: [(x*(root.top/720) + (root.top/2)) for x in root.net]
             joint: 'miter'
             width: 3
             close: 1
@@ -117,18 +129,14 @@
         id: pong_ball
         pos: self.pos
 
-    PongPaddle6:  # paddle_0 self.size_hint = 1, 1
-        #size_hint: None, None
+    PongPaddle:  # paddle_0
         id: paddle0
         pos: self.pos
-        size: self.size
         source: self.source
 
-    PongPaddle6:   #paddle_1
-        #size_hint: None, None
+    PongPaddle:   #paddle_1
         id: paddle1
         pos: self.pos
-        size: self.size
         source: self.source
 
 <Screen2>:
@@ -151,7 +159,7 @@
             width: 3
             close: 1
         Line:
-            points: [(x*(root.top/720) + (root.top/2) - 10) for x in root.net]
+            points: [(x*(root.top/720) + (root.top/2)) for x in root.net]
             joint: 'miter'
             width: 3
             close: 1
@@ -219,7 +227,7 @@
             width: 3
             close: 1
         Line:
-            points: [(x*(root.top/720) + (root.top/2) - 10) for x in root.net]
+            points: [(x*(root.top/720) + (root.top/2)) for x in root.net]
             joint: 'miter'
             width: 3
             close: 1
@@ -263,19 +271,19 @@
         id: pong_ball
         pos: self.pos
 
-    PongPaddle:  # paddle_0
+    PongPaddle3:  # paddle_0
         id: paddle0
         pos: self.pos
         size: self.size
         source: self.source
 
-    PongPaddle:   #paddle_1
+    PongPaddle3:   #paddle_1
         id: paddle1
         pos: self.pos
         size: self.size
         source: self.source
 
-    PongPaddle:   #paddle_2
+    PongPaddle3:   #paddle_2
         id: paddle2
         pos: self.pos
         size: self.size
@@ -304,7 +312,7 @@
             width: 3
             close: 1
         Line:
-            points: [(x*(root.top/720) + (root.top/2) - 10) for x in root.net]
+            points: [(x*(root.top/720) + root.top/2) for x in root.net]
             joint: 'miter'
             width: 3
             close: 1
@@ -401,7 +409,7 @@
             width: 3
             close: 1
         Line:
-            points: [(x*(root.top/720) + (root.top/2) - 10) for x in root.net]
+            points: [(x*(root.top/720) + (root.top/2)) for x in root.net]
             joint: 'miter'
             width: 3
             close: 1
@@ -460,31 +468,31 @@
         id: pong_ball
         pos: self.pos
 
-    PongPaddle:  # paddle_0
+    PongPaddle5:  # paddle_0
         id: paddle0
         pos: self.pos
         size: self.size
         source: self.source
 
-    PongPaddle:   #paddle_1
+    PongPaddle5:   #paddle_1
         id: paddle1
         pos: self.pos
         size: self.size
         source: self.source
 
-    PongPaddle:   #paddle_2
+    PongPaddle5:   #paddle_2
         id: paddle2
         pos: self.pos
         size: self.size
         source: self.source
 
-    PongPaddle:   #paddle_3
+    PongPaddle5:   #paddle_3
         id: paddle3
         pos: self.pos
         size: self.size
         source: self.source
 
-    PongPaddle:   #paddle_4
+    PongPaddle5:   #paddle_4
         id: paddle4
         pos: self.pos
         size: self.size
@@ -518,7 +526,7 @@
             width: 3
             close: 1
         Line:
-            points: [(x*(root.top/720) + (root.top/2) - 10) for x in root.net]
+            points: [(x*(root.top/720) + (root.top/2)) for x in root.net]
             joint: 'miter'
             width: 3
             close: 1
@@ -584,32 +592,32 @@
         id: pong_ball
         pos: self.pos
 
-    PongPaddle:  # paddle_0
+    PongPaddle6:  # paddle_0
         id: paddle0
         pos: self.pos
         size: self.size
         source: self.source
-    PongPaddle:   #paddle_1
+    PongPaddle6:   #paddle_1
         id: paddle1
         pos: self.pos
         size: self.size
         source: self.source
-    PongPaddle:   #paddle_2
+    PongPaddle6:   #paddle_2
         id: paddle2
         pos: self.pos
         size: self.size
         source: self.source
-    PongPaddle:   #paddle_3
+    PongPaddle6:   #paddle_3
         id: paddle3
         pos: self.pos
         size: self.size
         source: self.source
-    PongPaddle:   #paddle_4
+    PongPaddle6:   #paddle_4
         id: paddle4
         pos: self.pos
         size: self.size
         source: self.source
-    PongPaddle:   #paddle_5
+    PongPaddle6:   #paddle_5
         id: paddle5
         pos: self.pos
         size: self.size
