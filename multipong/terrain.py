@@ -7,8 +7,6 @@ from __main__ import *
 # coeff ecran fait dans kv
 # sauf get_kivy_coord() et triangle_correction
 COEF = 1
-print("Dans le script scr1.py, ")
-print("    coefficient de résolution écran:", COEF)
 
 
 def get_poly_name(num):
@@ -99,7 +97,7 @@ def get_ratio(num):
     ratio["HEXA"]     = [370, 360, 36]
 
     name = get_poly_name(num)
-    print(ratio[name])
+
     return ratio[name]
 
 def get_net_scale(num):

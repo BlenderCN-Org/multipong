@@ -63,26 +63,28 @@ def get_mur():
     """
 
     m = 0
-
-    # Land
-    if gl.land:
-        if gl.land["collision"] == 1:
-            m = 1
-            gl.land["collision"] = 0
-    # Filet
-    if gl.filet:
-        if gl.filet["collision"] == 1:
-            m = 1
-            gl.filet["collision"] = 0
-
-    # goal
-    l = gl.level
-    if l == 1: l = 2
-    for p in range(l):
-        if gl.goal[0] is not None:
-            if gl.goal[p]["collision"] == 1:
+    try:
+        # Land
+        if gl.land:
+            if gl.land["collision"] == 1:
                 m = 1
-                gl.goal[p]["collision"] = 0
+                gl.land["collision"] = 0
+        # Filet
+        if gl.filet:
+            if gl.filet["collision"] == 1:
+                m = 1
+                gl.filet["collision"] = 0
+
+        # goal
+        l = gl.level
+        if l == 1: l = 2
+        for p in range(l):
+            if gl.goal[0] is not None:
+                if gl.goal[p]["collision"] == 1:
+                    m = 1
+                    gl.goal[p]["collision"] = 0
+    except:
+        pass
     return m
 
 def get_raquette():
@@ -97,9 +99,12 @@ def get_raquette():
     r = 0
     for p in range(l):
         if gl.paddle[0] is not None:
-            if gl.paddle[p]["collision"] == 1:
-                r = 1
-                gl.paddle[p]["collision"] = 0
+            try:
+                if gl.paddle[p]["collision"] == 1:
+                    r = 1
+                    gl.paddle[p]["collision"] = 0
+            except:
+                pass
 
     return r
 

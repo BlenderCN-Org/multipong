@@ -66,7 +66,11 @@ def create_text():
         if value > 0:
             if len(text_list) >= value - 1:
                 # \n\n crée les sauts de ligne
-                text_list[value - 1] = str(value) + " .   " + str(key) + "\n\n"
+                try:
+                    text_list[value - 1] = str(value) + " .   "\
+                                           + str(key) + "\n\n"
+                except:
+                    pass
             b += 1
 
     # String de l'ensemble du texte à afficher

@@ -32,7 +32,7 @@ thread_b.start()
 sleep(0.2)
 
 # Nombre de joueurs
-N = 2
+N = 4
 
 l = []
 for i in range(N):

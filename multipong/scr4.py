@@ -15,6 +15,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.core.window import Window
 
 from terrain import Terrain
+from touch_improve import projection
 
 
 # Points pour kivy
@@ -27,20 +28,6 @@ PATH = TERRAIN.path_line
 
 # Pass variable between python script http://bit.ly/2n0ksWh
 from __main__ import *
-
-
-def droite(x1, y1, x2, y2):
-    """ Retourne les valeurs de a et b de y=ax+b
-        à partir des coordonnées de 2 points.
-    """
-
-    if x2 - x1 != 0:
-        a = (y2 - y1) / (x2 - x1)
-        b = y1 - (a * x1)
-    else:
-        a, b = 0, 0
-
-    return a, b
 
 
 class Screen4(Screen):
@@ -215,20 +202,24 @@ class Screen4(Screen):
     def apply_touch(self, x, y):
         """Calcul du déplacement de ma paddle."""
 
-        # Horizontal x = x
+        # Vertical y = y
         if self.my_num == 0:
             x = PATH[0]
+            y = (y*840/700 - 80)*self.coef
 
-        # Vertical y = y
+        # Horizontal x = x
         if self.my_num == 1:
+            x -= 580
             y = PATH[3]
 
-         # Horizontal x = x
+         # Vertical y = y
         if self.my_num == 2:
             x = PATH[5]
+            y = (y*840/700 - 80)*self.coef
 
-         # Vertical y = y
+         # Horizontal x = x
         if self.my_num == 3:
+            x -= 580
             y = PATH[7]
 
         # Position centée de ma paddle pour blender

@@ -182,7 +182,7 @@ class Screen2(Screen):
             x = PATH[6]
 
         # Correction pour jouabilité
-        y = y*840/700 - 80
+        y = (y*840/700 - 80)*self.coef
 
         # Position centée de ma paddle pour blender
         self.my_pad_pos = [x, y]

@@ -15,7 +15,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.core.window import Window
 
 from terrain import Terrain
-
+from touch_improve import projection
 
 # Points pour kivy
 NUM = 3
@@ -27,20 +27,6 @@ PATH = TERRAIN.path_line
 
 # Pass variable between python script http://bit.ly/2n0ksWh
 from __main__ import *
-
-
-def droite(x1, y1, x2, y2):
-    """ Retourne les valeurs de a et b de y=ax+b
-        à partir des coordonnées de 2 points.
-    """
-
-    if x2 - x1 != 0:
-        a = (y2 - y1) / (x2 - x1)
-        b = y1 - (a * x1)
-    else:
-        a, b = 0, 0
-
-    return a, b
 
 
 class Screen3(Screen):
@@ -132,7 +118,6 @@ class Screen3(Screen):
 
         if ball_pos:
             x, y = TERRAIN.get_kivy_coord(ball_pos)
-            print(TERRAIN.ratio)
 
             # Correction de Window size
             x *= self.coef
@@ -216,8 +201,16 @@ class Screen3(Screen):
 
         # Les non verticales
         if self.my_num in [0, 1, 2]:
-            a, b = droite(x1, y1, x2, y2)
-            y = a * x + b
+
+            # Correction pour saisie zone noire à droite
+            if self.my_num == 0:
+                x -= 580
+            if self.my_num == 1:
+                x -= 680
+            if self.my_num == 2:
+                x -= 500
+
+            x, y = projection(x1, y1, x2, y2, x, y)
 
         # Position centée de ma paddle pour blender
         self.my_pad_pos = [x, y]
