@@ -21,12 +21,16 @@
 #######################################################################
 
 
-__version__ = '0.435'
+__version__ = '0.439'
 
 """
 ne pas oublier de commenter le Window.size
 
 version
+0.439 re son
+0.438 avec ogg dans spec
+0.437 avec son
+0.436 décalage corrigé
 0.435 avec images, bug level 3
 0.434 recherche paddle level 3
 0.433 test scr3 propre angle pos text ok
@@ -64,11 +68,14 @@ from kivy.properties import StringProperty, ObjectProperty
 from kivy.config import Config
 from kivy.lang import Builder
 from kivy.clock import Clock
+from kivy.core.audio import SoundLoader
+
 
 import os
 from time import time
 import json
 import ast
+import random
 
 # Les fichiers de ces modules sont dans le dossier courant
 from labmulticast import Multicast
@@ -98,6 +105,7 @@ class PongPaddle(Widget):
 class PongPaddle3(Widget):
     color = ListProperty([1, 1, 1])
     source = StringProperty()
+
 
 class PongPaddle5(Widget):
     color = ListProperty([1, 1, 1])
@@ -138,6 +146,8 @@ class Network:
                                 'classement': {},
                                 'transit': 0,
                                 'score': [8, 6]}}}
+                                'mur': 1
+                                'raquette': 1
         Message envoyé:
         {'joueur': {'name':   a1_452,
                     'paddle': [300, 500]}
@@ -288,6 +298,10 @@ class Game(Network):
         self.my_name = get_user_id()
         self.my_num = self.get_my_number()
 
+        # Chargement des sons
+        self.mur = SoundLoader.load('./sound/mur.ogg')
+        self.raquette = SoundLoader.load('./sound/raquette.ogg')
+
         print("Initialisation de Game ok")
 
     def get_tempo(self):
@@ -304,16 +318,18 @@ class Game(Network):
         return 1/freq
 
     def game_update(self, dt):
-        """self.dictat = {"level":  2,
-                        "scene" : 'play',
-                        "classement": {},
-                        "ball":   [7.19, 7.19],
-                        "score":  [9, 7],
-                        "paddle": [[-9.4, 0.0], [-9.4, 0.40]],
-                        "who_are_you": {'moi': 0, 'toi': 1},
-                        "match_end": 0,
-                        "reset":   0,
-                        "transit": 0 }, "ip": etc ...}}
+        """self.dictat = {  "level":  2,
+                            "scene" : 'play',
+                            "classement": {},
+                            "ball":   [7.19, 7.19],
+                            "score":  [9, 7],
+                            "paddle": [[-9.4, 0.0], [-9.4, 0.40]],
+                            "who_are_you": {'moi': 0, 'toi': 1},
+                            "match_end": 0,
+                            "reset":   0,
+                            "transit": 0,
+                            "mur": 1,
+                            "raquette": 0 }
         """
 
         self.verif_freq()
@@ -331,6 +347,7 @@ class Game(Network):
         self.apply_other_paddles_pos()
         self.apply_score()
         self.apply_classement()
+        self.sound()
 
         # Envoi au serveur
         self.create_msg()
@@ -460,6 +477,28 @@ class Game(Network):
             return "Joueur" + self.cur_screen
         else:
             return None
+
+    def sound(self):
+        try:
+            mur = self.dictat["mur"]
+            raquette = self.dictat["raquette"]
+        except:
+            mur, raquette = None, None
+
+        if mur:
+            self.mur_sound()
+        if raquette:
+            self.raquette_sound()
+
+    def mur_sound(self):
+        if self.mur:
+            self.mur.volume = random.uniform(0.4, 1)
+            self.mur.play()
+
+    def raquette_sound(self):
+        if self.raquette:
+            self.raquette.volume = random.uniform(0.4, 1)
+            self.raquette.play()
 
 
 SCREENS = { 0: (MainScreen, "Main"),

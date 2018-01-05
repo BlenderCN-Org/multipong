@@ -45,15 +45,63 @@ def send_tcp_message():
 
 def create_msg_to_send():
     """Retourne le message à envoyer au server.
-
-        msg = {"blend": {"ball": (1,1), "reset": 0}}
+        msg = {"blend": {"ball": (1,1), "reset": 0, ....}}
     """
 
     msg = {"blend": {"ball":  get_ball_position(),
                      "paddle_1_pos": get_paddle_1_position(),
                      "score": get_score(),
-                     "reset": get_reset() }}
+                     "reset": get_reset(),
+                     "mur": get_mur(),
+                     "raquette": get_raquette()}}
     return msg
+
+def get_mur():
+    """Pour landx,
+    si property collision = 1 --> retourne 1
+    reset de toutes les prop à 0
+    """
+
+    m = 0
+
+    # Land
+    if gl.land:
+        if gl.land["collision"] == 1:
+            m = 1
+            gl.land["collision"] = 0
+    # Filet
+    if gl.filet:
+        if gl.filet["collision"] == 1:
+            m = 1
+            gl.filet["collision"] = 0
+
+    # goal
+    l = gl.level
+    if l == 1: l = 2
+    for p in range(l):
+        if gl.goal[0] is not None:
+            if gl.goal[p]["collision"] == 1:
+                m = 1
+                gl.goal[p]["collision"] = 0
+    return m
+
+def get_raquette():
+    """Parcours de toutes les raquettes,
+    si property collision = 1 --> retourne 1
+    reset de toutes les prop à 0
+    """
+
+    l = gl.level
+    if l == 1: l = 2
+
+    r = 0
+    for p in range(l):
+        if gl.paddle[0] is not None:
+            if gl.paddle[p]["collision"] == 1:
+                r = 1
+                gl.paddle[p]["collision"] = 0
+
+    return r
 
 def get_paddle_1_position():
     """Retourne la position de la paddle1 à level 1."""

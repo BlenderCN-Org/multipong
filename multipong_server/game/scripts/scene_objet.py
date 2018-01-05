@@ -71,6 +71,13 @@ def main():
     for scn in scenes:
         if "_players" in scn.name:
             for obj in scn.objects:
+                # land
+                if "land" in str(obj):
+                    gl.land = obj
+                # filet
+                if "filet" in str(obj):
+                    gl.filet = obj
+
                 # Ball
                 if "ball" in str(obj):
                     gl.ball = obj

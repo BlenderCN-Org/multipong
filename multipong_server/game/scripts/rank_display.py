@@ -64,8 +64,9 @@ def create_text():
     b = 0
     for key, value in gl.classement.items():
         if value > 0:
-            # \n\n crée les sauts de ligne
-            text_list[value - 1] = str(value) + " .   " + str(key) + "\n\n"
+            if len(text_list) >= value - 1:
+                # \n\n crée les sauts de ligne
+                text_list[value - 1] = str(value) + " .   " + str(key) + "\n\n"
             b += 1
 
     # String de l'ensemble du texte à afficher

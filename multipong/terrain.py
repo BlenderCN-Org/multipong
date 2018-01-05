@@ -38,27 +38,22 @@ def get_points_dict(num):
                           9.93543,   9.93543,
                           9.93543,  -9.93543]
 
-    points["TRIANGLE"] = [ 14.22068, -8.482277,
-                          -14.22068, -8.482277,
-                            0,        16.148667 ]
+    points["TRIANGLE"] = [ 9.71809,  -8.43440,
+                          -9.71809,  -8.43440,
+                            0,        8.40137]
 
     points["PENTA"] = [ 6.01965, -9.18323,
                        -6.01965, -9.18323,
                        -9.74,     2.26683,
-                        0,        9.34335,
+                        0,        9.374335,
                         9.74,     2.26683]
 
-    points["HEXA"] = [   0,        -9.8772,
-                        -8.55391,  -4.9386,
-                        -8.55391,   4.9386,
-                         0,         9.8772,
-                         8.55391,   4.9386,
-                         8.5539,   -4.9386]
-
-    points["HEPTA"] = []
-    points["OCTA"] = []
-    points["ENNEA"] = []
-    points["DECA"] = []
+    points["HEXA"] = [         0,  -9.80139,
+                        -8.48826,  -4.9007,
+                        -8.48826,   4.9007,
+                               0,   9.8014,
+                         8.48826,   4.9007,
+                         8.48825,  -4.9007 ]
 
     return points[num]
 
@@ -74,9 +69,9 @@ def get_paths_dict(num):
                          9.51,  9.51,
                          9.51, -9.51 ]
 
-    path["TRIANGLE"] = [ 13.293, -7.946,
-                        -13.293, -7.946,
-                              0,  15.077 ]
+    path["TRIANGLE"] = [ 9.08408, -8.06835,
+                        -9.08408, -8.06835,
+                              0,  7.66928 ]
 
     path["PENTA"] = [    5.780, -8.854,
                         -5.780, -8.854,
@@ -84,12 +79,12 @@ def get_paths_dict(num):
                              0,  8.937,
                          9.353,  2.141 ]
 
-    path["HEXA"] = [     0,      -9.564,
-                        -8.283,  -4.782,
-                        -8.283,   4.782,
-                         0,       9.564,
-                         8.283,   4.782,
-                         8.283,  -4.782]
+    path["HEXA"] = [           0, -9.49087,
+                        -8.21934, -4.74543,
+                        -8.21934,  4.74544,
+                               0,  9.49087,
+                         8.21933,  4.74544,
+                         8.21933, -4.74544]
 
     return path[num]
 
@@ -99,15 +94,12 @@ def get_ratio(num):
     ratio = {}
 
     ratio["CARRE"]    = [360, 360, 36]
-    ratio["TRIANGLE"] = [420, 247, 29]
-    ratio["PENTA"]    = [358, 358, 36]
-    ratio["HEXA"]     = [380, 358, 36]
-    ratio["HEPTA"]    = [380, 358, 36]
-    ratio["OCTA"]     = [380, 358, 36]
-    ratio["ENNEA"]    = [380, 358, 36]
-    ratio["DECA"]     = [380, 358, 36]
+    ratio["TRIANGLE"] = [360, 360, 36]
+    ratio["PENTA"]    = [370, 356, 36]
+    ratio["HEXA"]     = [370, 360, 36]
 
     name = get_poly_name(num)
+    print(ratio[name])
     return ratio[name]
 
 def get_net_scale(num):
@@ -222,9 +214,9 @@ class Terrain:
         line = []
         for i in range(len(net_line)):
             if i % 2 == 0:
-                net_line[i] += COEF*720/20
+                net_line[i] -= 25*COEF
             if i % 2 != 0:
-                net_line[i] -=  COEF*720/6
+                net_line[i] -= 109*COEF
             line.append(int(net_line[i]))
         return line
 
@@ -244,11 +236,12 @@ class Terrain:
     def get_kivy_coord(self, point):
         """Transforme les coordonnées de blender pour kivy
         point = [x, y]
+        self.ratio = [360, 360, 36] [décalage x, décalage y, scale]
         """
 
         r = self.ratio
-        x = (point[0]*r[2]) + r[0]
-        y = (point[1]*r[2]) + r[1]
+        x = int(point[0]*r[2] + r[0])
+        y = int(point[1]*r[2] + r[1])
 
         return x, y
 

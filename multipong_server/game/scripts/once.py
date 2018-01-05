@@ -242,6 +242,9 @@ def init_blender_obj():
     # L'objet du bas de Labomedia
     gl.help_obj = 0
 
+    gl.land = None
+    gl.filet = None
+
     # permet accès aux objet blender score et leur score
     gl.goal = { 0 : None,
                 1 : None,

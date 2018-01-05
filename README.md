@@ -1,6 +1,6 @@
 # Multi Pong
 
-## Jeu de pong sur android jusqu'à 10 joueurs
+## Jeu de pong sur android jusqu'à 6 joueurs
 
 
 ### [Multi Pong sur le wiki de La Labomedia](https://wiki.labomedia.org/index.php/Kivy_Multi_Pong)
@@ -38,7 +38,6 @@ pour l'installation de buildozer et son utilisation.
 ### Installation du serveur sur un PC
 
 #### Principe du serveur
-Le script sh lance un script python et un blend avec le blenderplayer.
 
 Le serveur envoie en multi-cast en permanence à tous les joueurs et blender toutes les datas nécessaires avec en plus l'IP du serveur pour que les joueurs envoient en TCP.
 
@@ -47,10 +46,6 @@ Le Blender Game Engine sert de moteur physique et de visualisation du jeu sur gr
 #### Installation de twisted
 
 * [Installation de Twisted pour python 3.x](https://wiki.labomedia.org/index.php/Installation_de_Twisted_pour_python_3.x)
-
-#### Installation de kivy
-
-* [Installation de Kivy](https://wiki.labomedia.org/index.php/2_Kivy:_Installation)
 
 #### Installation de Blender
 
@@ -64,6 +59,32 @@ mylabotools comprend mes scripts pour mes tâches courantes.
 
 Voir  [mylabotools](https://github.com/sergeLabo/mylabotools)
 
+#### Lancement du serveur
+Un script sh lance un script python qui est le serveur,
+et un autre lance le blend avec le blenderplayer.
+
+Cliquer sur:
+
+ clic_to_run_server
+
+puis
+
+ clic_to_run_blender
+
+### Jouer sur un PC pour tester
+
+#### Installation de kivy
+
+* [Installation de Kivy](https://wiki.labomedia.org/index.php/2_Kivy:_Installation)
+
+#### Lancement
+
+Modifier le script run_all.py ligne 35 pour définir le nombre de joueurs.
+
+~~~text
+python3 run_all.py
+~~~
+
 ### Installation sur android
 Récupérer le apk sur votre téléphone, l'installer après avoir autorisé les sources inconnues puisque la source est connue !!
 
@@ -75,5 +96,12 @@ Dans buildozer.spec, définir:
 android.permissions = INTERNET,CHANGE_WIFI_MULTICAST_STATE,ACCESS_NETWORK_STATE,ACCESS_WIFI_STATE
 ~~~
 
+### Travail à faire
+
+* Capture des x, y à droite de l'écran, en paralléle au déplacement de la raquette.
+
+### Ce qui ne sera pas fait
+
+* Construire les écrans pour aller jusqu'à 10 joueurs
 
 ### Merci à La Labomedia

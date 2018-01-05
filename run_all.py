@@ -25,21 +25,21 @@ def always():
 
 thread_s = threading.Thread(target=server)
 thread_s.start()
-sleep(1)
+sleep(0.2)
 
 thread_b = threading.Thread(target=blender)
 thread_b.start()
-sleep(1)
+sleep(0.2)
 
 # Nombre de joueurs
-N = 3
+N = 2
 
 l = []
 for i in range(N):
     t = threading.Thread(target=kivy)
     t.start()
     l.append(t)
-    sleep(1)
+    sleep(0.1)
 
 
 thread_a = threading.Thread(target=always)

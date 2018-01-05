@@ -101,9 +101,15 @@ class Screen3(Screen):
 
         if self.my_num == 0:
             self.paddle_d[0].source = './images/r_h.png'
+            self.paddle_d[1].source = './images/g_30.png'
+            self.paddle_d[2].source = './images/g_60.png'
         if self.my_num == 1:
+            self.paddle_d[0].source = './images/g_h.png'
             self.paddle_d[1].source = './images/r_30.png'
+            self.paddle_d[2].source = './images/g_60.png'
         if self.my_num == 2:
+            self.paddle_d[0].source = './images/g_h.png'
+            self.paddle_d[1].source = './images/g_30.png'
             self.paddle_d[2].source = './images/r_60.png'
 
     def apply_my_num(self, my_num):
@@ -126,6 +132,7 @@ class Screen3(Screen):
 
         if ball_pos:
             x, y = TERRAIN.get_kivy_coord(ball_pos)
+            print(TERRAIN.ratio)
 
             # Correction de Window size
             x *= self.coef
@@ -134,7 +141,7 @@ class Screen3(Screen):
             # Ajout du décalage de centre de ball, pas de coef
             s = self.BALL
             x = x - s
-            y = y - s #- 50
+            y = y - s
 
             X = int(x)
             Y = int(y)
@@ -212,6 +219,9 @@ class Screen3(Screen):
             a, b = droite(x1, y1, x2, y2)
             y = a * x + b
 
+        # Position centée de ma paddle pour blender
+        self.my_pad_pos = [x, y]
+        # Pour kivy ici
         self.apply_my_paddle_pos(x, y)
 
     def apply_my_paddle_pos(self, x, y):
@@ -223,15 +233,13 @@ class Screen3(Screen):
 
         # Ajout du décalage de centre de ball, pas de coef
         s = self.PADDLE
-        x = x - s #- 40
-        y = y - s #- 120
+        x = x - s
+        y = y - s
 
         X = int(x)
         Y = int(y)
 
         if self.my_num is not None:
-            # Les x, y envoyés à blender
-            self.my_pad_pos = [X, Y]#[X + 40, Y + 90]
             # Ma position
             self.paddle_d[self.my_num].pos = [X, Y]
 

@@ -109,13 +109,33 @@ class Screen5(Screen):
 
         if self.my_num == 0:
             self.paddle_d[0].source = './images/r_h.png'
+            self.paddle_d[1].source = './images/g_1805.png'
+            self.paddle_d[2].source = './images/g_m53.png'
+            self.paddle_d[3].source = './images/g_53.png'
+            self.paddle_d[4].source = './images/g_m1805.png'
         if self.my_num == 1:
+            self.paddle_d[0].source = './images/g_h.png'
             self.paddle_d[1].source = './images/r_1805.png'
+            self.paddle_d[2].source = './images/g_m53.png'
+            self.paddle_d[3].source = './images/g_53.png'
+            self.paddle_d[4].source = './images/g_m1805.png'
         if self.my_num == 2:
+            self.paddle_d[0].source = './images/g_h.png'
+            self.paddle_d[1].source = './images/g_1805.png'
             self.paddle_d[2].source = './images/r_m53.png'
+            self.paddle_d[3].source = './images/g_53.png'
+            self.paddle_d[4].source = './images/g_m1805.png'
         if self.my_num == 3:
+            self.paddle_d[0].source = './images/g_h.png'
+            self.paddle_d[1].source = './images/g_1805.png'
+            self.paddle_d[2].source = './images/g_m53.png'
             self.paddle_d[3].source = './images/r_53.png'
+            self.paddle_d[4].source = './images/g_m1805.png'
         if self.my_num == 4:
+            self.paddle_d[0].source = './images/g_h.png'
+            self.paddle_d[1].source = './images/g_1805.png'
+            self.paddle_d[2].source = './images/g_m53.png'
+            self.paddle_d[3].source = './images/g_53.png'
             self.paddle_d[4].source = './images/r_m1805.png'
 
     def apply_my_num(self, my_num):
@@ -231,6 +251,9 @@ class Screen5(Screen):
             a, b = droite(x1, y1, x2, y2)
             y = a * x + b
 
+        # Position centée de ma paddle pour blender
+        self.my_pad_pos = [x, y]
+        # Pour kivy ici
         self.apply_my_paddle_pos(x, y)
 
     def apply_my_paddle_pos(self, x, y):
@@ -249,7 +272,7 @@ class Screen5(Screen):
         Y = int(y)
 
         if self.my_num is not None:
-            self.my_pad_pos = [x, y]
+            # Ma position
             self.paddle_d[self.my_num].pos = [X, Y]
 
     def get_my_blender_paddle_pos(self):

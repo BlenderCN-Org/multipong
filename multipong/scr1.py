@@ -79,6 +79,7 @@ class Screen1(Screen):
 
         if self.my_num == 0:
             self.paddle_d[0].source = './images/r_v.png'
+            self.paddle_d[1].source = './images/g_v.png'
 
     def apply_my_num(self, my_num):
         """Appelé dans main"""
@@ -174,7 +175,9 @@ class Screen1(Screen):
         # Correction pour jouabilité
         y = y*840/700 - 80
 
+        # Position centée de ma paddle pour blender
         self.my_pad_pos = [x, y]
+        # Pour kivy ici
         self.apply_my_paddle_pos(x, y)
 
     def apply_my_paddle_pos(self, x, y):
@@ -192,7 +195,9 @@ class Screen1(Screen):
         X = int(x)
         Y = int(y)
 
-        self.paddle_d[0].pos = (X, Y)
+        if self.my_num is not None:
+            # Ma position
+            self.paddle_d[self.my_num].pos = [X, Y]
 
     def get_my_blender_paddle_pos(self):
         """Retourne la position de ma paddle à envoyer au serveur"""

@@ -52,6 +52,9 @@ class Game():
         self.paddle = [[0, 0]] * 10
         self.paddle_auto = [9.5, 0]
         self.score = [10] * 10
+        # Sons
+        self.mur = 0
+        self.raquette = 0
 
         # Nouveau classement
         self.match_end = 0
@@ -201,11 +204,11 @@ class Game():
         # #if time() - self.match_end_tempo < 5:
             # #print("Classement", self.classement)
 
-        if time() - self.match_end_tempo > 3:
+        if time() - self.match_end_tempo > 4:
             self.scene = "play"
             self.reset_data()
 
-        if time() - self.match_end_tempo > 4:
+        if time() - self.match_end_tempo > 5:
             # Le jeu a repris depuis longtemps
             # je peux rescanner les scores
             self.match_end = 0
@@ -246,10 +249,10 @@ class Game():
         l = len(self.players)
         if l == 0: l = 1
 
-        # Maxi 10 joueurs
-        if l > 10:
-            l=10
-            print("10 joueurs maxi")
+        # Maxi 6 joueurs
+        if l > 6:
+            l=6
+            print("6 joueurs maxi")
 
         self.level = l
 
@@ -286,13 +289,15 @@ class Game():
     def update_blend(self, blend):
         """Maj de la position de la balle et du reset
         avec valeurs reçues de blender
-         blend = {"ball": (1,1), "reset": 0}
+         blend = {"ball": (1,1), "reset": 0, ...}
         """
 
         self.ball = blend["ball"]
         self.paddle_auto = blend["paddle_1_pos"]
         self.reset = blend["reset"]
         self.score = blend["score"]
+        self.mur = blend["mur"]
+        self.raquette = blend["raquette"]
 
     def update_paddle_auto(self):
         """Modifie la liste self.paddle
@@ -351,7 +356,13 @@ class Game():
                 "who_are_you": self.get_who(),
                 "match_end":  self.match_end,
                 "reset": self.reset,
-                "transit": self.match_end  }
+                "transit": self.match_end,
+                "mur": self.mur,
+                "raquette": self.raquette}
+
+        # Reset des sons après envoi
+        self.mur = 0
+        self.raquette = 0
 
         return msg
 
