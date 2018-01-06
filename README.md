@@ -5,8 +5,8 @@
 
 ### [Multi Pong sur le wiki de La Labomedia](https://wiki.labomedia.org/index.php/Kivy_Multi_Pong)
 
-![3 joueurs](Mpff_02.png)
-![10joueurs](10players.png)
+![3 joueurs](/images/Mpff_02.png)
+![10joueurs](/images/10players.png)
 
 ### Licence
 
