@@ -3,7 +3,7 @@
 ## Jeu de pong sur android jusqu'à 6 joueurs
 
 
-### [Multi Pong sur le wiki de La Labomedia](https://wiki.labomedia.org/index.php/Kivy_Multi_Pong)
+##### [Multi Pong sur le wiki de La Labomedia](https://wiki.labomedia.org/index.php/Kivy_Multi_Pong)
 
 ![3 joueurs](/images/Mpff_02.png)
 ![10joueurs](/images/10players.png)
