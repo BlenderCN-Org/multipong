@@ -27,6 +27,7 @@
 import os, sys
 from time import time, sleep
 import threading
+from subprocess import Popen, PIPE
 import json
 import ast
 import queue
@@ -130,8 +131,6 @@ class MyMulticastSender(DatagramProtocol):
                 if e.errno == 101:
                     print("Network is unreachable")
 
-            #self.print_some(lapin)
-
     def send_loop_thread(self):
         thread_s = threading.Thread(target=self.send_loop)
         thread_s.start()
@@ -225,17 +224,26 @@ class MyTcpServerFactory(Factory):
 
     def __init__(self):
         """L'objet gestion du jeu est construit ici.
-        Il est accessible dans MyTcpServer avec self.factory.game."""
+        Il est accessible dans MyTcpServer avec self.factory.game"""
 
         self.game = Game(my_conf)
         self.get_and_queued_msg_thread()
+
+        # Lancement de blender
+        self.blender = None
+        self.blender_start()
 
         # Serveur
         self.numProtocols = 1
         print("Serveur twisted réception TCP sur {}\n".format(TCP_PORT))
 
+    def blender_start(self):
+        if not self.blender:
+            self.blender = Popen(['blenderplayer', './game/mp.blend'],
+                                              stdout=PIPE)
+            print("Le jeu Blender et lancé")
+
     def buildProtocol(self, addr):
-        print("Nouveau protocol crée dans l'usine: factory")
         print("Nombre de protocol dans factory", self.numProtocols)
 
         # le self permet l'accès à self.factory dans MyTcpServer

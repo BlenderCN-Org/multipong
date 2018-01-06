@@ -61,15 +61,11 @@ Voir  [mylabotools](https://github.com/sergeLabo/mylabotools)
 
 #### Lancement du serveur
 Un script sh lance un script python qui est le serveur,
-et un autre lance le blend avec le blenderplayer.
+ce serveur lance le blend avec le blenderplayer.
 
 Cliquer sur:
 
  clic_to_run_server
-
-puis
-
- clic_to_run_blender
 
 ### Jouer sur un PC pour tester
 
@@ -97,8 +93,6 @@ android.permissions = INTERNET,CHANGE_WIFI_MULTICAST_STATE,ACCESS_NETWORK_STATE,
 ~~~
 
 ### Travail à faire
-
-* Capture des x, y à droite de l'écran, en paralléle au déplacement de la raquette.
 
 ### Ce qui ne sera pas fait
 

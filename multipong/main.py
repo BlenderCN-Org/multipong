@@ -21,12 +21,13 @@
 #######################################################################
 
 
-__version__ = '0.439'
+__version__ = '0.500'
 
 """
 ne pas oublier de commenter le Window.size
 
 version
+0.500 acceptable
 0.439 re son
 0.438 avec ogg dans spec
 0.437 avec son
@@ -54,9 +55,9 @@ kivy.require('1.10.0')
 
 from kivy.core.window import Window
 # ## Les 3 lignes ci-dessous sont à commenter pour buildozer
-k = 1
-WS = (int(1280*k), int(720*k))
-Window.size = WS
+# #k = 1.2
+# #WS = (int(1280*k), int(720*k))
+# #Window.size = WS
 
 
 from kivy.app import App
@@ -280,6 +281,8 @@ class Network:
 
 class Game(Network):
 
+    volume = NumericProperty(1.0)
+
     def __init__(self, screen_manager, **kwargs):
 
         super(Game, self).__init__(screen_manager, **kwargs)
@@ -492,12 +495,14 @@ class Game(Network):
 
     def mur_sound(self):
         if self.mur:
-            self.mur.volume = random.uniform(0.4, 1)
+            volume = random.uniform(0.1, 1)
+            self.mur.volume = volume
             self.mur.play()
 
     def raquette_sound(self):
         if self.raquette:
-            self.raquette.volume = random.uniform(0.4, 1)
+            volume = random.uniform(0.1, 1)
+            self.raquette.volume = volume
             self.raquette.play()
 
 

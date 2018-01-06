@@ -205,21 +205,23 @@ class Screen4(Screen):
         # Vertical y = y
         if self.my_num == 0:
             x = PATH[0]
-            y = (y*840/700 - 80)*self.coef
+            y = y*840/700 - 80
 
         # Horizontal x = x
         if self.my_num == 1:
-            x -= 580
+            x = x*840/700 - 80
+            x -= 650
             y = PATH[3]
 
          # Vertical y = y
         if self.my_num == 2:
             x = PATH[5]
-            y = (y*840/700 - 80)*self.coef
+            y = y*840/700 - 80
 
          # Horizontal x = x
         if self.my_num == 3:
-            x -= 580
+            x = x*840/700 - 80
+            x -= 650
             y = PATH[7]
 
         # Position centée de ma paddle pour blender
