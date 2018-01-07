@@ -7,12 +7,8 @@ kivy.require('1.10.0')
 
 from kivy.app import App
 from kivy.properties import ListProperty
-from kivy.properties import ReferenceListProperty
-from kivy.properties import NumericProperty
 from kivy.properties import ObjectProperty
-from kivy.properties import StringProperty
 from kivy.uix.screenmanager import Screen
-from kivy.core.window import Window
 
 from terrain import Terrain
 

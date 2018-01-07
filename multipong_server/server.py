@@ -39,6 +39,7 @@ from twisted.internet import reactor
 
 from mylabotools.labconfig import MyConfig
 from mylabotools.labsometools import get_my_ip
+from mylabotools.mytools import MyTools
 
 from game_dictator import Game
 
@@ -238,10 +239,31 @@ class MyTcpServerFactory(Factory):
         print("Serveur twisted réception TCP sur {}\n".format(TCP_PORT))
 
     def blender_start(self):
+        """
+        Depuis server.py:
+        '/media/data/3D/projets/multipong/multipong_server/game':
+        ['mp.blend'],
+        Depuis run_all.py:
+        '/media/data/3D/projets/multipong/multipong_server/game':
+        ['mp.blend']
+
+        """
         if not self.blender:
-            self.blender = Popen(['blenderplayer', './game/mp.blend'],
-                                              stdout=PIPE)
-            print("Le jeu Blender et lancé")
+
+            # retourne le blend avec son chemin
+            mt = MyTools()
+            root_file = mt.get_absolute_path("./")
+            files = mt.directory_traversal(root_file, ".blend")
+            for k, v in files.items():
+                if "mp.blend" in v:
+                    blend_file = k + "/" + v[0]
+
+            print("Le chemin du blend est:", blend_file)
+            self.blender = Popen([  'blenderplayer',
+                                    blend_file],
+                                    stdout=PIPE)
+
+            print("Blender lancé:", self.blender)
 
     def buildProtocol(self, addr):
         print("Nombre de protocol dans factory", self.numProtocols)

@@ -21,32 +21,14 @@
 #######################################################################
 
 
-__version__ = '0.500'
+__version__ = '0.501'
 
 """
 ne pas oublier de commenter le Window.size
 
 version
+0.501 cleaning
 0.500 acceptable
-0.439 re son
-0.438 avec ogg dans spec
-0.437 avec son
-0.436 décalage corrigé
-0.435 avec images, bug level 3
-0.434 recherche paddle level 3
-0.433 test scr3 propre angle pos text ok
-0.432 scr2 idem scr1
-0.431 sans canvas de mainscreen, avec canvas clear
-0.430 Box pour label à la fin, sans canvas clear
-0.429 sans scr3
-0.428 canvas clear scr2
-0.427 canvas clear scr3
-0.426 box et canvas pour label
-0.425 text size
-0.424 une box en moins
-0.423 un Box en plus pour les label
-0.422 label dans boxlayout
-0.421 verif text score
 """
 
 
@@ -55,22 +37,18 @@ kivy.require('1.10.0')
 
 from kivy.core.window import Window
 # ## Les 3 lignes ci-dessous sont à commenter pour buildozer
-# #k = 1.2
-# #WS = (int(1280*k), int(720*k))
-# #Window.size = WS
+k = 1
+WS = (int(1280*k), int(720*k))
+Window.size = WS
 
 
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.widget import Widget
 from kivy.properties import NumericProperty, ListProperty
-from kivy.properties import ReferenceListProperty
-from kivy.properties import StringProperty, ObjectProperty
-from kivy.config import Config
-from kivy.lang import Builder
+from kivy.properties import StringProperty
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
-
 
 import os
 from time import time

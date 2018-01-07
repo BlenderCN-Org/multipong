@@ -17,20 +17,16 @@ def kivy():
 def always():
     while 1:
         sleep(1)
-        #print("ok")
 
-thread_s = threading.Thread(target=server)
-thread_s.start()
-sleep(0.2)
+# Server et blender
+server()
 
 # Nombre de joueurs
 N = 1
 
 l = []
 for i in range(N):
-    t = threading.Thread(target=kivy)
-    t.start()
-    l.append(t)
+    kivy()
     sleep(0.1)
 
 
