@@ -1,26 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-## once.py
+# once.py
 
-#######################################################################
+# #####################################################################
 # Copyright (C) Labomedia November 2017
 #
 # This file is part of multipong.
 #
-# multipong is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
 #
-# multipong is distributed in the hope that it will be useful,
+# This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with multipong.  If not, see <http://www.gnu.org/licenses/>.
-#######################################################################
+# along with this program; if not, write to the
+# Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# #####################################################################
 
 
 """
@@ -127,6 +129,7 @@ class MulticastClient(DatagramProtocol):
         if "transit" in data:
             gl.transit = data["transit"]
 
+
 def sorted_paddle():
     """Crée une liste avec les paddles des joueurs 0, 1, 2, ....
     gl.paddle_pos = {   'toto': [1.2, 5.6],
@@ -160,7 +163,9 @@ def reset_scores():
             print("Tous les scores = 10")
 
 def datagram_decode(datagram):
-    """Decode la réception qui est des bytes, pour obtenir un dict."""
+    """Decode la réception qui est des bytes, pour obtenir un dict.
+    Ne fonctionne qu'avec un msg contenant un dict.
+    """
 
     try:
         dec = datagram.decode("utf-8")
@@ -282,6 +287,8 @@ def init_tempo():
     gl.tempoDict = Tempo(tempo_liste)
 
 def multicast():
+    """Lance le reator pour multicast"""
+
     reactor.listenMulticast(gl.multi_port, MulticastClient(), listenMultiple=True)
     reactor.run(installSignalHandlers=False)
 

@@ -1,24 +1,26 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################################
+# #####################################################################
 # Copyright (C) Labomedia November 2017
 #
 # This file is part of multipong.
 #
-# multipong is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
 #
-# multipong is distributed in the hope that it will be useful,
+# This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with multipong.  If not, see <http://www.gnu.org/licenses/>.
-#######################################################################
+# along with this program; if not, write to the
+# Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# #####################################################################
 
 
 __version__ = '0.501'
@@ -27,6 +29,7 @@ __version__ = '0.501'
 ne pas oublier de commenter le Window.size
 
 version
+0.502 pour présentation
 0.501 cleaning
 0.500 acceptable
 """
@@ -37,9 +40,9 @@ kivy.require('1.10.0')
 
 from kivy.core.window import Window
 # ## Les 3 lignes ci-dessous sont à commenter pour buildozer
-k = 1
-WS = (int(1280*k), int(720*k))
-Window.size = WS
+# #k = 1
+# #WS = (int(1280*k), int(720*k))
+# #Window.size = WS
 
 
 from kivy.app import App
@@ -71,6 +74,7 @@ from scr3 import Screen3
 from scr4 import Screen4
 from scr5 import Screen5
 from scr6 import Screen6
+
 
 class PongBall(Widget):
     pass
