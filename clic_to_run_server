@@ -1,6 +1,0 @@
-#!/bin/bash
-# -*- coding: UTF-8 -*-
-
-cd multipong_server
-
-python3 server.py

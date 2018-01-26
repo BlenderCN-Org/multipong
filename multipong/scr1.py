@@ -180,9 +180,12 @@ class Screen1(Screen):
     def on_touch_move(self, touch):
         """Capture de la position de touch"""
 
-        x = touch.x
-        y = touch.y
-        self.apply_touch(x, y)
+        try:
+            x = touch.x/self.coef
+            y = touch.y/self.coef
+            self.apply_touch(x, y)
+        except:
+            print("Pb avec on_touch_move")
 
     def apply_touch(self, x, y):
         """Calcul du déplacement de ma paddle."""

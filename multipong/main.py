@@ -23,14 +23,13 @@
 # #####################################################################
 
 
-__version__ = '0.502'
+__version__ = '0.506'
 
 """
 ne pas oublier de commenter le Window.size
 
 version
-0.502 pour présentation
-0.501 cleaning
+0.506 quit en bord d'écran
 0.500 acceptable
 """
 
@@ -40,9 +39,9 @@ kivy.require('1.10.0')
 
 from kivy.core.window import Window
 # ## Les 3 lignes ci-dessous sont à commenter pour buildozer
-k = 1
-WS = (int(1280*k), int(720*k))
-Window.size = WS
+# #k = 1
+# #WS = (int(1280*k), int(720*k))
+# #Window.size = WS
 
 
 from kivy.app import App
