@@ -341,7 +341,9 @@ if __name__ == "__main__":
     endpoint.listen(MyTcpServerFactory())
 
     ## Send: je reçois aussi ce que j'envoie
-    reactor.listenMulticast(MULTICAST_PORT, MyMulticastSender(), listenMultiple=True)
+    reactor.listenMulticast(MULTICAST_PORT,
+                            MyMulticastSender(),
+                            listenMultiple=True)
 
     ## Pour les 2
     reactor.run()

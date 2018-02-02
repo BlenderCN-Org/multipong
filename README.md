@@ -74,11 +74,10 @@ Cliquer sur:
 * [Installation de Kivy](https://wiki.labomedia.org/index.php/2_Kivy:_Installation)
 
 #### Lancement
-
-Modifier le script run_all.py ligne 35 pour définir le nombre de joueurs.
+Cliquer sur:
 
 ~~~text
-python3 run_all.py
+run_game
 ~~~
 
 ### Installation sur android
