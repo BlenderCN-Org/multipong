@@ -47,7 +47,7 @@ Tap sur le apk, il devrait vous annoncer d'autoriser les sources inconnues,
 #### Se connecter sur le même wifi que le serveur
 Au labo, c'est HELLGATE
 
-####Lancer
+#### Lancer
 --> l'icône est **Multi Pong**
 
 ### Kivy, buildozer, python 3.5
@@ -74,6 +74,7 @@ Le Blender Game Engine sert de moteur physique et de visualisation du jeu sur gr
 
 ~~~text
 sudo apt-get install blender
+~~~
 
 #### Installation de mylabotools
 
@@ -86,10 +87,13 @@ Un script sh lance un script python qui est le serveur,
 ce serveur lance le blend avec le blenderplayer.
 
 Cliquer sur:
+
 ~~~text
 run_server
 ~~~
+
 ou
+
 ~~~text
 run_server_optimus
 ~~~
