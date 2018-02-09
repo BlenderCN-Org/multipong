@@ -105,6 +105,8 @@ class Game():
             l = list(self.players.values())
             d =  l[index]
             name = d['name']
+            # suppression des chiffres à la fin
+            name = name[:-5]
             return name
         except:
             return "Isac  Asimov"
@@ -163,9 +165,7 @@ class Game():
             for k, v in self.loser.items():
                 if v == t:
                     # k est le suivant
-                    #print("k", k)
                     k_name = self.get_name_with_index(k)
-                    #print("k_name", k_name)
                     self.classement[k_name] = n
                     n += 1
 

@@ -16,7 +16,7 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,ogg
 
 # (list) List of inclusions using pattern matching
-source.include_patterns = data/*.png, sound/*.ogg
+source.include_patterns = data/*.png, sound/*.ogg, images/*.png
 
 # (list) Source files to exclude (let empty to not exclude anything)
 #source.exclude_exts = spec
@@ -58,19 +58,6 @@ orientation = landscape
 #services = NAME:ENTRYPOINT_TO_PY,NAME2:ENTRYPOINT2_TO_PY
 
 #
-# OSX Specific
-#
-
-#
-# author = © Copyright Info
-
-# change the major version of python used by the app
-osx.python_version = 3
-
-# Kivy version to use
-osx.kivy_version = 1.9.1
-
-#
 # Android specific
 #
 
@@ -103,7 +90,7 @@ android.ndk = 10.3.2
 #android.private_storage = True
 
 # (str) Android NDK directory (if empty, it will be automatically downloaded.)
-android.ndk_path = /home/pierre/crystax-ndk-10.3.2
+android.ndk_path = /media/data/3D/Documents/crystax-ndk-10.3.2
 
 # (str) Android SDK directory (if empty, it will be automatically downloaded.)
 #android.sdk_path =
@@ -220,7 +207,7 @@ android.arch = armeabi-v7a
 [buildozer]
 
 # (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))
-log_level = 2
+log_level = 0
 
 # (int) Display warning if buildozer is run as root (0 = False, 1 = True)
 warn_on_root = 1

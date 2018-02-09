@@ -27,6 +27,25 @@ or send a letter to
     USA
 ~~~
 
+### Installation sur android
+Rechercher 
+~~~text
+wiki labomedia multi pong
+~~~
+
+Vous devriez arriver sur https://wiki.labomedia.org/index.php/Multi_Pong
+
+Télécharger MultiPong-0.506-debug.apk
+
+Sur Android --> Navigateur de fichier --> Dowloads
+
+Tap sur le apk, il devrait vous annoncer d'autoriser les sources inconnues,
+
+--> autoriser les sources inconnues
+--> installer
+--> lancer
+--> l'icône est **Multi Pong**
+
 ### Kivy, buildozer, python 3.5
 
 Construit sur Debian Stretch 9.2
@@ -51,7 +70,6 @@ Le Blender Game Engine sert de moteur physique et de visualisation du jeu sur gr
 
 ~~~text
 sudo apt-get install blender
-~~~
 
 #### Installation de mylabotools
 
@@ -64,8 +82,13 @@ Un script sh lance un script python qui est le serveur,
 ce serveur lance le blend avec le blenderplayer.
 
 Cliquer sur:
-
- clic_to_run_server
+~~~text
+run_server
+~~~
+ou
+~~~text
+run_server_optimus
+~~~
 
 ### Jouer sur un PC pour tester
 
@@ -80,11 +103,7 @@ Cliquer sur:
 run_game
 ~~~
 
-### Installation sur android
-Récupérer le apk sur votre téléphone, l'installer après avoir autorisé les sources inconnues puisque la source est connue !!
-
-### Réception sur Android en Multicast
-
+### Pour info: Réception sur Android en Multicast
 Dans buildozer.spec, définir:
 
 ~~~text
