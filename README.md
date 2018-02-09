@@ -43,7 +43,11 @@ Tap sur le apk, il devrait vous annoncer d'autoriser les sources inconnues,
 
 --> autoriser les sources inconnues
 --> installer
---> lancer
+
+#### Se connecter sur le même wifi que le serveur
+Au labo, c'est HELLGATE
+
+####Lancer
 --> l'icône est **Multi Pong**
 
 ### Kivy, buildozer, python 3.5
