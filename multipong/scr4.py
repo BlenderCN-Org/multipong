@@ -200,6 +200,8 @@ class Screen4(Screen):
             for i in range(len(classement)):
                 for name, rank in classement.items():
                     if rank == i + 1:
+                        if name != "Isac  Asimov":
+                            name = name[:-8]
                         text += ". " + str(i+1) + "  " + name + "\n\n"
 
             self.classement.text = text

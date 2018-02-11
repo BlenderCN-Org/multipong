@@ -23,12 +23,15 @@
 # #####################################################################
 
 
-__version__ = '0.507'
+__version__ = '0.602'
 
 """
 ne pas oublier de commenter le Window.size
 
 version
+0.602 classement 6 ok verif ok
+0.601 window ok
+0.600 user ok, classement ok avec modif sur game_dictator
 0.507 reste bug classement et quelques plantages
 0.506 quit en bord d'écran
 0.500 acceptable
@@ -38,10 +41,10 @@ import kivy
 kivy.require('1.10.0')
 
 from kivy.core.window import Window
-# ## Les 3 lignes ci-dessous sont à commenter pour buildozer
-# #k = 1
-# #WS = (int(1280*k), int(720*k))
-# #Window.size = WS
+# Les 3 lignes ci-dessous sont à commenter pour buildozer
+k = 1
+WS = (int(1280*k), int(720*k))
+Window.size = WS
 
 
 from kivy.app import App
@@ -53,6 +56,7 @@ from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 
 import os
+import getpass
 from time import time
 import json
 import ast
@@ -346,6 +350,8 @@ class Game(Network):
             if "who_are_you" in self.dictat:
                 #print(len(self.dictat["who_are_you"]))
                 combien = len(self.dictat["who_are_you"])
+                if combien > 6:
+                    combien = 6
                 if combien and self.cur_screen:
                     if str(combien) not in self.cur_screen.name:
                         self.scr_manager.current = (str(combien))
@@ -617,9 +623,10 @@ def get_user_id():
     """u0_a73 sur android"""
 
     try:
-        user = os.getlogin()
+        user = getpass.getuser()
+        print("Ton nom est:", user)
         # Ajout de qq chiffre pour distinction en debug sur mon PC
-        user += str(int(100*time()))[-5:]
+        user += str(int(10000* time()))[-8:]
         print("User login:", user)
     except:
         user = "j" + str(int(100*time()))[-8:]

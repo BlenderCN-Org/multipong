@@ -100,50 +100,51 @@ class Game():
                  {'paddle': [ 9.6, 5.3], 'name': 'pierre53'} ]
         """
 
-        # TODO delete try
         try:
             l = list(self.players.values())
             d =  l[index]
             name = d['name']
-            # suppression des chiffres à la fin
-            name = name[:-5]
             return name
         except:
             return "Isac  Asimov"
 
     def update_loser(self):
         """Enregistrement du time des loser dans self.loser
-             joueur1   time    joueur4 ...
-        = {    1:    345.123,   4:       345.457, 3: 363.729}
-
-        players_list = [['pierre', score], ['AI', score]]
-        Il ne faut l'ajouter dans la liste qu'une seule fois
+                        joueur time
+        self.loser = {  0:     345.9,
+                        3:     345.4,
+                        2:     345.8}
+        winner = 1
+        score = [0, 2, 0, 0]
         """
 
         for i in range(len(self.score)):
             if self.score[i] <= 0:
                 # Si pas encore dans le dict
-                if not i+1 in self.loser:
-                    self.loser[i + 1] = time()
+                if not i in self.loser:
+                    self.loser[i] = time()
+                    print("score", self.score)
+                    print("loser", self.loser)
 
     def get_winner(self):
         """ Qui a gagné ? celui qui n'est pas dans loser"""
 
         winner = 0
-        #print("self.loser", self.loser)
+
         loser_nums = list(self.loser.keys())
-        #print("loser_nums", loser_nums)
-        for i in range(len(loser_nums)):
+        # exemple loser_nums [0, 1]
+        print("loser_nums", loser_nums)
+        for i in range(len(loser_nums) + 1):
             if i not in loser_nums:
-                #print(i, "a gagné")
                 winner = i
+        print("winner index", winner)
         return winner
 
     def get_classement(self):
         """retourne le classement dans un dict non ordonné
         le json perd l'ordre
 
-        self.loser = { 0: 345.9, 3: 345.4, 2: 345.8}
+        self.loser = { 1: 345.9, 4: 345.4, 2: 345.8}
         winner_index = 1
         self.classement = {'pierre':1, 'AI':2, 'toi':4,'moi':3}
         blender attend {'toto': 3, 'labomedia': 2, 'gddgsg': 1}
@@ -153,6 +154,7 @@ class Game():
 
         winner_index = self.get_winner()
         winner_name = self.get_name_with_index(winner_index)
+        print("winner_name", winner_name)
         self.classement[winner_name] = 1
 
         time_list = list(self.loser.values())
@@ -166,8 +168,10 @@ class Game():
                 if v == t:
                     # k est le suivant
                     k_name = self.get_name_with_index(k)
+                    print("index k", k, "k_name", k_name)
                     self.classement[k_name] = n
                     n += 1
+        print("classement", self.classement)
 
     def get_match_end(self):
         """Obtenu avec self.score qui vient blender
@@ -192,7 +196,7 @@ class Game():
             self.match_end_tempo = time()
             # Calcul de classement une seule fois
             self.get_classement()
-            #print("Classement", self.classement)
+            print("Classement une seule fois", self.classement)
         else:
             self.match_end = 0
 
@@ -215,6 +219,7 @@ class Game():
             # Le jeu a repris depuis longtemps
             # je peux rescanner les scores
             self.match_end = 0
+            self.loser = {}
 
     def add_data_in_players(self, user, data):
         """Ajoute les datas reçues d'un joueur.
@@ -407,3 +412,21 @@ class Game():
                 print("{} supprimé dans players".format(key))
             except:
                 print("{} vérifié".format(key))
+
+
+'''
+
+score [4, 0, 6]
+loser {1: 1518349369.6317768}
+score [0, 0, 6]
+loser {0: 1518349370.0168114, 1: 1518349369.6317768}
+loser_nums [0, 1]
+winner index 0
+winner_name pierre93581878
+index k 0 k_name pierre93581878
+index k 1 k_name pierre93543224
+classement {'pierre93543224': 3, 'pierre93581878': 2}
+Classement une seule fois {'pierre93543224': 3, 'pierre93581878': 2}
+
+
+'''
